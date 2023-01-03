@@ -79,19 +79,17 @@ fun Output.write(path: Path) {
 fun main() {
     cleanDirectory(Path("inner"))
 
-    OutputDirectory {
-        mapOf(
-            "test-dir" to OutputDirectory {
-                mapOf(
-                    "file.txt" to OutputFile { out ->
-                        out.writer().use {
-                            it.append("test content")
-                        }
-                    }
-                )
-            }
-        )
-    }.write(Path("inner"))
+    markout {
+        directory("docs") {
+            file("EXAMPLE.md", """
+                This is an example
+            """.trimIndent())
+        }
 
-    println("Test")
+        file("README.md", """
+            Markout is a library for generating markdown directories from Kotlin
+            
+            [Example](docs/EXAMPLE.md)
+        """.trimIndent())
+    }
 }
