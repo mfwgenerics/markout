@@ -28,8 +28,8 @@ fun Output.write(path: Path) {
             is OutputDirectory -> {
                 Files.createDirectory(path)
 
-                entries.forEach { (name, output) ->
-                    output().write(path.resolve(name))
+                entries().forEach { (name, output) ->
+                    output.write(path.resolve(name))
                 }
             }
             is OutputFile -> writeTo(Files.newOutputStream(path))
@@ -45,21 +45,19 @@ fun Output.write(path: Path) {
 }
 
 fun main() {
-    OutputDirectory(
+    OutputDirectory {
         mapOf(
-            "test-dir" to {
-                OutputDirectory(
-                    mapOf(
-                        "file.txt" to { OutputFile { out ->
-                            out.writer().use {
-                                it.append("test content")
-                            }
-                        } }
-                    )
+            "test-dir" to OutputDirectory {
+                mapOf(
+                    "file.txt" to OutputFile { out ->
+                        out.writer().use {
+                            it.append("test content")
+                        }
+                    }
                 )
             }
         )
-    ).write(Path("inner"))
+    }.write(Path("inner"))
 
     println("Test")
 }

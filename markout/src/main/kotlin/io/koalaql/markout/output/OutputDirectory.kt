@@ -1,5 +1,5 @@
 package io.koalaql.markout.output
 
-class OutputDirectory(
-    val entries: Map<String, () -> Output>
-): Output
+fun interface OutputDirectory: Output {
+    fun entries(): Map<String, Output>
+}
