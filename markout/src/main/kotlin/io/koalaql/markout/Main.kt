@@ -3,33 +3,37 @@ package io.koalaql.markout
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
-import java.io.IOException
-import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.attribute.BasicFileAttributes
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 
-private const val METADATA_PATH = ".markout"
+private val METADATA_FILE_NAME = Path(".markout")
 
 fun isEmpty(dir: Path) =
     Files.newDirectoryStream(dir).use { directory -> !directory.iterator().hasNext() }
 
+fun validMetadataPath(dir: Path, path: String): Path? {
+    if (path.isBlank()) return null
+
+    return dir
+        .resolve(path)
+        .normalize()
+        .takeIf { it.parent == dir }
+}
+
 /* order is important here: metadata path should be the last to be deleted to allow crash recovery */
 fun metadataPaths(dir: Path): Sequence<Path> =
     try {
-        val metadata = dir.resolve(METADATA_PATH)
+        val metadata = dir.resolve(METADATA_FILE_NAME)
 
         metadata
             .readText()
             .splitToSequence("\n")
-            .filter { it.isNotBlank() }
-            .map { dir.resolve(it) } /* TODO prevent escaping to parent directory */
+            .mapNotNull { validMetadataPath(dir, it) }
             .plusElement(metadata) /* plusElement rather than plus bc Path : Iterable<Path> */
     } catch (ex: NoSuchFileException) {
         emptySequence()
@@ -57,7 +61,7 @@ fun Output.write(path: Path) {
             val entries = entries()
 
             /* write metadata first for graceful crash recovery */
-            path.resolve(METADATA_PATH).writeText(entries.keys.joinToString(
+            path.resolve(METADATA_FILE_NAME).writeText(entries.keys.joinToString(
                 separator = "\n",
                 postfix = "\n"
             ))
@@ -77,7 +81,7 @@ fun Output.write(path: Path) {
 }
 
 fun main() {
-    cleanDirectory(Path("inner"))
+    cleanDirectory(Path(".."))
 
     markout {
         directory("docs") {
