@@ -4,47 +4,81 @@ import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
 import java.io.IOException
-import java.nio.file.*
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
+import java.nio.file.NoSuchFileException
+import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.io.path.Path
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
-fun deleteTree(path: Path) {
-    Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
-        override fun visitFile(file: Path, attrs: BasicFileAttributes?): FileVisitResult {
-            Files.delete(file)
-            return FileVisitResult.CONTINUE
-        }
 
-        override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
-            Files.delete(dir)
-            return FileVisitResult.CONTINUE
+private const val METADATA_PATH = ".markout"
+
+fun isEmpty(dir: Path) =
+    Files.newDirectoryStream(dir).use { directory -> !directory.iterator().hasNext() }
+
+/* order is important here: metadata path should be the last to be deleted to allow crash recovery */
+fun metadataPaths(dir: Path): Sequence<Path> =
+    try {
+        val metadata = dir.resolve(METADATA_PATH)
+
+        metadata
+            .readText()
+            .splitToSequence("\n")
+            .filter { it.isNotBlank() }
+            .map { dir.resolve(it) } /* TODO prevent escaping to parent directory */
+            .plusElement(metadata) /* plusElement rather than plus bc Path : Iterable<Path> */
+    } catch (ex: NoSuchFileException) {
+        emptySequence()
+    }
+
+fun cleanDirectory(dir: Path) {
+    metadataPaths(dir).forEach { path ->
+        if (Files.isDirectory(path)) {
+            cleanDirectory(path)
+
+            if (isEmpty(path)) Files.delete(path)
+        } else {
+            Files.deleteIfExists(path)
         }
-    })
+    }
 }
 
 fun Output.write(path: Path) {
-    fun attempt() {
-        when (this) {
-            is OutputDirectory -> {
+    when (this) {
+        is OutputDirectory -> {
+            if (!Files.isDirectory(path)) {
                 Files.createDirectory(path)
-
-                entries().forEach { (name, output) ->
-                    output.write(path.resolve(name))
-                }
             }
-            is OutputFile -> writeTo(Files.newOutputStream(path))
-        }
-    }
 
-    try {
-        attempt()
-    } catch (ex: IOException) {
-        deleteTree(path)
-        attempt()
+            val entries = entries()
+
+            /* write metadata first for graceful crash recovery */
+            path.resolve(METADATA_PATH).writeText(entries.keys.joinToString(
+                separator = "\n",
+                postfix = "\n"
+            ))
+
+            entries.forEach { (name, output) ->
+                output.write(path.resolve(name))
+            }
+        }
+        is OutputFile -> {
+            check (Files.notExists(path)) {
+                "$path already exists as a user created file"
+            }
+
+            writeTo(Files.newOutputStream(path))
+        }
     }
 }
 
 fun main() {
+    cleanDirectory(Path("inner"))
+
     OutputDirectory {
         mapOf(
             "test-dir" to OutputDirectory {
