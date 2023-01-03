@@ -91,5 +91,5 @@ fun main() {
             
             [Example](docs/EXAMPLE.md)
         """.trimIndent())
-    }
+    }.write(Path(".."))
 }
