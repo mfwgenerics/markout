@@ -1,5 +1,6 @@
 package io.koalaql.markout
 
+import io.koalaql.markout.md.markdown
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
@@ -85,9 +86,13 @@ fun main() {
 
     markout {
         directory("docs") {
-            file("EXAMPLE.md", """
-                This is an example
-            """.trimIndent())
+            markdown("EXAMPLE") {
+                t("This "); i("is"); t(" an example")
+
+                p {
+                    t("Test2")
+                }
+            }
         }
 
         file("README.md", """
