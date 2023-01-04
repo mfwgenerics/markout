@@ -87,11 +87,21 @@ fun main() {
     markout {
         directory("docs") {
             markdown("EXAMPLE") {
+                h1 {
+                    t("Example "); b("Header")
+                }
+
                 t("This "); i("is"); t(" an example")
 
                 p {
                     t("Test2")
                 }
+
+                p {
+                    t("This "); i("is another"); t(" example")
+                }
+
+                code("Test\ntest")
             }
         }
 

@@ -1,56 +1,77 @@
 package io.koalaql.markout.md
 
 import io.koalaql.markout.Markout
+import io.koalaql.markout.MarkoutDsl
 
+private enum class BuilderState {
+    FRESH,
+    INLINE,
+    AFTER_BLOCK
+}
+
+@MarkoutDsl
 fun Markout.markdown(name: String, builder: Markdown.() -> Unit) {
     val sb = StringBuilder()
 
-    object : Markdown {
-        override fun t(text: String) {
-            sb.append(text)
-        }
-
+    class MarkdownImpl(
+        var state: BuilderState = BuilderState.FRESH
+    ) : Markdown {
         override fun t(line: MarkdownInline.() -> Unit) {
-            TODO("Not yet implemented")
+            if (state == BuilderState.AFTER_BLOCK) sb.append("\n\n")
+
+            state = BuilderState.INLINE
+
+            this.line()
         }
 
-        override fun i(block: Markdown.() -> Unit) {
+        override fun t(text: String) =
+            t { sb.append(text) }
+
+        override fun i(block: MarkdownInline.() -> Unit) = t {
             sb.append("*")
             this.block()
             sb.append("*")
         }
 
-        override fun b(block: Markdown.() -> Unit) {
+        override fun b(block: MarkdownInline.() -> Unit) = t {
             sb.append("**")
             this.block()
             sb.append("**")
-        }
-
-        override fun h1(block: MarkdownInline.() -> Unit) {
-            sb.append("#")
-            this.block()
-        }
-
-        override fun h2(block: MarkdownInline.() -> Unit) {
-            sb.append("##")
-            this.block()
-        }
-
-        override fun h3(block: MarkdownInline.() -> Unit) {
-            sb.append("###")
-            this.block()
         }
 
         override fun p(block: MarkdownBlock.() -> Unit) {
-            TODO("Not yet implemented")
+            if (state == BuilderState.AFTER_BLOCK || state == BuilderState.INLINE) {
+                sb.append("\n\n")
+            }
+
+            MarkdownImpl(BuilderState.FRESH).block()
+
+            state = BuilderState.AFTER_BLOCK
+        }
+
+        override fun h1(block: MarkdownInline.() -> Unit) = p {
+            sb.append("# ")
+            this.block()
+        }
+
+        override fun h2(block: MarkdownInline.() -> Unit) = p {
+            sb.append("## ")
+            this.block()
+        }
+
+        override fun h3(block: MarkdownInline.() -> Unit) = p {
+            sb.append("### ")
+            this.block()
         }
 
         override fun quote(block: Markdown.() -> Unit) {
             TODO("Not yet implemented")
         }
 
-        override fun code(code: String) {
-            TODO("Not yet implemented")
+        override fun code(code: String) = p {
+            sb.append("```\n")
+            sb.append(code)
+            sb.append("\n```")
         }
 
         override fun ol(builder: MarkdownList.() -> Unit) {
@@ -60,7 +81,9 @@ fun Markout.markdown(name: String, builder: Markdown.() -> Unit) {
         override fun ul(builder: MarkdownList.() -> Unit) {
             TODO("Not yet implemented")
         }
-    }.builder()
+    }
+
+    MarkdownImpl(BuilderState.FRESH).builder()
 
     file("$name.md", "$sb")
 }

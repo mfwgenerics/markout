@@ -4,8 +4,11 @@ import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
 
+@MarkoutDsl
 interface Markout {
+    @MarkoutDsl
     fun directory(name: String, builder: Markout.() -> Unit)
+    @MarkoutDsl
     fun file(name: String, contents: String)
 }
 
