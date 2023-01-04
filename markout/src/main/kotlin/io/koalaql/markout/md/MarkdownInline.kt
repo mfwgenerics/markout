@@ -2,6 +2,7 @@ package io.koalaql.markout.md
 
 import io.koalaql.markout.MarkoutDsl
 
+@MarkoutDsl
 interface MarkdownInline {
     @MarkoutDsl
     fun t(text: String)

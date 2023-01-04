@@ -2,6 +2,7 @@ package io.koalaql.markout.md
 
 import io.koalaql.markout.MarkoutDsl
 
+@MarkoutDsl
 interface MarkdownBlock: MarkdownInline {
     @MarkoutDsl
     fun quote(block: Markdown.() -> Unit)
