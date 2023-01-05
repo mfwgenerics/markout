@@ -45,7 +45,7 @@ class MarkdownBuilder(
         this@MarkdownBuilder.append("**")
     }
 
-    override fun p(block: MarkdownBlock.() -> Unit) {
+    override fun p(block: MarkdownInline.() -> Unit) {
         if (state == BuilderState.AFTER_BLOCK || state == BuilderState.INLINE) {
             this@MarkdownBuilder.append("\n\n")
         }
