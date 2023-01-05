@@ -8,6 +8,9 @@ interface MarkdownInline {
     fun t(text: String)
 
     @MarkoutDsl
+    fun c(text: String)
+
+    @MarkoutDsl
     fun t(line: MarkdownInline.() -> Unit)
 
     @MarkoutDsl
