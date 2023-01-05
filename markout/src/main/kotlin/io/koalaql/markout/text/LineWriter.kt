@@ -1,8 +1,8 @@
 package io.koalaql.markout.text
 
 interface LineWriter {
-    fun prefixed(prefix: String): LineWriter =
-        PrefixedLineWriter(this, prefix)
+    fun prefixed(prefix: String, start: Boolean = true): LineWriter =
+        PrefixedLineWriter(this, prefix, start)
 
     fun inline(text: String)
     fun newline()

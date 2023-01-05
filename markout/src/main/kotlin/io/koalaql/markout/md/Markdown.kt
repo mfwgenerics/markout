@@ -33,7 +33,7 @@ interface Markdown: MarkdownInline {
     fun code(code: String)
 
     @MarkoutDsl
-    fun ol(builder: MarkdownList.() -> Unit)
+    fun ol(builder: MarkdownNumberedList.() -> Unit)
     @MarkoutDsl
-    fun ul(builder: MarkdownList.() -> Unit)
+    fun ul(builder: MarkdownDottedList.() -> Unit)
 }

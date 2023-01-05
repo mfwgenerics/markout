@@ -2,14 +2,13 @@ package io.koalaql.markout.text
 
 class PrefixedLineWriter(
     private val of: LineWriter,
-    private val prefix: String
+    private val prefix: String,
+    private var start: Boolean = true
 ): LineWriter {
-    private var sol = true
-
     private fun emit() {
-        if (sol) {
+        if (start) {
             of.inline(prefix)
-            sol = false
+            start = false
         }
     }
 
@@ -23,6 +22,6 @@ class PrefixedLineWriter(
     override fun newline() {
         emit()
         of.newline()
-        sol = true
+        start = true
     }
 }
