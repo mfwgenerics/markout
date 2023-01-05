@@ -22,7 +22,4 @@ interface MarkdownInline {
     fun i(text: String) = i { t(text) }
     @MarkoutDsl
     fun b(text: String) = b { t(text) }
-
-    @MarkoutDsl
-    fun code(code: String)
 }

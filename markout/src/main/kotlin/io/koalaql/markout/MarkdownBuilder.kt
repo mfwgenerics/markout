@@ -1,15 +1,21 @@
 package io.koalaql.markout
 
 import io.koalaql.markout.md.*
+import io.koalaql.markout.text.LineWriter
 
 class MarkdownBuilder(
-    private var state: BuilderState = BuilderState.FRESH,
-    private val append: (String) -> Unit
+    private val writer: LineWriter
 ) : Markdown {
-    enum class BuilderState {
+    private enum class BuilderState {
         FRESH,
         INLINE,
         AFTER_BLOCK
+    }
+
+    private var state: BuilderState = BuilderState.FRESH
+
+    private fun append(text: String) {
+        writer.raw(text)
     }
 
     override fun t(line: MarkdownInline.() -> Unit) {
@@ -44,7 +50,7 @@ class MarkdownBuilder(
             this@MarkdownBuilder.append("\n\n")
         }
 
-        MarkdownBuilder(BuilderState.FRESH, append).block()
+        MarkdownBuilder(writer).block()
 
         state = BuilderState.AFTER_BLOCK
     }
@@ -64,8 +70,8 @@ class MarkdownBuilder(
         this.block()
     }
 
-    override fun quote(block: Markdown.() -> Unit) {
-        TODO("Not yet implemented")
+    override fun quote(block: Markdown.() -> Unit) = p {
+        MarkdownBuilder(this@MarkdownBuilder.writer.prefixed("> ")).block()
     }
 
     override fun code(code: String) = p {

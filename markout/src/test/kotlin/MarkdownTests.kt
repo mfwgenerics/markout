@@ -39,4 +39,43 @@ class MarkdownTests {
             }
         )
     }
+
+    @Test
+    fun `code blocks in quotes`() {
+        assertEquals(
+            """
+            non-quote
+
+            > Quote
+            > 
+            > > nested quote
+            > 
+            > > quote with `code` in it
+            > > 
+            > > ```
+            > > Multi
+            > > Line
+            > > Code
+            > > Block
+            > > ```
+            """.trimIndent(),
+            markdownString {
+                p {
+                    t("non-quote")
+                }
+
+                quote {
+                    t("Quote")
+
+                    quote("nested quote")
+
+                    quote {
+                        t("quote with "); c("code"); t(" in it")
+
+                        code("Multi\nLine\nCode\nBlock")
+                    }
+                }
+            }
+        )
+    }
 }

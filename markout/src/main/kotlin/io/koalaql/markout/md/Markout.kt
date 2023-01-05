@@ -3,11 +3,12 @@ package io.koalaql.markout.md
 import io.koalaql.markout.MarkdownBuilder
 import io.koalaql.markout.Markout
 import io.koalaql.markout.MarkoutDsl
+import io.koalaql.markout.text.AppendableLineWriter
 
 fun markdownString(builder: Markdown.() -> Unit): String {
     val sb = StringBuilder()
 
-    MarkdownBuilder { sb.append(it) }.builder()
+    MarkdownBuilder(AppendableLineWriter(sb)).builder()
 
     return "$sb"
 }

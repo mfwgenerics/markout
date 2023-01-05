@@ -11,6 +11,9 @@ interface MarkdownBlock: MarkdownInline {
     fun quote(text: String) = quote { t(text) }
 
     @MarkoutDsl
+    fun code(code: String)
+
+    @MarkoutDsl
     fun ol(builder: MarkdownList.() -> Unit)
     @MarkoutDsl
     fun ul(builder: MarkdownList.() -> Unit)
