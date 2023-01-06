@@ -54,4 +54,7 @@ interface Markdown: MarkdownInline {
     fun ul(builder: MarkdownDottedList.() -> Unit)
     @MarkoutDsl
     fun cl(builder: MarkdownCheckList.() -> Unit)
+
+    @MarkoutDsl
+    fun table(builder: MarkdownTable.() -> Unit)
 }

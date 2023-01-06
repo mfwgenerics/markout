@@ -1,6 +1,7 @@
 package io.koalaql.markout
 
 import io.koalaql.markout.md.*
+import io.koalaql.markout.text.AppendableLineWriter
 import io.koalaql.markout.text.LineWriter
 
 class MarkdownBuilder(
@@ -164,5 +165,73 @@ class MarkdownBuilder(
 
             MarkdownBuilder(writer.prefixed("      ", start = false), citations).block()
         }.builder()
+    }
+
+    private class Row(
+        val cells: List<String>,
+        val pad: String
+    )
+
+    override fun table(builder: MarkdownTable.() -> Unit) {
+        val rows = arrayListOf<Row>()
+
+        val lengths = arrayListOf<Int>()
+
+        fun row(cells: List<String>, pad: String) {
+            if (cells.isEmpty()) return
+
+            cells.forEachIndexed { ix, it ->
+                /* TODO something less ASCII-brained than String.length? */
+                if (lengths.size == ix) {
+                    lengths.add(it.length)
+                } else {
+                    lengths[ix] = maxOf(lengths[ix], it.length)
+                }
+            }
+
+            rows.add(Row(cells, pad))
+        }
+
+        fun cells(row: MarkdownTableRow.() -> Unit): List<String> = arrayListOf<String>().apply {
+            MarkdownTableRow {
+                val sb = StringBuilder()
+                MarkdownBuilder(AppendableLineWriter(sb), citations).it()
+                add("$sb")
+            }.row()
+        }
+
+        object : MarkdownTable {
+            override fun th(row: MarkdownTableRow.() -> Unit) {
+                val cells = cells(row)
+
+                row(cells, " ")
+                row(cells.map { "---" }, "-")
+            }
+
+            override fun tr(row: MarkdownTableRow.() -> Unit) {
+                row(cells(row), " ")
+            }
+        }.builder()
+
+        if (rows.isNotEmpty()) blocked {
+            var first = true
+
+            rows.forEach { row ->
+                if (!first) {
+                    writer.newline()
+                } else {
+                    first = false
+                }
+
+                writer.inline("|")
+
+                row.cells.forEachIndexed { ix, it ->
+                    writer.inline(" ")
+                    writer.inline(it)
+                    writer.inline(row.pad.repeat(lengths[ix] - it.length))
+                    writer.inline(" |")
+                }
+            }
+        }
     }
 }

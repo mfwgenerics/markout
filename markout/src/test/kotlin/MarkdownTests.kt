@@ -245,4 +245,51 @@ class MarkdownTests {
             }
         )
     }
+
+    @Test
+    fun `tables with references`() {
+        assertEquals(
+            """
+            # Table
+
+            | Header 1                                                | Header 2          |
+            | ------------------------------------------------------- | ----------------- |
+            | Cell 1                                                  | *Italicized cell* |
+            | [Very long cell name that also links to a reference][1] | Cell 2            |
+
+            # More compact table
+
+            | Cell 1     | *icell* |
+            | [Short][1] | Cell 2  |
+
+            [1]: https://example.com
+            """.trimIndent(),
+            markdownString {
+                h1("Table")
+
+                table {
+                    th { td("Header 1"); td("Header 2") }
+                    tr { td("Cell 1"); td { i("Italicized cell") } }
+                    tr {
+                        td {
+                            a(cite("https://example.com"), "Very long cell name that also links to a reference")
+                        }
+                        td("Cell 2");
+                    }
+                }
+
+                h1("More compact table")
+
+                table {
+                    tr { td("Cell 1"); td { i("icell") } }
+                    tr {
+                        td {
+                            a(cite("https://example.com"), "Short")
+                        }
+                        td("Cell 2");
+                    }
+                }
+            }
+        )
+    }
 }
