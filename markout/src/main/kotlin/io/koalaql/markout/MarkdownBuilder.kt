@@ -107,15 +107,16 @@ class MarkdownBuilder(
         MarkdownBuilder(writer.prefixed("> "), citations).block()
     }
 
-    override fun code(code: String) = blocked {
+    override fun code(lang: String, code: String) = blocked {
         writer.inline("```")
+        writer.inline(lang)
         writer.newline()
         writer.raw(code)
         writer.newline()
         writer.inline("```")
     }
 
-    override fun ol(builder: MarkdownNumberedList.() -> Unit) {
+    override fun ol(builder: MarkdownNumberedList.() -> Unit) = blocked {
         var first = true
         var next = 1
         var prefix = ""

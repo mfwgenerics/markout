@@ -9,6 +9,9 @@ plugins {
 }
 
 dependencies {
+    /* deliberately include runtime without plugin */
+    implementation("io.koalaql:kapshot-runtime:0.0.2")
+
     api(kotlin("reflect"))
 
     testImplementation(kotlin("test"))
