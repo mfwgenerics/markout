@@ -149,4 +149,16 @@ class MarkdownBuilder(
             MarkdownBuilder(writer.prefixed("  ", start = false), citations).block()
         }.builder()
     }
+
+    override fun cl(builder: MarkdownCheckList.() -> Unit) = blocked {
+        var first = true
+
+        MarkdownCheckList { checked, block ->
+            if (!first) writer.newline()
+            writer.inline(if (checked) "- [x] " else "- [ ] ")
+            first = false
+
+            MarkdownBuilder(writer.prefixed("      ", start = false), citations).block()
+        }.builder()
+    }
 }

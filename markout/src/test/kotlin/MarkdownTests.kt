@@ -181,6 +181,28 @@ class MarkdownTests {
     }
 
     @Test
+    fun `check lists`() {
+        assertEquals(
+            """
+            Checklists!
+
+            - [x] Task 1
+            - [x] Task *2*?
+            - [ ] Task 3
+            """.trimIndent(),
+            markdownString {
+                t("Checklists!")
+
+                cl {
+                    li(true, "Task 1")
+                    li(true) { t("Task "); i("2"); t("?") }
+                    li(false, "Task 3")
+                }
+            }
+        )
+    }
+
+    @Test
     fun `links and citations`() {
         assertEquals(
             """
