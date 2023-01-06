@@ -4,7 +4,8 @@ import io.koalaql.markout.md.*
 import io.koalaql.markout.text.LineWriter
 
 class MarkdownBuilder(
-    private val writer: LineWriter
+    private val writer: LineWriter,
+    private val citations: MutableMap<String, Citation>
 ) : Markdown {
     private enum class BuilderState {
         FRESH,
@@ -13,6 +14,22 @@ class MarkdownBuilder(
     }
 
     private var state: BuilderState = BuilderState.FRESH
+
+    override fun cite(href: String, title: String?): Citation {
+        val sb = StringBuilder()
+
+        sb.append(href)
+
+        if (title != null) {
+            sb.append(" \"")
+            sb.append(title)
+            sb.append("\"")
+        }
+
+        return citations.getOrPut("$sb") {
+            Citation("[${citations.size + 1}]")
+        }
+    }
 
     private fun inlined(line: MarkdownBuilder.() -> Unit) {
         if (state == BuilderState.AFTER_BLOCK) {
@@ -33,7 +50,7 @@ class MarkdownBuilder(
 
         state = BuilderState.AFTER_BLOCK
 
-        MarkdownBuilder(writer).block()
+        MarkdownBuilder(writer, citations).block()
     }
 
     override fun t(line: MarkdownInline.() -> Unit) = inlined(line)
@@ -41,6 +58,21 @@ class MarkdownBuilder(
     override fun t(text: String) = inlined { writer.raw(text) }
 
     override fun c(text: String) = inlined { writer.raw("`$text`") }
+
+    private fun link(href: String, line: MarkdownInline.() -> Unit) = inlined {
+        writer.inline("[")
+        line()
+        writer.inline("]")
+        writer.inline(href)
+    }
+
+    override fun a(href: String, line: MarkdownInline.() -> Unit) {
+        link("($href)", line)
+    }
+
+    override fun a(href: Citation, line: MarkdownInline.() -> Unit) {
+        link(href.label, line)
+    }
 
     override fun i(block: MarkdownInline.() -> Unit) = inlined {
         writer.inline("*")
@@ -72,7 +104,7 @@ class MarkdownBuilder(
     }
 
     override fun quote(block: Markdown.() -> Unit) = blocked {
-        MarkdownBuilder(writer.prefixed("> ")).block()
+        MarkdownBuilder(writer.prefixed("> "), citations).block()
     }
 
     override fun code(code: String) = blocked {
@@ -101,7 +133,7 @@ class MarkdownBuilder(
 
             next++
 
-            MarkdownBuilder(writer.prefixed(prefix, start = false)).block()
+            MarkdownBuilder(writer.prefixed(prefix, start = false), citations).block()
         }.builder()
     }
 
@@ -113,7 +145,7 @@ class MarkdownBuilder(
             writer.inline("* ")
             first = false
 
-            MarkdownBuilder(writer.prefixed("  ", start = false)).block()
+            MarkdownBuilder(writer.prefixed("  ", start = false), citations).block()
         }.builder()
     }
 }

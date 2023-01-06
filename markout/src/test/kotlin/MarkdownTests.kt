@@ -179,4 +179,48 @@ class MarkdownTests {
             }
         )
     }
+
+    @Test
+    fun `links and citations`() {
+        assertEquals(
+            """
+            # Link *in* [Header](https://example.com)
+
+            > How about a [reference style link][1]
+
+            [same reference style link again (should dedup)][1]
+
+            [won't dedup][2]
+
+            > [will dedup][2]
+            > 
+            > [won't dedup][3]
+
+            [1]: https://example.com/something
+            [2]: https://example.com/something "Something1"
+            [3]: https://example.com/something "Something 2"
+            """.trimIndent(),
+            markdownString {
+                h1 {
+                    t("Link "); i("in"); t(" "); a("https://example.com", "Header")
+                }
+
+                quote {
+                    t("How about a ")
+                    a(cite("https://example.com/something"), "reference style link")
+                }
+
+                p {
+                    a(cite("https://example.com/something"), "same reference style link again (should dedup)")
+                }
+
+                p { a(cite("https://example.com/something", "Something1"), "won't dedup") }
+
+                quote {
+                    p { a(cite("https://example.com/something", "Something1"), "will dedup") }
+                    p { a(cite("https://example.com/something", "Something 2"), "won't dedup") }
+                }
+            }
+        )
+    }
 }

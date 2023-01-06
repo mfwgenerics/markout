@@ -5,10 +5,23 @@ import io.koalaql.markout.MarkoutDsl
 @MarkoutDsl
 interface MarkdownInline {
     @MarkoutDsl
+    fun cite(href: String, title: String? = null): Citation
+
+    @MarkoutDsl
     fun t(text: String)
 
     @MarkoutDsl
     fun c(text: String)
+
+    @MarkoutDsl
+    fun a(href: String, line: MarkdownInline.() -> Unit)
+    @MarkoutDsl
+    fun a(href: Citation, line: MarkdownInline.() -> Unit)
+
+    @MarkoutDsl
+    fun a(href: String, text: String) = a(href) { t(text) }
+    @MarkoutDsl
+    fun a(href: Citation, text: String) = a(href) { t(text) }
 
     @MarkoutDsl
     fun t(line: MarkdownInline.() -> Unit)

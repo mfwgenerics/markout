@@ -7,8 +7,19 @@ import io.koalaql.markout.text.AppendableLineWriter
 
 fun markdownString(builder: Markdown.() -> Unit): String {
     val sb = StringBuilder()
+    val cites = linkedMapOf<String, Citation>()
 
-    MarkdownBuilder(AppendableLineWriter(sb)).builder()
+    MarkdownBuilder(AppendableLineWriter(sb), cites).builder()
+
+    if (cites.isNotEmpty()) {
+        sb.append("\n")
+        cites.forEach { (key, cite) ->
+            sb.append("\n")
+            sb.append(cite.label)
+            sb.append(": ")
+            sb.append(key)
+        }
+    }
 
     return "$sb"
 }
