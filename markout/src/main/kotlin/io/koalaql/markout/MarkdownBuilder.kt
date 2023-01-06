@@ -88,6 +88,10 @@ class MarkdownBuilder(
 
     override fun p(block: MarkdownInline.() -> Unit) = blocked(block)
 
+    override fun hr() = blocked {
+        writer.inline("---")
+    }
+
     override fun h1(block: MarkdownInline.() -> Unit) = blocked {
         writer.inline("# ")
         block()

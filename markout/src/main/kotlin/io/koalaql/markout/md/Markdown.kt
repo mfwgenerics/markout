@@ -25,6 +25,9 @@ interface Markdown: MarkdownInline {
     fun p(text: String) = p { t(text) }
 
     @MarkoutDsl
+    fun hr()
+
+    @MarkoutDsl
     fun quote(block: Markdown.() -> Unit)
 
     @MarkoutDsl
