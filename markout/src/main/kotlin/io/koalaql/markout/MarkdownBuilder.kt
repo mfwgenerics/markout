@@ -87,6 +87,12 @@ class MarkdownBuilder(
         writer.inline("**")
     }
 
+    override fun s(block: MarkdownInline.() -> Unit) = inlined {
+        writer.inline("~~")
+        block()
+        writer.inline("~~")
+    }
+
     override fun p(block: MarkdownInline.() -> Unit) = blocked(block)
 
     override fun hr() = blocked {

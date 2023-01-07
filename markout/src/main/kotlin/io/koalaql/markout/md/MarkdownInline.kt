@@ -30,9 +30,13 @@ interface MarkdownInline {
     fun i(block: MarkdownInline.() -> Unit)
     @MarkoutDsl
     fun b(block: MarkdownInline.() -> Unit)
+    @MarkoutDsl
+    fun s(block: MarkdownInline.() -> Unit)
 
     @MarkoutDsl
     fun i(text: String) = i { t(text) }
     @MarkoutDsl
     fun b(text: String) = b { t(text) }
+    @MarkoutDsl
+    fun s(text: String) = s { t(text) }
 }
