@@ -8,6 +8,11 @@ interface MarkdownInline {
     fun cite(href: String, title: String? = null): Citation
 
     @MarkoutDsl
+    fun footnote(note: Markdown.() -> Unit)
+    @MarkoutDsl
+    fun footnote(note: String) = footnote { t(note) }
+
+    @MarkoutDsl
     fun t(text: String)
 
     @MarkoutDsl

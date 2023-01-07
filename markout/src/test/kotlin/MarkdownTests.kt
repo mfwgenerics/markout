@@ -292,4 +292,56 @@ class MarkdownTests {
             }
         )
     }
+
+    @Test
+    fun `footnotes with references`() {
+        assertEquals(
+            """
+            test[^1]
+            
+            this isn't a [footnote][1][^2][^3]
+            
+            [^1]: Test note
+            [^2]: complex footnote that references [^4] ~~another footnote~~
+                  
+                  also it has multiple paragraphs and a [link][1]
+                  
+                  > and quoted text
+            [^3]: [the link is deduped in this last footnote][1]
+            [^4]: Example footnote
+            
+            [1]: https://example.com
+            """.trimIndent(),
+            markdownString {
+                p {
+                    t("test"); footnote("Test note")
+                }
+
+                t("this isn't a ")
+                a(cite("https://example.com"), "footnote")
+
+                footnote {
+                    p {
+                        t("complex footnote that references ");
+                        footnote("Example footnote")
+                        t(" ")
+                        s("another footnote")
+                    }
+
+                    p {
+                        t("also it has multiple paragraphs and a ")
+                        a(cite("https://example.com"), "link")
+                    }
+
+                    quote {
+                        t("and quoted text")
+                    }
+                }
+
+                footnote {
+                    a(cite("https://example.com"), "the link is deduped in this last footnote")
+                }
+            }
+        )
+    }
 }

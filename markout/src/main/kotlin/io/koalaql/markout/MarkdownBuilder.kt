@@ -6,7 +6,7 @@ import io.koalaql.markout.text.LineWriter
 
 class MarkdownBuilder(
     private val writer: LineWriter,
-    private val citations: MutableMap<String, Citation>
+    private val bibliography: Bibliography = Bibliography()
 ) : Markdown {
     private enum class BuilderState {
         FRESH,
@@ -27,9 +27,11 @@ class MarkdownBuilder(
             sb.append("\"")
         }
 
-        return citations.getOrPut("$sb") {
-            Citation("[${citations.size + 1}]")
-        }
+        return bibliography.reference("$sb")
+    }
+
+    override fun footnote(note: Markdown.() -> Unit) = inlined {
+        writer.inline(bibliography.footnote(note))
     }
 
     private fun inlined(line: MarkdownBuilder.() -> Unit) {
@@ -51,7 +53,7 @@ class MarkdownBuilder(
 
         state = BuilderState.AFTER_BLOCK
 
-        MarkdownBuilder(writer, citations).block()
+        MarkdownBuilder(writer, bibliography).block()
     }
 
     override fun t(line: MarkdownInline.() -> Unit) = inlined(line)
@@ -115,7 +117,7 @@ class MarkdownBuilder(
     }
 
     override fun quote(block: Markdown.() -> Unit) = blocked {
-        MarkdownBuilder(writer.prefixed("> "), citations).block()
+        MarkdownBuilder(writer.prefixed("> "), bibliography).block()
     }
 
     override fun code(lang: String, code: String) = blocked {
@@ -145,7 +147,7 @@ class MarkdownBuilder(
 
             next++
 
-            MarkdownBuilder(writer.prefixed(prefix, start = false), citations).block()
+            MarkdownBuilder(writer.prefixed(prefix, start = false), bibliography).block()
         }.builder()
     }
 
@@ -157,7 +159,7 @@ class MarkdownBuilder(
             writer.inline("* ")
             first = false
 
-            MarkdownBuilder(writer.prefixed("  ", start = false), citations).block()
+            MarkdownBuilder(writer.prefixed("  ", start = false), bibliography).block()
         }.builder()
     }
 
@@ -169,7 +171,7 @@ class MarkdownBuilder(
             writer.inline(if (checked) "- [x] " else "- [ ] ")
             first = false
 
-            MarkdownBuilder(writer.prefixed("      ", start = false), citations).block()
+            MarkdownBuilder(writer.prefixed("      ", start = false), bibliography).block()
         }.builder()
     }
 
@@ -201,7 +203,7 @@ class MarkdownBuilder(
         fun cells(row: MarkdownTableRow.() -> Unit): List<String> = arrayListOf<String>().apply {
             MarkdownTableRow {
                 val sb = StringBuilder()
-                MarkdownBuilder(AppendableLineWriter(sb), citations).it()
+                MarkdownBuilder(AppendableLineWriter(sb), bibliography).it()
                 add("$sb")
             }.row()
         }
@@ -237,6 +239,42 @@ class MarkdownBuilder(
                     writer.inline(row.pad.repeat(lengths[ix] - it.length))
                     writer.inline(" |")
                 }
+            }
+        }
+    }
+
+    fun footer() {
+        val footnotes = bibliography.footnotes
+        val references = bibliography.references
+
+        if (footnotes.isNotEmpty()) {
+            writer.newline()
+
+            var i = 0
+
+            while (i < footnotes.size) {
+                /* no forEach - list may be appended to during loop */
+
+                val (label, write) = footnotes[i++]
+
+                writer.newline()
+                writer.inline(label)
+                writer.inline(": ")
+
+                val indent = " ".repeat(label.length + 2)
+
+                MarkdownBuilder(writer.prefixed(indent, start = false), bibliography).write()
+            }
+        }
+
+        if (references.isNotEmpty()) {
+            writer.newline()
+
+            references.forEach { (reference, cite) ->
+                writer.newline()
+                writer.inline(cite.label)
+                writer.inline(": ")
+                writer.inline(reference)
             }
         }
     }
