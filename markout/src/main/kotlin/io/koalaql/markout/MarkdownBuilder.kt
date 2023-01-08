@@ -101,33 +101,9 @@ class MarkdownBuilder(
         writer.inline("---")
     }
 
-    override fun h1(block: MarkdownInline.() -> Unit) = blocked {
-        writer.inline("# ")
-        block()
-    }
-
-    override fun h2(block: MarkdownInline.() -> Unit) = blocked {
-        writer.inline("## ")
-        block()
-    }
-
-    override fun h3(block: MarkdownInline.() -> Unit) = blocked {
-        writer.inline("### ")
-        block()
-    }
-
-    override fun h4(block: MarkdownInline.() -> Unit) = blocked {
-        writer.inline("#### ")
-        block()
-    }
-
-    override fun h5(block: MarkdownInline.() -> Unit) = blocked {
-        writer.inline("##### ")
-        block()
-    }
-
-    override fun h6(block: MarkdownInline.() -> Unit) = blocked {
-        writer.inline("###### ")
+    override fun h(level: Int, block: MarkdownInline.() -> Unit) = blocked {
+        writer.inline("#".repeat(level))
+        writer.inline(" ")
         block()
     }
 

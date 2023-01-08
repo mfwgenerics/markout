@@ -6,17 +6,20 @@ import io.koalaql.markout.MarkoutDsl
 @MarkoutDsl
 interface Markdown: MarkdownInline {
     @MarkoutDsl
-    fun h1(block: MarkdownInline.() -> Unit)
+    fun h(level: Int, block: MarkdownInline.() -> Unit)
+
     @MarkoutDsl
-    fun h2(block: MarkdownInline.() -> Unit)
+    fun h1(block: MarkdownInline.() -> Unit) = h(1, block)
     @MarkoutDsl
-    fun h3(block: MarkdownInline.() -> Unit)
+    fun h2(block: MarkdownInline.() -> Unit) = h(2, block)
     @MarkoutDsl
-    fun h4(block: MarkdownInline.() -> Unit)
+    fun h3(block: MarkdownInline.() -> Unit) = h(3, block)
     @MarkoutDsl
-    fun h5(block: MarkdownInline.() -> Unit)
+    fun h4(block: MarkdownInline.() -> Unit) = h(4, block)
     @MarkoutDsl
-    fun h6(block: MarkdownInline.() -> Unit)
+    fun h5(block: MarkdownInline.() -> Unit) = h(5, block)
+    @MarkoutDsl
+    fun h6(block: MarkdownInline.() -> Unit) = h(6, block)
 
     @MarkoutDsl
     fun h1(text: String) = h1 { t(text) }
