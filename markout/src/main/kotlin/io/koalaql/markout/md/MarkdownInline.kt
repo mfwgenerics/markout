@@ -15,6 +15,8 @@ interface MarkdownInline {
     @MarkoutDsl
     fun t(text: String)
 
+    operator fun String.unaryPlus() = t(this)
+
     @MarkoutDsl
     fun c(text: String)
 

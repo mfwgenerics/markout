@@ -1,6 +1,12 @@
+# Markout
+
 Markout is a library for generating markdown files and directories from Kotlin
 
-# Example
+## Syntax
+
+1. [Basic Syntax](docs/BASIC.md)
+
+## Example
 
 ```kotlin
 h1 { t("Hello "); b("Markout!") }

@@ -11,6 +11,12 @@ interface Markdown: MarkdownInline {
     fun h2(block: MarkdownInline.() -> Unit)
     @MarkoutDsl
     fun h3(block: MarkdownInline.() -> Unit)
+    @MarkoutDsl
+    fun h4(block: MarkdownInline.() -> Unit)
+    @MarkoutDsl
+    fun h5(block: MarkdownInline.() -> Unit)
+    @MarkoutDsl
+    fun h6(block: MarkdownInline.() -> Unit)
 
     @MarkoutDsl
     fun h1(text: String) = h1 { t(text) }
@@ -18,6 +24,12 @@ interface Markdown: MarkdownInline {
     fun h2(text: String) = h2 { t(text) }
     @MarkoutDsl
     fun h3(text: String) = h3 { t(text) }
+    @MarkoutDsl
+    fun h4(text: String) = h4 { t(text) }
+    @MarkoutDsl
+    fun h5(text: String) = h5 { t(text) }
+    @MarkoutDsl
+    fun h6(text: String) = h6 { t(text) }
 
     @MarkoutDsl
     fun p(block: MarkdownInline.() -> Unit)
@@ -46,7 +58,7 @@ interface Markdown: MarkdownInline {
     }
 
     @MarkoutDsl
-    fun <T> code(code: CapturedBlock<T>): T = code("", code)
+    fun <T> code(code: CapturedBlock<T>): T = code("kotlin", code)
 
     @MarkoutDsl
     fun ol(builder: MarkdownNumberedList.() -> Unit)

@@ -116,17 +116,37 @@ class MarkdownBuilder(
         block()
     }
 
+    override fun h4(block: MarkdownInline.() -> Unit) = blocked {
+        writer.inline("#### ")
+        block()
+    }
+
+    override fun h5(block: MarkdownInline.() -> Unit) = blocked {
+        writer.inline("##### ")
+        block()
+    }
+
+    override fun h6(block: MarkdownInline.() -> Unit) = blocked {
+        writer.inline("###### ")
+        block()
+    }
+
     override fun quote(block: Markdown.() -> Unit) = blocked {
         MarkdownBuilder(writer.prefixed("> "), bibliography).block()
     }
 
     override fun code(lang: String, code: String) = blocked {
-        writer.inline("```")
+        var delimiter = "```"
+
+        /* TODO something less naive than this */
+        while (code.contains(delimiter)) delimiter = "$delimiter`"
+
+        writer.inline(delimiter)
         writer.inline(lang)
         writer.newline()
         writer.raw(code)
         writer.newline()
-        writer.inline("```")
+        writer.inline(delimiter)
     }
 
     override fun ol(builder: MarkdownNumberedList.() -> Unit) = blocked {
