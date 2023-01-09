@@ -47,15 +47,17 @@ class MarkdownBuilder(
 
     private fun blocked(block: MarkdownBuilder.() -> Unit) {
         val writer = if (state == BuilderState.AFTER_BLOCK || state == BuilderState.INLINE) {
+            state = BuilderState.AFTER_BLOCK
+
             writer.onWrite {
                 writer.newline()
                 writer.newline()
             }
         } else {
-            writer
+            writer.onWrite {
+                state = BuilderState.AFTER_BLOCK
+            }
         }
-
-        state = BuilderState.AFTER_BLOCK
 
         MarkdownBuilder(writer, bibliography).block()
     }
@@ -242,9 +244,7 @@ class MarkdownBuilder(
         val footnotes = bibliography.footnotes
         val references = bibliography.references
 
-        if (footnotes.isNotEmpty()) {
-            writer.newline()
-
+        list {
             var i = 0
 
             while (i < footnotes.size) {
@@ -252,24 +252,13 @@ class MarkdownBuilder(
 
                 val (label, write) = footnotes[i++]
 
-                writer.newline()
-                writer.inline(label)
-                writer.inline(": ")
-
-                val indent = " ".repeat(label.length + 2)
-
-                MarkdownBuilder(writer.prefixed(indent, start = false), bibliography).write()
+                li("$label: ", write)
             }
         }
 
-        if (references.isNotEmpty()) {
-            writer.newline()
-
+        list {
             references.forEach { (reference, cite) ->
-                writer.newline()
-                writer.inline(cite.label)
-                writer.inline(": ")
-                writer.inline(reference)
+                li("${cite.label}: ") { +reference }
             }
         }
     }

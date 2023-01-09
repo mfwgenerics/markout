@@ -387,6 +387,14 @@ class MarkdownTests {
         )
 
         assertEquals(
+            "a",
+            markdownString {
+                p { }
+                t("a")
+            }
+        )
+
+        assertEquals(
             """
             above
             
@@ -411,6 +419,16 @@ class MarkdownTests {
                 +"below"
                 table {  }
                 p { }
+            }
+        )
+    }
+
+    @Test
+    fun `single reference has appropriate whitespace`() {
+        assertEquals(
+            "[1]: https://example.com",
+            markdownString {
+                cite("https://example.com")
             }
         )
     }
