@@ -4,6 +4,9 @@ interface LineWriter {
     fun prefixed(prefix: String, start: Boolean = true): LineWriter =
         PrefixedLineWriter(this, prefix, start)
 
+    fun onWrite(action: () -> Unit): LineWriter =
+        OnWriteWriter(this, action)
+
     fun inline(text: String)
     fun newline()
 

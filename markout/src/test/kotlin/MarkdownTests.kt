@@ -374,4 +374,44 @@ class MarkdownTests {
             markdownString { code("``` ````` ``") }
         )
     }
+
+    @Test
+    fun `empty blocks don't produce extra whitespace`() {
+        assertEquals(
+            "",
+            markdownString {
+                p { }
+                table {  }
+                p { }
+            }
+        )
+
+        assertEquals(
+            """
+            above
+            
+            below
+            """.trimIndent(),
+            markdownString {
+                p { +"above" }
+                p { }
+                p { +"below" }
+            }
+        )
+
+        assertEquals(
+            """
+            above
+            
+            below
+            """.trimIndent(),
+            markdownString {
+                +"above"
+                p { }
+                +"below"
+                table {  }
+                p { }
+            }
+        )
+    }
 }

@@ -46,9 +46,13 @@ class MarkdownBuilder(
     }
 
     private fun blocked(block: MarkdownBuilder.() -> Unit) {
-        if (state == BuilderState.AFTER_BLOCK || state == BuilderState.INLINE) {
-            writer.newline()
-            writer.newline()
+        val writer = if (state == BuilderState.AFTER_BLOCK || state == BuilderState.INLINE) {
+            writer.onWrite {
+                writer.newline()
+                writer.newline()
+            }
+        } else {
+            writer
         }
 
         state = BuilderState.AFTER_BLOCK
@@ -212,7 +216,7 @@ class MarkdownBuilder(
             }
         }.builder()
 
-        if (rows.isNotEmpty()) blocked {
+        blocked {
             var first = true
 
             rows.forEach { row ->
