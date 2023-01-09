@@ -125,50 +125,45 @@ class MarkdownBuilder(
         writer.inline(delimiter)
     }
 
-    override fun ol(builder: MarkdownNumberedList.() -> Unit) = blocked {
+    private fun interface GenericList {
+        fun li(label: String, block: Markdown.() -> Unit)
+    }
+
+    private fun list(builder: GenericList.() -> Unit) = blocked {
         var first = true
-        var next = 1
         var prefix = ""
 
-        MarkdownNumberedList { number, block ->
+        builder { label, block ->
             if (!first) writer.newline()
             first = false
 
-            number?.let { next = it }
-
-            val label = "$next. "
             writer.inline(label)
 
             if (prefix.length != label.length) prefix = " ".repeat(label.length)
 
-            next++
-
             MarkdownBuilder(writer.prefixed(prefix, start = false), bibliography).block()
-        }.builder()
+        }
     }
 
-    override fun ul(builder: MarkdownDottedList.() -> Unit) = blocked {
-        var first = true
+    override fun ol(builder: MarkdownNumberedList.() -> Unit) = list {
+        var next = 1
 
-        MarkdownDottedList { block ->
-            if (!first) writer.newline()
-            writer.inline("* ")
-            first = false
-
-            MarkdownBuilder(writer.prefixed("  ", start = false), bibliography).block()
-        }.builder()
+        builder { number, block ->
+            number?.let { next = it }
+            li("${next++}. ", block)
+        }
     }
 
-    override fun cl(builder: MarkdownCheckList.() -> Unit) = blocked {
-        var first = true
+    override fun ul(builder: MarkdownDottedList.() -> Unit) = list {
+        builder {
+            li("* ", it)
+        }
+    }
 
-        MarkdownCheckList { checked, block ->
-            if (!first) writer.newline()
-            writer.inline(if (checked) "- [x] " else "- [ ] ")
-            first = false
-
-            MarkdownBuilder(writer.prefixed("      ", start = false), bibliography).block()
-        }.builder()
+    override fun cl(builder: MarkdownCheckList.() -> Unit) = list {
+        builder { checked, block ->
+            li(if (checked) "- [x] " else "- [ ] ", block)
+        }
     }
 
     private class Row(
@@ -197,11 +192,11 @@ class MarkdownBuilder(
         }
 
         fun cells(row: MarkdownTableRow.() -> Unit): List<String> = arrayListOf<String>().apply {
-            MarkdownTableRow {
+            row {
                 val sb = StringBuilder()
                 MarkdownBuilder(AppendableLineWriter(sb), bibliography).it()
                 add("$sb")
-            }.row()
+            }
         }
 
         object : MarkdownTable {
