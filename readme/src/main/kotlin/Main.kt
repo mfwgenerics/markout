@@ -1,4 +1,5 @@
 import io.koalaql.kapshot.Capturable
+import io.koalaql.kapshot.Source
 import io.koalaql.markout.markout
 import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdown
@@ -8,14 +9,14 @@ import kotlin.io.path.Path
 fun interface CapturedBuilderBlock: Capturable<CapturedBuilderBlock> {
     fun Markdown.build()
 
-    override fun withSource(source: String): CapturedBuilderBlock = object : CapturedBuilderBlock by this {
-        override fun source(): String = source
+    override fun withSource(source: Source): CapturedBuilderBlock = object : CapturedBuilderBlock by this {
+        override val source = source
     }
 }
 
 fun Markdown.example(block: CapturedBuilderBlock) {
     h3("Kotlin")
-    code("kotlin", block.source())
+    code("kotlin", block.source.text)
 
     val rendered = markdownString { with(block) { build() } }
 

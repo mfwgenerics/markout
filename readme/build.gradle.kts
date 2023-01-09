@@ -5,7 +5,7 @@ repositories {
 plugins {
     kotlin("jvm") version "1.8.0"
 
-    id("io.koalaql.kapshot-plugin") version "0.0.3"
+    id("io.koalaql.kapshot-plugin") version "0.1.0"
 
     application
 }

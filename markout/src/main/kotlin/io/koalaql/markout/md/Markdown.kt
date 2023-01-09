@@ -55,7 +55,7 @@ interface Markdown: MarkdownInline {
 
     @MarkoutDsl
     fun <T> code(lang: String, code: CapturedBlock<T>): T {
-        code(lang, code.source())
+        code(lang, code.source.text)
 
         return code()
     }
