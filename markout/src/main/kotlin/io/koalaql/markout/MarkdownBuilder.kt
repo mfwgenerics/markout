@@ -114,7 +114,7 @@ class MarkdownBuilder(
     override fun code(lang: String, code: String) = blocked {
         var delimiter = "```"
 
-        /* TODO something less naive than this */
+        /* inefficient but good enough up to 10k backtick runs */
         while (code.contains(delimiter)) delimiter = "$delimiter`"
 
         writer.inline(delimiter)

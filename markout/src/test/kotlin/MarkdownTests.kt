@@ -344,4 +344,34 @@ class MarkdownTests {
             }
         )
     }
+
+    @Test
+    fun `code block delimiter`() {
+        assertEquals(
+            """
+            ````
+            ```
+            ````
+            """.trimIndent(),
+            markdownString { code("```") }
+        )
+
+        assertEquals(
+            """
+            `````
+            ````
+            `````
+            """.trimIndent(),
+            markdownString { code("````") }
+        )
+
+        assertEquals(
+            """
+            ``````
+            ``` ````` ``
+            ``````
+            """.trimIndent(),
+            markdownString { code("``` ````` ``") }
+        )
+    }
 }
