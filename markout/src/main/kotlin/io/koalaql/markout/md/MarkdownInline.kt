@@ -4,6 +4,9 @@ import io.koalaql.markout.MarkoutDsl
 
 @MarkoutDsl
 interface MarkdownInline {
+    operator fun Unit.plus(text: String) = +text
+    operator fun Unit.plus(unit: Unit) = Unit
+
     @MarkoutDsl
     fun cite(href: String, title: String? = null): Citation
 

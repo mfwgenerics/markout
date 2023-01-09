@@ -70,7 +70,12 @@ fun main() = markout(Path("..")) {
                     i("Italics")
                     +" and "
                     b { i("Bold italics") }
-                    +". "
+                    +"."
+                }
+
+                p {
+                    /* same as above, using `+` syntax sugar */
+                    b("Bold") + ", " + i("Italics") + " and " + b { i("Bold italics") } + "."
                 }
 
                 p {

@@ -90,7 +90,12 @@ p {
     i("Italics")
     +" and "
     b { i("Bold italics") }
-    +". "
+    +"."
+}
+
+p {
+    /* same as above, using `+` syntax sugar */
+    b("Bold") + ", " + i("Italics") + " and " + b { i("Bold italics") } + "."
 }
 
 p {
@@ -101,14 +106,18 @@ p {
 ### Generated
 
 ```markdown
-**Bold**, *Italics* and ***Bold italics***. 
+**Bold**, *Italics* and ***Bold italics***.
+
+**Bold**, *Italics* and ***Bold italics***.
 
 For inline text styling you can *still* use **raw markdown**
 ```
 
 ### Rendered
 
-> **Bold**, *Italics* and ***Bold italics***. 
+> **Bold**, *Italics* and ***Bold italics***.
+> 
+> **Bold**, *Italics* and ***Bold italics***.
 > 
 > For inline text styling you can *still* use **raw markdown**
 
