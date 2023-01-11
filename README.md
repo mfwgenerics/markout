@@ -2,6 +2,14 @@
 
 Markout is a library for generating markdown files and directories from Kotlin
 
+## Use
+
+```kotlin
+dependencies {
+    implementation("io.koalaql:markout:0.0.2")
+}
+```
+
 ## Syntax
 
 1. [Basic Syntax](docs/BASIC.md)

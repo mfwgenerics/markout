@@ -14,6 +14,16 @@ fun main() = markout(Path("..")) {
 
         t("Markout is a library for generating markdown files and directories from Kotlin")
 
+        h2("Use")
+
+        code("kotlin",
+            """
+            dependencies {
+                implementation("io.koalaql:markout:0.0.2")
+            }
+            """.trimIndent()
+        )
+
         h2("Syntax")
 
         ol {
