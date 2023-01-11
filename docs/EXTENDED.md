@@ -1,5 +1,8 @@
 # Extended Syntax
 
+1. [Tables](#tables)
+2. [Footnotes](#footnotes)
+
 ## Tables
 
 ### Kotlin

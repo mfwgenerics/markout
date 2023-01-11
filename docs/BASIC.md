@@ -1,5 +1,14 @@
 # Basic Syntax
 
+1. [Headers](#headers)
+2. [Paragraphs](#paragraphs)
+3. [Emphasis](#emphasis)
+4. [Blockquotes](#blockquotes)
+5. [Lists](#lists)
+6. [Code](#code)
+7. [Horizontal Rules](#horizontal-rules)
+8. [Links](#links)
+
 ## Headers
 
 ### Kotlin
