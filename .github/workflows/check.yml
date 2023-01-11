@@ -10,3 +10,4 @@ jobs:
         with:
           java-version: 19
       - run: ./gradlew check
+      - run: ./check-readme.sh
