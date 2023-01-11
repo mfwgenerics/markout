@@ -31,7 +31,7 @@ fun Markout.extended() = markdown("EXTENDED") {
         fun note() = footnote("""
             At the moment there is no way to re-use footnotes
             and the requirement for the note text to appear at
-            the cite of the footnote call is less than ideal
+            the site of the footnote call is less than ideal
         """.trimIndent())
 
         +"The syntax is a work in progress" + note() + " but footnotes are possible."
