@@ -1,2 +1,6 @@
-includeBuild("markout")
-includeBuild("readme")
+pluginManagement {
+    includeBuild("build-logic")
+}
+
+include("markout")
+include("readme")

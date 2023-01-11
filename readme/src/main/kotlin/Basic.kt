@@ -1,5 +1,18 @@
+import io.koalaql.kapshot.CapturedBlock
 import io.koalaql.markout.Markout
+import io.koalaql.markout.MarkoutDsl
+import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdown
+
+@MarkoutDsl
+fun <T> Markdown.code(lang: String, code: CapturedBlock<T>): T {
+    code(lang, code.source.text)
+
+    return code()
+}
+
+@MarkoutDsl
+fun <T> Markdown.code(code: CapturedBlock<T>): T = code("kotlin", code)
 
 fun Markout.basic() = markdown("BASIC") {
     h1("Basic Syntax")

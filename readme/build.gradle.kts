@@ -15,7 +15,7 @@ application {
 }
 
 dependencies {
-    implementation("io.koalaql:markout")
+    implementation(project(":markout"))
 
     implementation(kotlin("reflect"))
 }
