@@ -40,8 +40,9 @@ fun Markout.basic() = markdown("BASIC") {
                 p("""
                     A second paragraph.
                     Line breaks won't
-                    affect the markdown layout
-                """.trimIndent())
+                    affect the rendered markdown
+                    and indent is trimmed
+                """)
             }
         }
 
