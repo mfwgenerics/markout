@@ -59,7 +59,7 @@ class MarkdownBuilder(
             }
         }
 
-        MarkdownBuilder(writer, bibliography).block()
+        MarkdownBuilder(writer.trimmedLines(), bibliography).block()
     }
 
     override fun t(line: MarkdownInline.() -> Unit) = inlined(line)
@@ -102,7 +102,7 @@ class MarkdownBuilder(
     }
 
     override fun p(block: MarkdownBlock.() -> Unit) = blocked {
-        MarkdownBuilder(writer.trimmedLines().paragraphRules(), bibliography).block()
+        MarkdownBuilder(writer.paragraphRules(), bibliography).block()
     }
 
     override fun hr() = blocked {
@@ -138,13 +138,10 @@ class MarkdownBuilder(
     }
 
     private fun list(builder: GenericList.() -> Unit) = blocked {
-        var first = true
         var prefix = ""
 
         builder { label, block ->
-            if (!first) writer.newline()
-            first = false
-
+            writer.newline()
             writer.inline(label)
 
             if (prefix.length != label.length) prefix = " ".repeat(label.length)
@@ -221,15 +218,8 @@ class MarkdownBuilder(
         }.builder()
 
         blocked {
-            var first = true
-
             rows.forEach { row ->
-                if (!first) {
-                    writer.newline()
-                } else {
-                    first = false
-                }
-
+                writer.newline()
                 writer.inline("|")
 
                 row.cells.forEachIndexed { ix, it ->
