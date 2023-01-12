@@ -8,13 +8,13 @@ class MarkdownBuilder(
     private val writer: LineWriter,
     private val bibliography: Bibliography = Bibliography()
 ) : Markdown {
-    private enum class BuilderState {
-        FRESH,
-        INLINE,
-        AFTER_BLOCK
+    private sealed interface BuilderState {
+        object Fresh : BuilderState
+        object Inline : BuilderState
+        object AfterBlock : BuilderState
     }
 
-    private var state: BuilderState = BuilderState.FRESH
+    private var state: BuilderState = BuilderState.Fresh
 
     override fun cite(href: String, title: String?): Citation {
         val sb = StringBuilder()
@@ -35,19 +35,19 @@ class MarkdownBuilder(
     }
 
     private fun inlined(line: MarkdownBuilder.() -> Unit) {
-        if (state == BuilderState.AFTER_BLOCK) {
+        if (state == BuilderState.AfterBlock) {
             writer.newline()
             writer.newline()
         }
 
-        state = BuilderState.INLINE
+        state = BuilderState.Inline
 
         line()
     }
 
     private fun blocked(block: MarkdownBuilder.() -> Unit) {
-        val writer = if (state == BuilderState.AFTER_BLOCK || state == BuilderState.INLINE) {
-            state = BuilderState.AFTER_BLOCK
+        val writer = if (state == BuilderState.AfterBlock || state == BuilderState.Inline) {
+            state = BuilderState.AfterBlock
 
             writer.onWrite {
                 writer.newline()
@@ -55,7 +55,7 @@ class MarkdownBuilder(
             }
         } else {
             writer.onWrite {
-                state = BuilderState.AFTER_BLOCK
+                state = BuilderState.AfterBlock
             }
         }
 
