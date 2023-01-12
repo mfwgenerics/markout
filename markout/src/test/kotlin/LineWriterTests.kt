@@ -38,4 +38,36 @@ class LineWriterTests {
         assertEquals("a\n\nb", trimLines("\n\na\n\nb\n\n"))
         assertEquals("  a", trimLines("  \n \t\n  a\n  \n  "))
     }
+
+    @Test
+    fun `paragraph rules`() {
+        fun paragraphize(case: String): String = "${StringBuilder().also {
+            AppendableLineWriter(it)
+                .paragraphRules()
+                .raw(case)
+        }}"
+
+        assertEquals("", paragraphize(""))
+        assertEquals("", paragraphize("     "))
+        assertEquals("", paragraphize("     \n\n\n"))
+        assertEquals("a  \n", paragraphize("     \n    a  \n\n"))
+        assertEquals("""
+            I'm an
+            untrimmed paragraph
+            with alignments all off
+            a markdown line break  
+            (i.e. previous space has two whitespace after)
+            
+        """.trimIndent(), paragraphize("""
+           I'm an
+               untrimmed paragraph
+               
+       with alignments all off
+       
+       a markdown line break  
+         (i.e. previous space has two whitespace after)
+         
+         
+        """))
+    }
 }
