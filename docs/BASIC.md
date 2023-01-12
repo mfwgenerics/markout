@@ -58,9 +58,9 @@ h6("Header 6")
 
 ```kotlin
 p {
-    +"This text will appear in a paragraph."
-    +" "
-    +"This sentence will be grouped with the preceding one."
+    -"This text will appear in a paragraph."
+
+    -"This sentence will be grouped with the preceding one."
 }
 
 p("""
@@ -73,7 +73,9 @@ p("""
 ### Generated
 
 ```markdown
-This text will appear in a paragraph. This sentence will be grouped with the preceding one.
+
+This text will appear in a paragraph.
+This sentence will be grouped with the preceding one.
 
 A second paragraph.
 Line breaks won't
@@ -82,7 +84,9 @@ affect the markdown layout
 
 ### Rendered
 
-> This text will appear in a paragraph. This sentence will be grouped with the preceding one.
+> 
+> This text will appear in a paragraph.
+> This sentence will be grouped with the preceding one.
 > 
 > A second paragraph.
 > Line breaks won't

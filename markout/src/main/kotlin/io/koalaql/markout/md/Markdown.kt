@@ -3,7 +3,7 @@ package io.koalaql.markout.md
 import io.koalaql.markout.MarkoutDsl
 
 @MarkoutDsl
-interface Markdown: MarkdownInline {
+interface Markdown: MarkdownBlock {
     @MarkoutDsl
     fun h(level: Int, block: MarkdownInline.() -> Unit)
 
@@ -34,7 +34,7 @@ interface Markdown: MarkdownInline {
     fun h6(text: String) = h6 { t(text) }
 
     @MarkoutDsl
-    fun p(block: MarkdownInline.() -> Unit)
+    fun p(block: MarkdownBlock.() -> Unit)
     @MarkoutDsl
     fun p(text: String) = p { t(text) }
 

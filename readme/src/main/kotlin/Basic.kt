@@ -32,9 +32,9 @@ fun Markout.basic() = markdown("BASIC") {
         section("Paragraphs") {
             example {
                 p {
-                    +"This text will appear in a paragraph."
-                    +" "
-                    +"This sentence will be grouped with the preceding one."
+                    -"This text will appear in a paragraph."
+
+                    -"This sentence will be grouped with the preceding one."
                 }
 
                 p("""
