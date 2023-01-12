@@ -104,7 +104,7 @@ p {
 
 p {
     /* same as above, using `+` syntax sugar */
-    b("Bold") + ", " + { i("Italics") } + " and " + { b { i("Bold italics") } } + "."
+    b("Bold") + ", " + i("Italics") + " and " + b { i("Bold italics") } + "."
 }
 
 p {
