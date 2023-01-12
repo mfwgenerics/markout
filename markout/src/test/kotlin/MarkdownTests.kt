@@ -403,6 +403,7 @@ class MarkdownTests {
             markdownString {
                 p { +"above" }
                 p { }
+                +""
                 p { +"below" }
             }
         )
