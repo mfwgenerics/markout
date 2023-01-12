@@ -404,6 +404,8 @@ class MarkdownTests {
                 p { +"above" }
                 p { }
                 +""
+                -"     "
+                -""
                 p { +"below" }
             }
         )

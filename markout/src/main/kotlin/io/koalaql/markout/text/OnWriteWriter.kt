@@ -14,6 +14,8 @@ class OnWriteWriter(
     }
 
     override fun inline(text: String) {
+        if (text.isEmpty()) return
+
         write()
         of.inline(text)
     }

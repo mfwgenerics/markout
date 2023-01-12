@@ -10,8 +10,10 @@ class MarkdownBuilder(
 ) : Markdown {
     private sealed interface BuilderState {
         object Fresh : BuilderState
-        object Inline : BuilderState
         object AfterBlock : BuilderState
+        class Inline(
+            val builder: MarkdownBuilder
+        ) : BuilderState
     }
 
     private var state: BuilderState = BuilderState.Fresh
@@ -35,18 +37,31 @@ class MarkdownBuilder(
     }
 
     private fun inlined(line: MarkdownBuilder.() -> Unit) {
-        if (state == BuilderState.AfterBlock) {
-            writer.newline()
-            writer.newline()
+        val builder = when (val current = state) {
+            is BuilderState.Inline -> current.builder
+            else -> {
+                val writer = if (current == BuilderState.AfterBlock) {
+                    writer.onWrite {
+                        writer.newline()
+                        writer.newline()
+                    }
+                } else {
+                    writer
+                }
+
+                val builder = MarkdownBuilder(writer.trimmedLines().paragraphRules(), bibliography)
+
+                state = BuilderState.Inline(builder)
+
+                builder
+            }
         }
 
-        state = BuilderState.Inline
-
-        line()
+        builder.line()
     }
 
     private fun blocked(block: MarkdownBuilder.() -> Unit) {
-        val writer = if (state == BuilderState.AfterBlock || state == BuilderState.Inline) {
+        val writer = if (state == BuilderState.AfterBlock || state is BuilderState.Inline) {
             state = BuilderState.AfterBlock
 
             writer.onWrite {
