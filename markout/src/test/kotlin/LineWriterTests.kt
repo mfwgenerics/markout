@@ -32,11 +32,18 @@ class LineWriterTests {
                 .raw(case)
         }}"
 
-        assertEquals("", trimLines("\n\n\n"))
+        fun assertTrimmed(expected: String, case: String) {
+            val trimmed = trimLines(case)
 
-        assertEquals("a", trimLines("\na\n\n"))
-        assertEquals("a\n\nb", trimLines("\n\na\n\nb\n\n"))
-        assertEquals("  a", trimLines("  \n \t\n  a\n  \n  "))
+            assertEquals(expected, trimmed)
+            assertEquals(trimmed, trimLines(trimmed)) // idempotent
+        }
+
+        assertTrimmed("", trimLines("\n\n\n"))
+
+        assertTrimmed("a", trimLines("\na\n\n"))
+        assertTrimmed("a\n\nb", trimLines("\n\na\n\nb\n\n"))
+        assertTrimmed("  a", trimLines("  \n \t\n  a\n  \n  "))
     }
 
     @Test

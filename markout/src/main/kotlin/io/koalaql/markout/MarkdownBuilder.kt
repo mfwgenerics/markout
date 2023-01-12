@@ -101,7 +101,9 @@ class MarkdownBuilder(
         writer.inline("~~")
     }
 
-    override fun p(block: MarkdownBlock.() -> Unit) = blocked(block)
+    override fun p(block: MarkdownBlock.() -> Unit) = blocked {
+        MarkdownBuilder(writer.trimmedLines().paragraphRules(), bibliography).block()
+    }
 
     override fun hr() = blocked {
         writer.inline("---")
