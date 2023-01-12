@@ -58,35 +58,40 @@ h6("Header 6")
 
 ```kotlin
 p {
-    +"This text will appear in a paragraph."
-    +" "
-    +"This sentence will be grouped with the preceding one."
+    -"This text will appear in a paragraph."
+
+    -"This sentence will be grouped with the preceding one."
 }
 
 p("""
     A second paragraph.
     Line breaks won't
-    affect the markdown layout
-""".trimIndent())
+    affect the rendered markdown
+    and indent is trimmed
+""")
 ```
 
 ### Generated
 
 ```markdown
-This text will appear in a paragraph. This sentence will be grouped with the preceding one.
+This text will appear in a paragraph.
+This sentence will be grouped with the preceding one.
 
 A second paragraph.
 Line breaks won't
-affect the markdown layout
+affect the rendered markdown
+and indent is trimmed
 ```
 
 ### Rendered
 
-> This text will appear in a paragraph. This sentence will be grouped with the preceding one.
+> This text will appear in a paragraph.
+> This sentence will be grouped with the preceding one.
 > 
 > A second paragraph.
 > Line breaks won't
-> affect the markdown layout
+> affect the rendered markdown
+> and indent is trimmed
 
 ## Emphasis
 

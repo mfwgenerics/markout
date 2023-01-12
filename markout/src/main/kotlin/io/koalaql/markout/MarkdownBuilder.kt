@@ -8,13 +8,15 @@ class MarkdownBuilder(
     private val writer: LineWriter,
     private val bibliography: Bibliography = Bibliography()
 ) : Markdown {
-    private enum class BuilderState {
-        FRESH,
-        INLINE,
-        AFTER_BLOCK
+    private sealed interface BuilderState {
+        object Fresh : BuilderState
+        object AfterBlock : BuilderState
+        class Inline(
+            val builder: MarkdownBuilder
+        ) : BuilderState
     }
 
-    private var state: BuilderState = BuilderState.FRESH
+    private var state: BuilderState = BuilderState.Fresh
 
     override fun cite(href: String, title: String?): Citation {
         val sb = StringBuilder()
@@ -35,19 +37,32 @@ class MarkdownBuilder(
     }
 
     private fun inlined(line: MarkdownBuilder.() -> Unit) {
-        if (state == BuilderState.AFTER_BLOCK) {
-            writer.newline()
-            writer.newline()
+        val builder = when (val current = state) {
+            is BuilderState.Inline -> current.builder
+            else -> {
+                val writer = if (current == BuilderState.AfterBlock) {
+                    writer.onWrite {
+                        writer.newline()
+                        writer.newline()
+                    }
+                } else {
+                    writer
+                }
+
+                val builder = MarkdownBuilder(writer.trimmedLines().paragraphRules(), bibliography)
+
+                state = BuilderState.Inline(builder)
+
+                builder
+            }
         }
 
-        state = BuilderState.INLINE
-
-        line()
+        builder.line()
     }
 
     private fun blocked(block: MarkdownBuilder.() -> Unit) {
-        val writer = if (state == BuilderState.AFTER_BLOCK || state == BuilderState.INLINE) {
-            state = BuilderState.AFTER_BLOCK
+        val writer = if (state == BuilderState.AfterBlock || state is BuilderState.Inline) {
+            state = BuilderState.AfterBlock
 
             writer.onWrite {
                 writer.newline()
@@ -55,11 +70,11 @@ class MarkdownBuilder(
             }
         } else {
             writer.onWrite {
-                state = BuilderState.AFTER_BLOCK
+                state = BuilderState.AfterBlock
             }
         }
 
-        MarkdownBuilder(writer, bibliography).block()
+        MarkdownBuilder(writer.trimmedLines(), bibliography).block()
     }
 
     override fun t(line: MarkdownInline.() -> Unit) = inlined(line)
@@ -101,7 +116,9 @@ class MarkdownBuilder(
         writer.inline("~~")
     }
 
-    override fun p(block: MarkdownInline.() -> Unit) = blocked(block)
+    override fun p(block: MarkdownBlock.() -> Unit) = blocked {
+        MarkdownBuilder(writer.paragraphRules(), bibliography).block()
+    }
 
     override fun hr() = blocked {
         writer.inline("---")
@@ -136,13 +153,10 @@ class MarkdownBuilder(
     }
 
     private fun list(builder: GenericList.() -> Unit) = blocked {
-        var first = true
         var prefix = ""
 
         builder { label, block ->
-            if (!first) writer.newline()
-            first = false
-
+            writer.newline()
             writer.inline(label)
 
             if (prefix.length != label.length) prefix = " ".repeat(label.length)
@@ -219,15 +233,8 @@ class MarkdownBuilder(
         }.builder()
 
         blocked {
-            var first = true
-
             rows.forEach { row ->
-                if (!first) {
-                    writer.newline()
-                } else {
-                    first = false
-                }
-
+                writer.newline()
                 writer.inline("|")
 
                 row.cells.forEachIndexed { ix, it ->

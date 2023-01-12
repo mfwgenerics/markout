@@ -3,7 +3,9 @@ repositories {
 }
 
 plugins {
-    id("io.koalaql.kapshot-plugin") version "0.1.0"
+    id("conventions")
+
+    id("io.koalaql.kapshot-plugin") version "0.1.1"
 
     application
 }

@@ -7,6 +7,12 @@ interface LineWriter {
     fun onWrite(action: () -> Unit): LineWriter =
         OnWriteWriter(this, action)
 
+    fun trimmedLines(): LineWriter =
+        TrimLinesWriter(this)
+
+    fun paragraphRules(): LineWriter =
+        ParagraphWriter(this)
+
     fun inline(text: String)
     fun newline()
 

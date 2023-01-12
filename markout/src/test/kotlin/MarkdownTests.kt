@@ -403,6 +403,9 @@ class MarkdownTests {
             markdownString {
                 p { +"above" }
                 p { }
+                +""
+                -"     "
+                -""
                 p { +"below" }
             }
         )
@@ -429,6 +432,24 @@ class MarkdownTests {
             "[1]: https://example.com",
             markdownString {
                 cite("https://example.com")
+            }
+        )
+    }
+
+    @Test
+    fun `linebreaks in and out of paragraphs`() {
+        assertEquals("""
+            Line 1.
+            Part 2 of Line 1  
+            Line 2
+        """.trimIndent(),
+            markdownString {
+                p {
+                    -"Line 1."
+                    -"Part 2 of Line 1"
+                    br()
+                    -"Line 2"
+                }
             }
         )
     }
