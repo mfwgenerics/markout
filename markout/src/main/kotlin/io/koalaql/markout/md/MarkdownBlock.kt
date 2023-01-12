@@ -9,4 +9,9 @@ interface MarkdownBlock: MarkdownInline {
         t("\n")
         t(this)
     }
+
+    @MarkoutDsl
+    fun br() {
+        t("  \n")
+    }
 }
