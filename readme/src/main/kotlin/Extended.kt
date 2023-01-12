@@ -34,7 +34,7 @@ fun Markout.extended() = markdown("EXTENDED") {
                     the site of the footnote call is less than ideal
                 """.trimIndent())
 
-                +"The syntax is a work in progress" + note() + " but footnotes are possible."
+                +"The syntax is a work in progress" + { note() } + " but footnotes are possible."
             }
         }
     }
