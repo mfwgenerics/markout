@@ -1,3 +1,4 @@
+import io.koalaql.markout.text.AppendableLineWriter
 import io.koalaql.markout.text.LineWriter
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,5 +22,20 @@ class LineWriterTests {
         test("\nlines\n\n\n \n more")
         test("  lines more")
         test("")
+    }
+
+    @Test
+    fun `newline trimming`() {
+        fun trimLines(case: String): String = "${StringBuilder().also {
+            AppendableLineWriter(it)
+                .trimmedLines()
+                .raw(case)
+        }}"
+
+        assertEquals("", trimLines("\n\n\n"))
+
+        assertEquals("a", trimLines("\na\n\n"))
+        assertEquals("a\n\nb", trimLines("\n\na\n\nb\n\n"))
+        assertEquals("  a", trimLines("  \n \t\n  a\n  \n  "))
     }
 }
