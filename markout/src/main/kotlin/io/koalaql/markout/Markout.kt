@@ -3,10 +3,13 @@ package io.koalaql.markout
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
+import java.io.InputStream
+import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.inputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
@@ -105,10 +108,125 @@ private fun Output.write(path: Path) {
     }
 }
 
+private enum class DiffType {
+    MISMATCH,
+    UNTRACKED,
+    EXPECTED,
+    UNEXPECTED
+}
+
+private data class Diff(
+    val type: DiffType,
+    val path: Path
+) {
+    override fun toString(): String =
+        "${"$type".lowercase()}\t$path"
+}
+
+private class StreamMatcher(
+    private val input: InputStream
+): OutputStream() {
+    private var matches = true
+
+    fun matched(): Boolean {
+        return matches && input.read() == -1
+    }
+
+    override fun write(byte: Int) {
+        matches = matches && input.read() == byte
+    }
+}
+
+private fun Output.expect(
+    path: Path,
+    diffs: MutableList<Diff>,
+    untracked: Boolean
+) {
+    fun failed(type: DiffType, on: Path = path) {
+        diffs.add(Diff(type, on))
+    }
+
+    if (Files.notExists(path)) {
+        failed(DiffType.EXPECTED)
+        return
+    }
+
+    if (untracked) {
+        failed(DiffType.UNTRACKED)
+        return
+    }
+
+    when (this) {
+        is OutputDirectory -> {
+            if (!Files.isDirectory(path)) {
+                failed(DiffType.MISMATCH)
+                return
+            }
+
+            val entries = entries()
+
+            val tracked = metadataPaths(path)
+                .toMutableSet()
+
+            tracked.remove(path.resolve(METADATA_FILE_NAME))
+
+            entries.forEach { (name, output) ->
+                val nextPath = path.resolve(name)
+                val nextUntracked = !tracked.remove(nextPath)
+
+                output.expect(nextPath, diffs, nextUntracked)
+            }
+
+            tracked.forEach { failed(DiffType.UNEXPECTED, it) }
+        }
+        is OutputFile -> {
+            if (Files.isDirectory(path)) {
+                failed(DiffType.MISMATCH)
+                return
+            }
+
+            val matcher = StreamMatcher(path.inputStream())
+
+            writeTo(matcher)
+
+            if (!matcher.matched()) failed(DiffType.MISMATCH)
+        }
+    }
+}
+
+private fun executionModeProperty(): ExecutionMode {
+    val key = "MARKOUT_MODE"
+
+    return when (val value = System.getenv(key)) {
+        null, "", "apply" -> ExecutionMode.APPLY
+        "expect" -> ExecutionMode.EXPECT
+        else -> error("unexpected value `$value` for property $key")
+    }
+}
+
+
 fun markout(
     path: Path,
+    mode: ExecutionMode = executionModeProperty(),
     builder: Markout.() -> Unit
 ) {
-    cleanDirectory(path)
-    buildOutput(builder).write(path)
+    val output = buildOutput(builder)
+
+    val normalized = path.normalize()
+
+    when (mode) {
+        ExecutionMode.APPLY -> {
+            cleanDirectory(normalized)
+            output.write(normalized)
+        }
+        ExecutionMode.EXPECT -> {
+            val diffs = arrayListOf<Diff>()
+
+            output.expect(normalized, diffs, false)
+
+            if (diffs.isNotEmpty()) {
+                error(diffs.joinToString("\n"))
+            }
+        }
+    }
 }
