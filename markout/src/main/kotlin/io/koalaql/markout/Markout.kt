@@ -3,10 +3,13 @@ package io.koalaql.markout
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
+import java.io.InputStream
+import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.inputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
@@ -106,10 +109,10 @@ private fun Output.write(path: Path) {
 }
 
 private enum class DiffType {
-    TYPE,
+    MISMATCH,
     UNTRACKED,
-    MISSING,
-    PRESENT
+    EXPECTED,
+    UNEXPECTED
 }
 
 private data class Diff(
@@ -118,6 +121,20 @@ private data class Diff(
 ) {
     override fun toString(): String =
         "${"$type".lowercase()}\t$path"
+}
+
+private class StreamMatcher(
+    private val input: InputStream
+): OutputStream() {
+    private var matches = true
+
+    fun matched(): Boolean {
+        return matches && input.read() == -1
+    }
+
+    override fun write(byte: Int) {
+        matches = matches && input.read() == byte
+    }
 }
 
 private fun Output.expect(
@@ -130,7 +147,7 @@ private fun Output.expect(
     }
 
     if (Files.notExists(path)) {
-        failed(DiffType.MISSING)
+        failed(DiffType.EXPECTED)
         return
     }
 
@@ -142,7 +159,7 @@ private fun Output.expect(
     when (this) {
         is OutputDirectory -> {
             if (!Files.isDirectory(path)) {
-                failed(DiffType.TYPE)
+                failed(DiffType.MISMATCH)
                 return
             }
 
@@ -160,10 +177,19 @@ private fun Output.expect(
                 output.expect(nextPath, diffs, nextUntracked)
             }
 
-            tracked.forEach { failed(DiffType.PRESENT, it) }
+            tracked.forEach { failed(DiffType.UNEXPECTED, it) }
         }
         is OutputFile -> {
+            if (Files.isDirectory(path)) {
+                failed(DiffType.MISMATCH)
+                return
+            }
 
+            val matcher = StreamMatcher(path.inputStream())
+
+            writeTo(matcher)
+
+            if (!matcher.matched()) failed(DiffType.MISMATCH)
         }
     }
 }
