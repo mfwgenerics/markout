@@ -105,10 +105,102 @@ private fun Output.write(path: Path) {
     }
 }
 
+private enum class DiffType {
+    TYPE,
+    UNTRACKED,
+    MISSING,
+    PRESENT
+}
+
+private data class Diff(
+    val type: DiffType,
+    val path: Path
+) {
+    override fun toString(): String =
+        "${"$type".lowercase()}\t$path"
+}
+
+private fun Output.expect(
+    path: Path,
+    diffs: MutableList<Diff>,
+    untracked: Boolean
+) {
+    fun failed(type: DiffType, on: Path = path) {
+        diffs.add(Diff(type, on))
+    }
+
+    if (Files.notExists(path)) {
+        failed(DiffType.MISSING)
+        return
+    }
+
+    if (untracked) {
+        failed(DiffType.UNTRACKED)
+        return
+    }
+
+    when (this) {
+        is OutputDirectory -> {
+            if (!Files.isDirectory(path)) {
+                failed(DiffType.TYPE)
+                return
+            }
+
+            val entries = entries()
+
+            val tracked = metadataPaths(path)
+                .toMutableSet()
+
+            tracked.remove(path.resolve(METADATA_FILE_NAME))
+
+            entries.forEach { (name, output) ->
+                val nextPath = path.resolve(name)
+                val nextUntracked = !tracked.remove(nextPath)
+
+                output.expect(nextPath, diffs, nextUntracked)
+            }
+
+            tracked.forEach { failed(DiffType.PRESENT, it) }
+        }
+        is OutputFile -> {
+
+        }
+    }
+}
+
+private fun executionModeProperty(): ExecutionMode {
+    val key = "io.koalaql.markout.mode"
+
+    return when (val value = System.getProperty(key)) {
+        null, "", "apply" -> ExecutionMode.APPLY
+        "expect" -> ExecutionMode.EXPECT
+        else -> error("unexpected value `$value` for property $key")
+    }
+}
+
+
 fun markout(
     path: Path,
+    mode: ExecutionMode = executionModeProperty(),
     builder: Markout.() -> Unit
 ) {
-    cleanDirectory(path)
-    buildOutput(builder).write(path)
+    val output = buildOutput(builder)
+
+    val normalized = path.normalize()
+
+    when (mode) {
+        ExecutionMode.APPLY -> {
+            cleanDirectory(normalized)
+            output.write(normalized)
+        }
+        ExecutionMode.EXPECT -> {
+            val diffs = arrayListOf<Diff>()
+
+            output.expect(normalized, diffs, false)
+
+            if (diffs.isNotEmpty()) {
+                error(diffs.joinToString("\n"))
+            }
+        }
+    }
 }
