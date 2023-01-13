@@ -195,9 +195,9 @@ private fun Output.expect(
 }
 
 private fun executionModeProperty(): ExecutionMode {
-    val key = "io.koalaql.markout.mode"
+    val key = "MARKOUT_MODE"
 
-    return when (val value = System.getProperty(key)) {
+    return when (val value = System.getenv(key)) {
         null, "", "apply" -> ExecutionMode.APPLY
         "expect" -> ExecutionMode.EXPECT
         else -> error("unexpected value `$value` for property $key")
