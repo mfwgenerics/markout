@@ -3,7 +3,7 @@ import io.koalaql.markout.md.markdown
 import io.koalaql.markout.md.markdownString
 import kotlin.io.path.Path
 
-private val CURRENT_VERSION = "0.0.3"
+private val CURRENT_VERSION = "0.0.4"
 
 fun main() = markout(Path("..")) {
     directory("docs") {
