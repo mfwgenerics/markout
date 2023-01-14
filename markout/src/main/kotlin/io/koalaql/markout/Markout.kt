@@ -22,7 +22,7 @@ interface Markout {
 }
 
 private fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory {
-    val entries = hashMapOf<String, Output>()
+    val entries = linkedMapOf<String, Output>()
 
     object : Markout {
         override fun directory(name: String, builder: Markout.() -> Unit) {

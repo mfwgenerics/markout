@@ -110,9 +110,9 @@ class ExpectModeTests {
         } catch (ex: IllegalStateException) {
             assertEquals(
                 """
-                mismatch	test-data/tree/file0.txt
-                mismatch	test-data/tree/dir/file1.txt
                 mismatch	test-data/tree/dir/nested/file2.txt
+                mismatch	test-data/tree/dir/file1.txt
+                mismatch	test-data/tree/file0.txt
                 """.trimIndent(),
                 ex.message
             )
@@ -133,8 +133,8 @@ class ExpectModeTests {
         } catch (ex: IllegalStateException) {
             assertEquals(
                 """
-                mismatch	test-data/tree/file0.txt
                 mismatch	test-data/tree/dir
+                mismatch	test-data/tree/file0.txt
                 """.trimIndent(),
                 ex.message
             )
