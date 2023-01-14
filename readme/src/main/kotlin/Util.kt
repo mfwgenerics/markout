@@ -93,35 +93,3 @@ private fun drawFileTree(
 
 fun drawFileTree(output: Output): String =
     "${StringBuilder().also { drawFileTree(Prefix(), output, it) }}"
-
-fun main() {
-    println(drawFileTree(buildOutput {
-        directory("dir") {
-            file("file1", "")
-
-            directory("dir2") {
-                file("file2", "")
-                file("file3", "")
-
-                directory("dir4") {
-                    file("file2", "")
-                    file("file3", "")
-                }
-
-                directory("dir6") {
-                    file("file2", "")
-                    file("file3", "")
-                }
-            }
-
-            file("file4", "")
-
-            directory("dir3") {
-                file("file2", "")
-                file("file3", "")
-            }
-        }
-
-        file("file", "")
-    }))
-}
