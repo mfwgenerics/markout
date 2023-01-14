@@ -20,7 +20,7 @@ dependencies {
 }
 ```
 
-### File Generation
+#### File Generation
 
 If you want to use markout as a documentation generator, call
 the `markout` function directly from your main method. Pass a path
@@ -45,7 +45,7 @@ Currently the Gradle application plugin is the best way to run a standalone mark
 ./gradlew :my-project:run
 ```
 
-### Markdown Strings
+#### Markdown Strings
 
 If you only want to use markout to generate Markdown strings then you can use
 `markdownString`

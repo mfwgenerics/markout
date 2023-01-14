@@ -3,7 +3,7 @@
 Markout can run in one of two modes
 
 1. [Apply Mode](#apply-mode)
-2. [Check Mode](#check-mode)
+2. [Expect Mode](#expect-mode)
 
 ## Apply Mode
 
@@ -32,7 +32,7 @@ markout(Path("..")) {
 
     markdown("readme") {
         -"A markdown file"
-        -"The .MD prefix is automatically added to the filename"
+        -"The .md prefix is automatically added to the filename"
     }
 }
 ```
@@ -62,4 +62,14 @@ unless it is tracked in `.markout`
 File tracking allows regular files to be mixed in with generated ones.
 For example, you might mix handwritten markdown into your docs directory.
 
-## Check Mode
+## Expect Mode
+
+Running Markout in expect mode will cause it to fail when it encounters changes.
+This allows you to check that files have been generated and are consistent
+with the code. It is intended for use in CI workflows.
+
+To use Expect mode, run markout with the `MARKOUT_MODE` environment variable set to `expect`.
+
+```shell
+MARKOUT_MODE=expect ./gradlew :readme:run
+```

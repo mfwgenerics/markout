@@ -35,7 +35,7 @@ fun main() = markout(Path("..")) {
                     """.trimIndent()
                 )
 
-                h3("File Generation")
+                h4("File Generation")
 
                 -"If you want to use markout as a documentation generator, call"
                 -"the `markout` function directly from your main method. Pass a path"
@@ -58,7 +58,7 @@ fun main() = markout(Path("..")) {
 
                 code("shell", "./gradlew :my-project:run")
 
-                h3("Markdown Strings")
+                h4("Markdown Strings")
 
                 -"If you only want to use markout to generate Markdown strings then you can use"
                 -"`${::markdownString.name}`"

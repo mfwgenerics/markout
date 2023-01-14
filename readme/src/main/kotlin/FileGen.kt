@@ -1,3 +1,4 @@
+import io.koalaql.markout.MODE_ENV_VAR
 import io.koalaql.markout.Markout
 import io.koalaql.markout.buildOutput
 import io.koalaql.markout.md.markdown
@@ -39,7 +40,7 @@ fun Markout.fileGen() = markdown("FILES") {
 
                     markdown("readme") {
                         -"A markdown file"
-                        -"The .MD prefix is automatically added to the filename"
+                        -"The .md prefix is automatically added to the filename"
                     }
                 }
             }
@@ -63,8 +64,18 @@ fun Markout.fileGen() = markdown("FILES") {
             }
         }
 
-        section("Check Mode") {
+        section("Expect Mode") {
+            p {
+                -"Running Markout in expect mode will cause it to fail when it encounters changes."
+                -"This allows you to check that files have been generated and are consistent"
+                -"with the code. It is intended for use in CI workflows."
+            }
 
+            p {
+                -"To use Expect mode, run markout with the `$MODE_ENV_VAR` environment variable set to `expect`."
+            }
+
+            code("shell", "$MODE_ENV_VAR=expect ./gradlew :readme:run")
         }
     }
 }

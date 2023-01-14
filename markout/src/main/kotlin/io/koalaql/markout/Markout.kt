@@ -194,13 +194,13 @@ private fun Output.expect(
     }
 }
 
-private fun executionModeProperty(): ExecutionMode {
-    val key = "MARKOUT_MODE"
+val MODE_ENV_VAR = "MARKOUT_MODE"
 
-    return when (val value = System.getenv(key)) {
+private fun executionModeProperty(): ExecutionMode {
+    return when (val value = System.getenv(MODE_ENV_VAR)) {
         null, "", "apply" -> ExecutionMode.APPLY
         "expect" -> ExecutionMode.EXPECT
-        else -> error("unexpected value `$value` for property $key")
+        else -> error("unexpected value `$value` for property $MODE_ENV_VAR")
     }
 }
 
