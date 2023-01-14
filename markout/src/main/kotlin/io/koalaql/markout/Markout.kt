@@ -21,7 +21,7 @@ interface Markout {
     fun file(name: String, contents: String)
 }
 
-private fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory {
+fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory {
     val entries = linkedMapOf<String, Output>()
 
     object : Markout {
