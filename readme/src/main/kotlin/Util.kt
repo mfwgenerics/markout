@@ -52,26 +52,38 @@ fun Markdown.sectioned(builder: Sections.() -> Unit) {
     actions.forEach { it() }
 }
 
-private class Prefix(
-    val indent: String = "",
-    val below: String = "",
-    val before: String = "",
-    val last: String = ""
-) {
-    fun last() = Prefix(
-        "$below| ",
-        "$below  ",
-        "$below|-",
-        "$below\\-"
-    )
+private fun interface RenderPrefix {
+    fun next(indent: String): Prefix
+}
 
-    fun next() = Prefix(
-        "$indent| ",
-        "$indent  ",
-        "$indent|-",
-        "$indent\\-"
+private val ASCII = RenderPrefix {
+    Prefix(
+        PrefixPair("$it| ", "$it|-"),
+        PrefixPair("$it  ", "$it\\-")
     )
 }
+
+private val PIPES = RenderPrefix {
+    Prefix(
+        PrefixPair("$it│  ", "$it├─╴"),
+        PrefixPair("$it   ", "$it└─╴")
+    )
+
+    /*Prefix(
+        PrefixPair("$it│ ", "$it├╴"),
+        PrefixPair("$it  ", "$it└╴")
+    )*/
+}
+
+private class PrefixPair(
+    val indent: String = "",
+    val before: String = "",
+)
+
+private class Prefix(
+    val pre: PrefixPair = PrefixPair(),
+    val post: PrefixPair = PrefixPair(),
+)
 
 private fun drawFileTree(
     prefix: Prefix,
@@ -83,17 +95,12 @@ private fun drawFileTree(
             val entries = output.entries().entries.toList()
 
             entries.forEachIndexed { ix, (key, output) ->
-                if (ix < entries.size - 1) {
-                    sb.append("\n${prefix.before}")
-                    sb.append(key)
+                val p = if (ix < entries.size - 1) prefix.pre else prefix.post
 
-                    drawFileTree(prefix.next(), output, sb)
-                } else {
-                    sb.append("\n${prefix.last}")
-                    sb.append(key)
+                sb.append("\n${p.before}")
+                sb.append(key)
 
-                    drawFileTree(prefix.last(), output, sb)
-                }
+                drawFileTree(PIPES.next(p.indent), output, sb)
             }
         }
         is OutputFile -> { }
@@ -101,7 +108,7 @@ private fun drawFileTree(
 }
 
 fun drawFileTree(output: Output): String =
-    "${StringBuilder().also { drawFileTree(Prefix("", "", "", ""), output, it) }}"
+    "${StringBuilder().also { drawFileTree(Prefix(), output, it) }}"
 
 fun main() {
     println(drawFileTree(buildOutput {
