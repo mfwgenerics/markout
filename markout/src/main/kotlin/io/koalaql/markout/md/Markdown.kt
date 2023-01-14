@@ -37,6 +37,8 @@ interface Markdown: MarkdownBlock {
     fun p(block: MarkdownBlock.() -> Unit)
     @MarkoutDsl
     fun p(text: String) = p { t(text) }
+    @MarkoutDsl
+    fun p() = p { }
 
     @MarkoutDsl
     fun hr()
