@@ -140,4 +140,14 @@ class ExpectModeTests {
             )
         }
     }
+
+    @Test
+    fun `unicode smoke test`() {
+        markout(
+            Path("./test-data/unicode"),
+            ExecutionMode.EXPECT
+        ) {
+            file("unicode.txt", "\uD83D\uDE80\uD83C\uDF3B\uD83C\uDF55\uD83C\uDF89\uD83D\uDE97\uD83C\uDF0A\uD83C\uDF3A\uD83C\uDFB8\uD83D\uDD25\uD83C\uDF08")
+        }
+    }
 }

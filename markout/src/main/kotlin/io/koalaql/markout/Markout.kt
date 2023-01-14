@@ -133,7 +133,7 @@ private class StreamMatcher(
     }
 
     override fun write(byte: Int) {
-        matches = matches && input.read() == byte
+        matches = matches && input.read() == byte and 0xFF
     }
 }
 
