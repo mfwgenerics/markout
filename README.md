@@ -7,9 +7,7 @@ allows literate programming and "executable documentation", enabling developers
 to ensure that documentation remains correct and up to date.
 
 1. [Getting Started](#getting-started)
-2. [Files](#files)
-3. [Markdown](#markdown)
-4. [Example](#example)
+2. [Usage](#usage)
 
 ## Getting Started
 
@@ -68,35 +66,8 @@ The above will produce the String
 Text with some *italics*.
 ```
 
-## Files
+## Usage
 
-## Markdown
-
-1. [Basic Syntax](docs/BASIC.md)
-2. [Extended Syntax](docs/EXTENDED.md)
-
-## Example
-
-```kotlin
-h1 { t("Hello "); b("Markout!") }
-
-p("Example paragraph")
-
-ol {
-    li("List")
-    li("Of")
-    li("Items")
-}
-```
-
-Will produce the following markdown
-
-```md
-# Hello **Markout!**
-
-Example paragraph
-
-1. List
-2. Of
-3. Items
-```
+1. [File Generation](docs/FILES.md)
+2. [Basic Markdown](docs/BASIC.md)
+3. [Extended Markdown](docs/EXTENDED.md)

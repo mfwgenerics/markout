@@ -9,6 +9,7 @@ fun main() = markout(Path("..")) {
     directory("docs") {
         basic()
         extended()
+        fileGen()
     }
 
     markdown("README") {
@@ -75,35 +76,12 @@ fun main() = markout(Path("..")) {
                 code("markdown", result)
             }
 
-            section("Files") {
-
-            }
-
-            section("Markdown") {
+            section("Usage") {
                 ol {
-                    li { a("docs/BASIC.md", "Basic Syntax") }
-                    li { a("docs/EXTENDED.md", "Extended Syntax") }
+                    li { a("docs/FILES.md", "File Generation") }
+                    li { a("docs/BASIC.md", "Basic Markdown") }
+                    li { a("docs/EXTENDED.md", "Extended Markdown") }
                 }
-            }
-
-            section("Example") {
-                val exampleMarkdown = markdownString {
-                    this@markdown.code("kotlin") {
-                        h1 { t("Hello "); b("Markout!") }
-
-                        p("Example paragraph")
-
-                        ol {
-                            li("List")
-                            li("Of")
-                            li("Items")
-                        }
-                    }
-                }
-
-                p("Will produce the following markdown")
-
-                code("md", exampleMarkdown)
             }
         }
     }

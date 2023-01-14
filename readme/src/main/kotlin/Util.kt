@@ -74,7 +74,9 @@ private fun drawFileTree(
 ) {
     when (output) {
         is OutputDirectory -> {
-            val entries = output.entries().entries.toList()
+            val entries = (mapOf(".markout" to OutputFile { }) + output.entries())
+                .entries
+                .toList()
 
             entries.forEachIndexed { ix, (key, output) ->
                 val p = if (ix < entries.size - 1) prefix.pre else prefix.post
