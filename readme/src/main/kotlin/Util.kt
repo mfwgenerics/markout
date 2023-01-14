@@ -52,28 +52,10 @@ fun Markdown.sectioned(builder: Sections.() -> Unit) {
     actions.forEach { it() }
 }
 
-private fun interface RenderPrefix {
-    fun next(indent: String): Prefix
-}
-
-private val ASCII = RenderPrefix {
-    Prefix(
-        PrefixPair("$it| ", "$it|-"),
-        PrefixPair("$it  ", "$it\\-")
-    )
-}
-
-private val PIPES = RenderPrefix {
-    Prefix(
-        PrefixPair("$it│  ", "$it├─╴"),
-        PrefixPair("$it   ", "$it└─╴")
-    )
-
-    /*Prefix(
-        PrefixPair("$it│ ", "$it├╴"),
-        PrefixPair("$it  ", "$it└╴")
-    )*/
-}
+private fun pipeify(indent: String) = Prefix(
+    PrefixPair("$indent│  ", "$indent├─ "),
+    PrefixPair("$indent   ", "$indent└─ ")
+)
 
 private class PrefixPair(
     val indent: String = "",
@@ -100,7 +82,7 @@ private fun drawFileTree(
                 sb.append("\n${p.before}")
                 sb.append(key)
 
-                drawFileTree(PIPES.next(p.indent), output, sb)
+                drawFileTree(pipeify(p.indent), output, sb)
             }
         }
         is OutputFile -> { }

@@ -2,6 +2,11 @@
 
 Markout is a library for generating markdown files and directories from Kotlin
 
+1. [Use](#use)
+2. [Files](#files)
+3. [Markdown](#markdown)
+4. [Example](#example)
+
 ## Use
 
 ```kotlin
@@ -10,7 +15,9 @@ dependencies {
 }
 ```
 
-## Syntax
+## Files
+
+## Markdown
 
 1. [Basic Syntax](docs/BASIC.md)
 2. [Extended Syntax](docs/EXTENDED.md)

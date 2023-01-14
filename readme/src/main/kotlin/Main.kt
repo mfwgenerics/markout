@@ -14,41 +14,48 @@ fun main() = markout(Path("..")) {
 
         t("Markout is a library for generating markdown files and directories from Kotlin")
 
-        h2("Use")
-
-        code("kotlin",
-            """
-            dependencies {
-                implementation("io.koalaql:markout:0.0.2")
+        sectioned {
+            section("Use") {
+                code(
+                    "kotlin",
+                    """
+                    dependencies {
+                        implementation("io.koalaql:markout:0.0.2")
+                    }
+                    """.trimIndent()
+                )
             }
-            """.trimIndent()
-        )
 
-        h2("Syntax")
+            section("Files") {
 
-        ol {
-            li { a("docs/BASIC.md", "Basic Syntax") }
-            li { a("docs/EXTENDED.md", "Extended Syntax") }
-        }
+            }
 
-        h2("Example")
-
-        val exampleMarkdown = markdownString {
-            this@markdown.code("kotlin") {
-                h1 { t("Hello "); b("Markout!") }
-
-                p("Example paragraph")
-
+            section("Markdown") {
                 ol {
-                    li("List")
-                    li("Of")
-                    li("Items")
+                    li { a("docs/BASIC.md", "Basic Syntax") }
+                    li { a("docs/EXTENDED.md", "Extended Syntax") }
                 }
             }
+
+            section("Example") {
+                val exampleMarkdown = markdownString {
+                    this@markdown.code("kotlin") {
+                        h1 { t("Hello "); b("Markout!") }
+
+                        p("Example paragraph")
+
+                        ol {
+                            li("List")
+                            li("Of")
+                            li("Items")
+                        }
+                    }
+                }
+
+                p("Will produce the following markdown")
+
+                code("md", exampleMarkdown)
+            }
         }
-
-        p("Will produce the following markdown")
-
-        code("md", exampleMarkdown)
     }
 }
