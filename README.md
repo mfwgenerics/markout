@@ -1,42 +1,73 @@
 # Markout
 
-Markout is a library for generating markdown files and directories from Kotlin
+Markout is a library for generating files, directories and Markdown documentation from Kotlin.
+It is designed for generating GitHub Flavored Markdown docs that live alongside code.
+Using [Kapshot](https://github.com/mfwgenerics/kapshot) with this project
+allows literate programming and "executable documentation", enabling developers
+to ensure that documentation remains correct and up to date.
 
-## Use
+1. [Getting Started](#getting-started)
+2. [Usage](#usage)
+
+## Getting Started
+
+Add the markout dependency
 
 ```kotlin
+/* build.gradle.kts */
 dependencies {
-    implementation("io.koalaql:markout:0.0.2")
+    implementation("io.koalaql:markout:0.0.3")
 }
 ```
 
-## Syntax
+#### File Generation
 
-1. [Basic Syntax](docs/BASIC.md)
-2. [Extended Syntax](docs/EXTENDED.md)
-
-## Example
+If you want to use markout as a documentation generator, call
+the `markout` function directly from your main method. Pass a path
+to the directory where you want markout to generate files.
+The path can be relative or absolute.
 
 ```kotlin
-h1 { t("Hello "); b("Markout!") }
+fun main() = markout(Path(".")) {
+    markdown("hello") {
+        p("This file was generated using markout")
 
-p("Example paragraph")
-
-ol {
-    li("List")
-    li("Of")
-    li("Items")
+        p {
+            i("Hello ") + "World!"
+        }
+    }
 }
 ```
 
-Will produce the following markdown
+Currently the Gradle application plugin is the best way to run a standalone markout project
 
-```md
-# Hello **Markout!**
-
-Example paragraph
-
-1. List
-2. Of
-3. Items
+```shell
+./gradlew :my-project:run
 ```
+
+#### Markdown Strings
+
+If you only want to use markout to generate Markdown strings then you can use
+`markdownString`
+
+```kotlin
+markdownString {
+    h1("My Markdown")
+
+    -"Text with some "+i("italics")+"."
+}
+```
+
+The above will produce the String
+
+```markdown
+# My Markdown
+
+Text with some *italics*.
+```
+
+## Usage
+
+1. [File Generation](docs/FILES.md)
+2. [Basic Markdown](docs/BASIC.md)
+3. [Extended Markdown](docs/EXTENDED.md)

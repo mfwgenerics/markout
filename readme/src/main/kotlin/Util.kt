@@ -1,8 +1,12 @@
 import io.koalaql.kapshot.Capturable
 import io.koalaql.kapshot.Source
 import io.koalaql.markout.MarkoutDsl
+import io.koalaql.markout.buildOutput
 import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdownString
+import io.koalaql.markout.output.Output
+import io.koalaql.markout.output.OutputDirectory
+import io.koalaql.markout.output.OutputFile
 
 fun interface CapturedBuilderBlock: Capturable<CapturedBuilderBlock> {
     fun Markdown.build()
@@ -47,3 +51,45 @@ fun Markdown.sectioned(builder: Sections.() -> Unit) {
 
     actions.forEach { it() }
 }
+
+private fun pipeify(indent: String) = Prefix(
+    PrefixPair("$indent│  ", "$indent├─ "),
+    PrefixPair("$indent   ", "$indent└─ ")
+)
+
+private class PrefixPair(
+    val indent: String = "",
+    val before: String = "",
+)
+
+private class Prefix(
+    val pre: PrefixPair = PrefixPair(),
+    val post: PrefixPair = PrefixPair(),
+)
+
+private fun drawFileTree(
+    prefix: Prefix,
+    output: Output,
+    sb: StringBuilder
+) {
+    when (output) {
+        is OutputDirectory -> {
+            val entries = (mapOf(".markout" to OutputFile { }) + output.entries())
+                .entries
+                .toList()
+
+            entries.forEachIndexed { ix, (key, output) ->
+                val p = if (ix < entries.size - 1) prefix.pre else prefix.post
+
+                sb.append("\n${p.before}")
+                sb.append(key)
+
+                drawFileTree(pipeify(p.indent), output, sb)
+            }
+        }
+        is OutputFile -> { }
+    }
+}
+
+fun drawFileTree(output: Output): String =
+    "${StringBuilder().also { drawFileTree(Prefix(), output, it) }}"
