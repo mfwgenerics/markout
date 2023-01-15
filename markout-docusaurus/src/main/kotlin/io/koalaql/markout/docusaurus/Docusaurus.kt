@@ -1,7 +1,6 @@
 package io.koalaql.markout.docusaurus
 
 import io.koalaql.markout.MarkoutDsl
-import io.koalaql.markout.md.Markdown
 
 @MarkoutDsl
 interface Docusaurus {
@@ -10,5 +9,5 @@ interface Docusaurus {
     @MarkoutDsl
     fun file(name: String, contents: String)
     @MarkoutDsl
-    fun markdown(name: String, builder: Markdown.() -> Unit)
+    fun markdown(name: String, builder: DocusaurusMarkdown.() -> Unit)
 }

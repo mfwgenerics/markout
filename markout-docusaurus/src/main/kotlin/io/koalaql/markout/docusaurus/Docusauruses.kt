@@ -6,6 +6,11 @@ import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdown
 import io.koalaql.markout.md.markdownString
 
+private class DocusaurusMarkdownImpl(
+    private val markdown: Markdown
+): DocusaurusMarkdown, Markdown by markdown {
+}
+
 private class DirectoryContext(
     private val markout: Markout,
     private val position: Int
@@ -33,8 +38,10 @@ private class DirectoryContext(
         markout.file(name, contents)
     }
 
-    override fun markdown(name: String, builder: Markdown.() -> Unit) {
-        markout.markdown(name, builder)
+    override fun markdown(name: String, builder: DocusaurusMarkdown.() -> Unit) {
+        markout.markdown(name) {
+            DocusaurusMarkdownImpl(this).builder()
+        }
     }
 
     fun category() {
@@ -78,7 +85,7 @@ fun Markout.docusaurus(block: Docusaurus.() -> Unit) {
             this@docusaurus.file(name, contents)
         }
 
-        override fun markdown(name: String, builder: Markdown.() -> Unit) {
+        override fun markdown(name: String, builder: DocusaurusMarkdown.() -> Unit) {
             val position = ++sidebarPosition
 
             file("$name.md", markdownString(trailingNewline = true) {
@@ -91,7 +98,7 @@ fun Markout.docusaurus(block: Docusaurus.() -> Unit) {
                     block = true
                 )
 
-                builder()
+                DocusaurusMarkdownImpl(this).builder()
             })
         }
     }.block()
