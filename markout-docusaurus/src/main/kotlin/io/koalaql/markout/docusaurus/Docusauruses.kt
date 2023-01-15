@@ -6,11 +6,6 @@ import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdown
 import io.koalaql.markout.md.markdownString
 
-private class DocusaurusMarkdownImpl(
-    private val markdown: Markdown
-): DocusaurusMarkdown, Markdown by markdown {
-}
-
 private class DirectoryContext(
     private val markout: Markout,
     private val position: Int
