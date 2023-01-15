@@ -1,12 +1,13 @@
 import io.koalaql.kapshot.Capturable
 import io.koalaql.kapshot.Source
 import io.koalaql.markout.MarkoutDsl
-import io.koalaql.markout.buildOutput
 import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdownString
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
+import io.koalaql.markout.text.AppendableLineWriter
+import io.koalaql.markout.text.LineWriter
 
 fun interface CapturedBuilderBlock: Capturable<CapturedBuilderBlock> {
     fun Markdown.build()
@@ -52,11 +53,6 @@ fun Markdown.sectioned(builder: Sections.() -> Unit) {
     actions.forEach { it() }
 }
 
-private fun pipeify(indent: String) = Prefix(
-    PrefixPair("$indent│  ", "$indent├─ "),
-    PrefixPair("$indent   ", "$indent└─ ")
-)
-
 private class PrefixPair(
     val indent: String = "",
     val before: String = "",
@@ -67,10 +63,20 @@ private class Prefix(
     val post: PrefixPair = PrefixPair(),
 )
 
+private val NO_PREFIX = Prefix(
+    PrefixPair("", ""),
+    PrefixPair("", "")
+)
+
+private val PIPES_PREFIX = Prefix(
+    PrefixPair("│  ", "├─ "),
+    PrefixPair("   ", "└─ ")
+)
+
 private fun drawFileTree(
     prefix: Prefix,
     output: Output,
-    sb: StringBuilder
+    writer: LineWriter
 ) {
     when (output) {
         is OutputDirectory -> {
@@ -81,11 +87,11 @@ private fun drawFileTree(
             entries.forEachIndexed { ix, (key, output) ->
                 val p = if (ix < entries.size - 1) prefix.pre else prefix.post
 
-                sb.append(p.before)
-                sb.append(key)
-                sb.append("\n")
+                writer.inline(p.before)
+                writer.inline(key)
+                writer.newline()
 
-                drawFileTree(pipeify(p.indent), output, sb)
+                drawFileTree(PIPES_PREFIX, output, writer.prefixed(p.indent))
             }
         }
         is OutputFile -> { }
@@ -93,4 +99,4 @@ private fun drawFileTree(
 }
 
 fun drawFileTree(output: Output): String =
-    "${StringBuilder().also { drawFileTree(Prefix(), output, it) }}".trimEnd()
+    "${StringBuilder().also { drawFileTree(NO_PREFIX, output, AppendableLineWriter(it).trimmedLines()) }}"
