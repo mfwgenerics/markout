@@ -81,8 +81,9 @@ private fun drawFileTree(
             entries.forEachIndexed { ix, (key, output) ->
                 val p = if (ix < entries.size - 1) prefix.pre else prefix.post
 
-                sb.append("\n${p.before}")
+                sb.append(p.before)
                 sb.append(key)
+                sb.append("\n")
 
                 drawFileTree(pipeify(p.indent), output, sb)
             }
@@ -92,4 +93,4 @@ private fun drawFileTree(
 }
 
 fun drawFileTree(output: Output): String =
-    "${StringBuilder().also { drawFileTree(Prefix(), output, it) }}"
+    "${StringBuilder().also { drawFileTree(Prefix(), output, it) }}".trimEnd()

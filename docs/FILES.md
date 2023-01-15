@@ -40,7 +40,6 @@ markout(Path("..")) {
 When this code is run it generates the following file tree
 
 ```
-
 .markout
 my-directory
 ├─ .markout
