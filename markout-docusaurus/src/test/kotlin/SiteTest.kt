@@ -13,10 +13,6 @@ class SiteTest {
         docusaurus {
             markdown("intro") {
 raw("""
-    ---
-    sidebar_position: 1
-    ---
-
     # Tutorial Intro
 
     Let's discover **Docusaurus in less than 5 minutes**.
@@ -62,6 +58,20 @@ raw("""
     Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
 
 """.trimIndent())
+            }
+
+            directory("tutorial-basics") {
+                label = "Tutorial - Basics"
+
+                link(
+                    description = "5 minutes to learn the most important Docusaurus concepts."
+                )
+            }
+
+            directory("tutorial-extras") {
+                label = "Tutorial - Extras"
+
+                link()
             }
         }
     }
