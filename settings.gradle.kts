@@ -3,4 +3,5 @@ pluginManagement {
 }
 
 include("markout")
+include("markout-docusaurus")
 include("readme")
