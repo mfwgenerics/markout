@@ -14,6 +14,8 @@ interface DocusaurusContext {
 
     @MarkoutDsl
     fun markdown(name: String, builder: Markdown.() -> Unit) {
-        file("$name.md", markdownString(builder))
+        file("$name.md", markdownString(trailingNewline = true) {
+            builder()
+        })
     }
 }
