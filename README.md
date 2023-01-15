@@ -69,5 +69,4 @@ Text with some *italics*.
 ## Usage
 
 1. [File Generation](docs/FILES.md)
-2. [Basic Markdown](docs/BASIC.md)
-3. [Extended Markdown](docs/EXTENDED.md)
+2. [Markdown](docs/MARKDOWN.md)

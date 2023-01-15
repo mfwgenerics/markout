@@ -14,8 +14,8 @@ fun <T> Markdown.code(lang: String, code: CapturedBlock<T>): T {
 @MarkoutDsl
 fun <T> Markdown.code(code: CapturedBlock<T>): T = code("kotlin", code)
 
-fun Markout.basic() = markdown("BASIC") {
-    h1("Basic Syntax")
+fun Markout.markdownDocs() = markdown("MARKDOWN") {
+    h1("Markdown")
 
     sectioned {
         section("Headers") {
@@ -189,6 +189,39 @@ fun Markout.basic() = markdown("BASIC") {
                     a(cite("https://example.com", "Example"), "References")
                     +" can be titled"
                 }
+            }
+        }
+
+        section("Tables") {
+            example {
+                table {
+                    th {
+                        td("Column 1")
+                        td { i("Italic Column") }
+                    }
+
+                    tr {
+                        td("1997")
+                        td("Non-italic")
+                    }
+
+                    tr {
+                        td("2023")
+                        td { i("Italic") }
+                    }
+                }
+            }
+        }
+
+        section("Footnotes") {
+            example {
+                fun note() = footnote("""
+                    At the moment there is no way to re-use footnotes
+                    and the requirement for the note text to appear at
+                    the site of the footnote call is less than ideal
+                """)
+
+                +"The syntax is a work in progress" + note() + " but footnotes are possible."
             }
         }
     }

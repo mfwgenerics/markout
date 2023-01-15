@@ -7,8 +7,7 @@ private val CURRENT_VERSION = "0.0.4"
 
 fun main() = markout(Path("..")) {
     directory("docs") {
-        basic()
-        extended()
+        markdownDocs()
         fileGen()
     }
 
@@ -16,7 +15,7 @@ fun main() = markout(Path("..")) {
         h1("Markout")
 
         -"Markout is a library for generating files, directories and Markdown documentation from Kotlin."
-        -"It is designed for generating GitHub Flavored Markdown docs that live alongside code." +
+        -"It is designed for generating GitHub Flavored Markdown docs that live alongside code."
         -"Using "+a("https://github.com/mfwgenerics/kapshot", "Kapshot")+" with this project"
         -"allows literate programming and \"executable documentation\", enabling developers"
         -"to ensure that documentation remains correct and up to date."
@@ -79,8 +78,7 @@ fun main() = markout(Path("..")) {
             section("Usage") {
                 ol {
                     li { a("docs/FILES.md", "File Generation") }
-                    li { a("docs/BASIC.md", "Basic Markdown") }
-                    li { a("docs/EXTENDED.md", "Extended Markdown") }
+                    li { a("docs/MARKDOWN.md", "Markdown") }
                 }
             }
         }
