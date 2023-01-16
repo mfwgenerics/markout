@@ -8,8 +8,9 @@
 6. [Code](#code)
 7. [Horizontal Rules](#horizontal-rules)
 8. [Links](#links)
-9. [Tables](#tables)
-10. [Footnotes](#footnotes)
+9. [Images](#images)
+10. [Tables](#tables)
+11. [Footnotes](#footnotes)
 
 ## Headers
 
@@ -447,6 +448,50 @@ Reference [links][1] are de-duplicated
 > Reference [links][1] are de-duplicated
 > 
 > [References][2] can be titled
+
+## Images
+
+### Kotlin
+
+```kotlin
+p {
+    +"In inline contexts images will "
+    img("markout.png")
+    +" be shown inline "
+    img("markout.png", "Alt text", "Title text is displayed on hover")
+}
+
++"At top level images will be treated as blocks and vertically separated"
+img("markout.png")
+img("markout.png")
+img("unknown.png", "Alt text is displayed when the image can't be displayed")
+```
+
+### Generated
+
+```markdown
+In inline contexts images will ![](markout.png) be shown inline ![Alt text](markout.png "Title text is displayed on hover")
+
+At top level images will be treated as blocks and vertically separated
+
+![](markout.png)
+
+![](markout.png)
+
+![Alt text is displayed when the image can't be displayed](unknown.png)
+```
+
+### Rendered
+
+> In inline contexts images will ![](markout.png) be shown inline ![Alt text](markout.png "Title text is displayed on hover")
+> 
+> At top level images will be treated as blocks and vertically separated
+> 
+> ![](markout.png)
+> 
+> ![](markout.png)
+> 
+> ![Alt text is displayed when the image can't be displayed](unknown.png)
 
 ## Tables
 

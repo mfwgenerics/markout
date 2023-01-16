@@ -8,7 +8,7 @@ import io.koalaql.markout.text.AppendableLineWriter
 fun markdownString(builder: Markdown.() -> Unit): String {
     val sb = StringBuilder()
 
-    MarkdownBuilder(AppendableLineWriter(sb)).apply {
+    MarkdownBuilder(AppendableLineWriter(sb), top = true).apply {
         builder()
         footer()
     }
