@@ -204,7 +204,7 @@ fun Markout.markdownDocs() = markdown("MARKDOWN") {
                 +"At top level images will be treated as blocks and vertically separated"
                 img("markout.png")
                 img("markout.png")
-                img("unknown.png", "Alt text is displayed when the image can't be displayed load")
+                img("unknown.png", "Alt text is displayed when the image can't be displayed")
             }
         }
 
