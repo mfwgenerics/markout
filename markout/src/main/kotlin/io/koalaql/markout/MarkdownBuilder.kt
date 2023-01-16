@@ -6,7 +6,8 @@ import io.koalaql.markout.text.LineWriter
 
 class MarkdownBuilder(
     private val writer: LineWriter,
-    private val bibliography: Bibliography = Bibliography()
+    private val bibliography: Bibliography = Bibliography(),
+    private val top: Boolean
 ) : Markdown {
     private sealed interface BuilderState {
         object Fresh : BuilderState
@@ -49,7 +50,7 @@ class MarkdownBuilder(
                     writer
                 }
 
-                val builder = MarkdownBuilder(writer.trimmedLines().paragraphRules(), bibliography)
+                val builder = MarkdownBuilder(writer.trimmedLines().paragraphRules(), bibliography, false)
 
                 state = BuilderState.Inline(builder)
 
@@ -74,7 +75,7 @@ class MarkdownBuilder(
             }
         }
 
-        MarkdownBuilder(writer.trimmedLines(), bibliography).block()
+        MarkdownBuilder(writer.trimmedLines(), bibliography, false).block()
     }
 
     override fun t(line: MarkdownInline.() -> Unit) = inlined(line)
@@ -98,6 +99,14 @@ class MarkdownBuilder(
         link(href.label, line)
     }
 
+    override fun img(href: String, alt: String, title: String) {
+        val suffix = if (title.isNotBlank()) " \"$title\"" else ""
+
+        val raw = "![$alt]($href$suffix)"
+
+        if (top) p(raw) else t(raw)
+    }
+
     override fun i(block: MarkdownInline.() -> Unit) = inlined {
         writer.inline("*")
         block()
@@ -117,7 +126,7 @@ class MarkdownBuilder(
     }
 
     override fun p(block: MarkdownBlock.() -> Unit) = blocked {
-        MarkdownBuilder(writer.paragraphRules(), bibliography).block()
+        MarkdownBuilder(writer.paragraphRules(), bibliography, false).block()
     }
 
     override fun hr() = blocked {
@@ -131,7 +140,7 @@ class MarkdownBuilder(
     }
 
     override fun quote(block: Markdown.() -> Unit) = blocked {
-        MarkdownBuilder(writer.prefixed("> "), bibliography).block()
+        MarkdownBuilder(writer.prefixed("> "), bibliography, true).block()
     }
 
     override fun code(lang: String, code: String) = blocked {
@@ -161,7 +170,7 @@ class MarkdownBuilder(
 
             if (prefix.length != label.length) prefix = " ".repeat(label.length)
 
-            MarkdownBuilder(writer.prefixed(prefix, start = false), bibliography).block()
+            MarkdownBuilder(writer.prefixed(prefix, start = false), bibliography, true).block()
         }
     }
 
@@ -214,7 +223,7 @@ class MarkdownBuilder(
         fun cells(row: MarkdownTableRow.() -> Unit): List<String> = arrayListOf<String>().apply {
             row {
                 val sb = StringBuilder()
-                MarkdownBuilder(AppendableLineWriter(sb), bibliography).it()
+                MarkdownBuilder(AppendableLineWriter(sb), bibliography, false).it()
                 add("$sb")
             }
         }
