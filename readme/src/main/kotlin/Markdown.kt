@@ -195,7 +195,7 @@ fun Markout.markdownDocs() = markdown("MARKDOWN") {
         section("Images") {
             example {
                 p {
-                    +"In inline contexts images will"
+                    +"In inline contexts images will "
                     img("markout.png")
                     +" be shown inline "
                     img("markout.png", "Alt text", "Title text is displayed on hover")

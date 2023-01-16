@@ -455,7 +455,7 @@ Reference [links][1] are de-duplicated
 
 ```kotlin
 p {
-    +"In inline contexts images will"
+    +"In inline contexts images will "
     img("markout.png")
     +" be shown inline "
     img("markout.png", "Alt text", "Title text is displayed on hover")
@@ -470,7 +470,7 @@ img("unknown.png", "Alt text is displayed when the image doesn't load")
 ### Generated
 
 ```markdown
-In inline contexts images will![markout.png](markout.png) be shown inline ![Title text is displayed on hover](markout.png "Alt text")
+In inline contexts images will ![markout.png](markout.png) be shown inline ![Title text is displayed on hover](markout.png "Alt text")
 
 At top level images will be treated as blocks and vertically separated
 
@@ -483,7 +483,7 @@ At top level images will be treated as blocks and vertically separated
 
 ### Rendered
 
-> In inline contexts images will![markout.png](markout.png) be shown inline ![Title text is displayed on hover](markout.png "Alt text")
+> In inline contexts images will ![markout.png](markout.png) be shown inline ![Title text is displayed on hover](markout.png "Alt text")
 > 
 > At top level images will be treated as blocks and vertically separated
 > 
