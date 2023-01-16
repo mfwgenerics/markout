@@ -464,7 +464,7 @@ p {
 +"At top level images will be treated as blocks and vertically separated"
 img("markout.png")
 img("markout.png")
-img("unknown.png", "Alt text is displayed when the image can't be displayed load")
+img("unknown.png", "Alt text is displayed when the image can't be displayed")
 ```
 
 ### Generated
@@ -478,7 +478,7 @@ At top level images will be treated as blocks and vertically separated
 
 ![](markout.png)
 
-![Alt text is displayed when the image can't be displayed load](unknown.png)
+![Alt text is displayed when the image can't be displayed](unknown.png)
 ```
 
 ### Rendered
@@ -491,7 +491,7 @@ At top level images will be treated as blocks and vertically separated
 > 
 > ![](markout.png)
 > 
-> ![Alt text is displayed when the image can't be displayed load](unknown.png)
+> ![Alt text is displayed when the image can't be displayed](unknown.png)
 
 ## Tables
 
