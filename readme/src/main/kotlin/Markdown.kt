@@ -192,6 +192,22 @@ fun Markout.markdownDocs() = markdown("MARKDOWN") {
             }
         }
 
+        section("Images") {
+            example {
+                p {
+                    +"In inline contexts images will"
+                    img("markout.png")
+                    +" be shown inline "
+                    img("markout.png", "Alt text", "Title text is displayed on hover")
+                }
+
+                +"At top level images will be treated as blocks and vertically separated"
+                img("markout.png")
+                img("markout.png")
+                img("unknown.png", "Alt text is displayed when the image doesn't load")
+            }
+        }
+
         section("Tables") {
             example {
                 table {

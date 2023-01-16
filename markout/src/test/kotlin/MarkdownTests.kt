@@ -453,4 +453,52 @@ class MarkdownTests {
             }
         )
     }
+
+    @Test
+    fun `img placed inline or block depending on context`() {
+        assertEquals("""
+            ![block](block)
+
+            ![block](block)
+            
+            ![inline](inline)![inline](inline)
+            
+            > ![block](block)
+            > 
+            > ![block](block)
+            
+            1. ![block](block)
+               
+               ![block](block)
+               
+               ![inline](inline)![inline](inline)
+        """.trimIndent(),
+            markdownString {
+                img("block")
+                img("block")
+
+                p {
+                    img("inline")
+                    img("inline")
+                }
+
+                quote {
+                    img("block")
+                    img("block")
+                }
+
+                ol {
+                    li {
+                        img("block")
+                        img("block")
+
+                        t {
+                            img("inline")
+                            img("inline")
+                        }
+                    }
+                }
+            }
+        )
+    }
 }
