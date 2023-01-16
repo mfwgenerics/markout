@@ -34,7 +34,7 @@ interface MarkdownInline {
     fun a(href: Citation, text: String) = a(href) { t(text) }
 
     @MarkoutDsl
-    fun img(href: String, title: String = "", alt: String = "")
+    fun img(href: String, alt: String = "", title: String = "")
 
     @MarkoutDsl
     fun t(line: MarkdownInline.() -> Unit)

@@ -457,21 +457,21 @@ class MarkdownTests {
     @Test
     fun `img placed inline or block depending on context`() {
         assertEquals("""
-            ![block](block)
+            ![](block)
 
-            ![block](block)
+            ![](block)
             
-            ![inline](inline)![inline](inline)
+            ![](inline)![](inline)
             
-            > ![block](block)
+            > ![](block)
             > 
-            > ![block](block)
+            > ![](block)
             
-            1. ![block](block)
+            1. ![](block)
                
-               ![block](block)
+               ![](block)
                
-               ![inline](inline)![inline](inline)
+               ![](inline)![](inline)
         """.trimIndent(),
             markdownString {
                 img("block")

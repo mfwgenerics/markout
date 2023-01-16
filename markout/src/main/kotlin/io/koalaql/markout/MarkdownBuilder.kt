@@ -99,16 +99,10 @@ class MarkdownBuilder(
         link(href.label, line)
     }
 
-    override fun img(href: String, title: String, alt: String) {
-        val computedAlt = when {
-            alt.isNotBlank() -> alt
-            title.isNotBlank() -> title
-            else -> href
-        }
-
+    override fun img(href: String, alt: String, title: String) {
         val suffix = if (title.isNotBlank()) " \"$title\"" else ""
 
-        val raw = "![$computedAlt]($href$suffix)"
+        val raw = "![$alt]($href$suffix)"
 
         if (top) p(raw) else t(raw)
     }

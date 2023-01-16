@@ -464,34 +464,34 @@ p {
 +"At top level images will be treated as blocks and vertically separated"
 img("markout.png")
 img("markout.png")
-img("unknown.png", "Alt text is displayed when the image doesn't load")
+img("unknown.png", "Alt text is displayed when the image can't be displayed load")
 ```
 
 ### Generated
 
 ```markdown
-In inline contexts images will ![markout.png](markout.png) be shown inline ![Title text is displayed on hover](markout.png "Alt text")
+In inline contexts images will ![](markout.png) be shown inline ![Alt text](markout.png "Title text is displayed on hover")
 
 At top level images will be treated as blocks and vertically separated
 
-![markout.png](markout.png)
+![](markout.png)
 
-![markout.png](markout.png)
+![](markout.png)
 
-![Alt text is displayed when the image doesn't load](unknown.png "Alt text is displayed when the image doesn't load")
+![Alt text is displayed when the image can't be displayed load](unknown.png)
 ```
 
 ### Rendered
 
-> In inline contexts images will ![markout.png](markout.png) be shown inline ![Title text is displayed on hover](markout.png "Alt text")
+> In inline contexts images will ![](markout.png) be shown inline ![Alt text](markout.png "Title text is displayed on hover")
 > 
 > At top level images will be treated as blocks and vertically separated
 > 
-> ![markout.png](markout.png)
+> ![](markout.png)
 > 
-> ![markout.png](markout.png)
+> ![](markout.png)
 > 
-> ![Alt text is displayed when the image doesn't load](unknown.png "Alt text is displayed when the image doesn't load")
+> ![Alt text is displayed when the image can't be displayed load](unknown.png)
 
 ## Tables
 
