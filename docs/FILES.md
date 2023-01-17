@@ -32,7 +32,7 @@ markout(Path("..")) {
 
     markdown("readme") {
         -"A markdown file"
-        -"The .md prefix is automatically added to the filename"
+        -"The .md extension is automatically added to the filename if it is not present"
     }
 }
 ```
