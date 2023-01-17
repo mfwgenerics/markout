@@ -30,8 +30,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 19
-      - name: Publish Kotlin plugin + runtime dependencies
-        run: ./gradlew :markout:publish
+      - name: Publish to Maven Central
+        run: ./gradlew publish
         env:
           REPOSITORY_ID: ${{ needs.staging_repository.outputs.repository_id }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}

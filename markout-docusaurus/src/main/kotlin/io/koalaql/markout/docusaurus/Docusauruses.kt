@@ -34,8 +34,13 @@ private class DirectoryContext(
     }
 
     override fun markdown(name: String, builder: DocusaurusMarkdown.() -> Unit) {
+        val position = ++sidebarPosition
+
         markout.markdown(name) {
-            DocusaurusMarkdownImpl(this).builder()
+            DocusaurusMarkdownImpl(this).apply {
+                sidebar(position)
+                builder()
+            }
         }
     }
 
@@ -84,16 +89,10 @@ fun Markout.docusaurus(block: Docusaurus.() -> Unit) {
             val position = ++sidebarPosition
 
             file("$name.md", markdownString(trailingNewline = true) {
-                raw(
-                    """
-                    ---
-                    sidebar_position: $position
-                    ---
-                    """.trimIndent(),
-                    block = true
-                )
-
-                DocusaurusMarkdownImpl(this).builder()
+                DocusaurusMarkdownImpl(this).apply {
+                    sidebar(position)
+                    builder()
+                }
             })
         }
     }.block()
