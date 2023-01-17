@@ -18,5 +18,11 @@ fun markdownString(builder: Markdown.() -> Unit): String {
 
 @MarkoutDsl
 fun Markout.markdown(name: String, builder: Markdown.() -> Unit) {
-    file("$name.md", markdownString(builder))
+    val suffixed = when {
+        name.endsWith(".md", ignoreCase = true) ||
+        name.endsWith(".mdx", ignoreCase = true) -> name
+        else -> "$name.md"
+    }
+
+    file(suffixed, markdownString(builder))
 }
