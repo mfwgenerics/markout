@@ -8,7 +8,7 @@ class SiteTest {
     @Test
     fun `matches test site`() = markout(
         Path("./testing/docs"),
-        mode = ExecutionMode.EXPECT
+        mode = ExecutionMode.APPLY
     ) {
         docusaurus {
             markdown("intro") {
@@ -25,20 +25,9 @@ class SiteTest {
                 )
 
                 markdown("create-a-page") {
-                    raw("""
-                        # Create a Page
+                    h1("Create a Page")
 
-                        Add **Markdown or React** files to `src/pages` to create a **standalone page**:
-
-                        - `src/pages/index.js` → `localhost:3000/`
-                        - `src/pages/foo.md` → `localhost:3000/foo`
-                        - `src/pages/foo/bar.js` → `localhost:3000/foo/bar`
-
-                        ## Create your first React Page
-
-                        Create a file at `src/pages/my-react-page.js`:
-
-                        ```jsx title="src/pages/my-react-page.js"
+                    code("jsx", "src/pages/my-react-page.js", """
                         import React from 'react';
                         import Layout from '@theme/Layout';
 
@@ -50,21 +39,25 @@ class SiteTest {
                             </Layout>
                           );
                         }
-                        ```
+                    """.trimIndent())
 
-                        A new page is now available at [http://localhost:3000/my-react-page](http://localhost:3000/my-react-page).
-
-                        ## Create your first Markdown Page
-
-                        Create a file at `src/pages/my-markdown-page.md`:
-
-                        ```mdx title="src/pages/my-markdown-page.md"
+                    code("mdx", "src/pages/my-markdown-page.md", """
                         # My Markdown page
 
                         This is a Markdown page
-                        ```
+                    """.trimIndent())
+                }
 
-                        A new page is now available at [http://localhost:3000/my-markdown-page](http://localhost:3000/my-markdown-page).
+                markdown("create-a-document") {
+                    code("md", "docs/hello.md", 1..4, """
+                        ---
+                        sidebar_label: 'Hi!'
+                        sidebar_position: 3
+                        ---
+
+                        # Hello
+
+                        This is my **first Docusaurus document**!
                     """.trimIndent())
                 }
             }

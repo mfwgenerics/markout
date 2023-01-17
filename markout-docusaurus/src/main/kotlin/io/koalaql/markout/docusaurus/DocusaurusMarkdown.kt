@@ -7,6 +7,25 @@ import io.koalaql.markout.md.markdownString
 @MarkoutDsl
 interface DocusaurusMarkdown: Markdown {
     @MarkoutDsl
+    fun code(lang: String, title: String, code: String) =
+        code("$lang title=\"$title\"", code)
+
+    @MarkoutDsl
+    fun code(lang: String, title: String, highlight: ClosedRange<Int>, code: String) {
+        val lines = if (highlight.start == highlight.endInclusive) {
+            "{${highlight.start}}"
+        } else {
+            "{${highlight.start}-${highlight.endInclusive}}"
+        }
+
+        code("$lang title=\"$title\" $lines", code)
+    }
+
+    @MarkoutDsl
+    fun code(lang: String, title: String, highlight: Int, code: String) =
+        code(lang, title, highlight..highlight, code)
+
+    @MarkoutDsl
     fun callout(type: String, title: String = "", block: DocusaurusMarkdown.() -> Unit) {
         val contents = markdownString {
             DocusaurusMarkdownImpl(this).block()
