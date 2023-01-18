@@ -12,6 +12,8 @@ class SiteTest {
     ) {
         docusaurus {
             markdown("intro") {
+                slug = "/"
+
                 h1("Intro")
 
                 p("Text")

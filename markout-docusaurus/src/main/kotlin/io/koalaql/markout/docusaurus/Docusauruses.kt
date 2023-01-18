@@ -1,31 +1,27 @@
 package io.koalaql.markout.docusaurus
 
-import io.koalaql.markout.MarkdownBuilder
 import io.koalaql.markout.Markout
 import io.koalaql.markout.MarkoutDsl
 import io.koalaql.markout.md.markdown
 import io.koalaql.markout.md.markdownString
-import io.koalaql.markout.text.AppendableLineWriter
 
 private fun docusaurusMdFile(
     position: Int,
     builder: DocusaurusMarkdownFile.() -> Unit
 ): String {
-    val sb = StringBuilder()
+    lateinit var header: String
 
-    lateinit var impl: MarkdownFileImpl
-    val lw = AppendableLineWriter(sb)
+    val body = markdownString(trailingNewline = true) {
+        val impl = MarkdownFileImpl(this, position)
 
-    impl = MarkdownFileImpl(MarkdownBuilder(lw, top = true))
+        impl.builder()
 
-    impl.sidebar(position)
-    impl.builder()
+        header = impl.header()
+    }
 
-    if (sb.isEmpty()) return ""
+    if (body.isEmpty()) return header
 
-    sb.append("\n")
-
-    return "$sb"
+    return "$header\n$body"
 }
 
 private class DirectoryContext(
