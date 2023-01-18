@@ -38,6 +38,7 @@ fun interface Sections {
     fun section(title: String, contents: Markdown.() -> Unit)
 }
 
+@MarkoutDsl
 fun Markdown.sectioned(builder: Sections.() -> Unit) {
     val actions = arrayListOf<Markdown.() -> Unit>()
 

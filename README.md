@@ -1,17 +1,30 @@
-# Markout
+# Markout: Markdown DSL and File Generator
 
 Markout is a library for generating files, directories and Markdown documentation from Kotlin.
 It is designed for generating GitHub Flavored Markdown docs that live alongside code.
 Using [Kapshot](https://github.com/mfwgenerics/kapshot) with this project
-allows literate programming and "executable documentation", enabling developers
-to ensure that documentation remains correct and up to date.
+allows literate programming and "executable documentation" which ensures
+that documentation remains correct and up to date.
 
-1. [Getting Started](#getting-started)
-2. [Usage](#usage)
+1. [Intro](#intro)
+2. [Getting Started](#getting-started)
+3. [Usage](#usage)
+
+## Intro
+
+Markout provides a fully featured Markdown DSL to support documentation
+generation and automation. It is flexible, mixes easily with raw markdown and
+is intended to be built upon and used in conjunction with other tools.
+The Markdown DSL can build strings or output directly to a file.
+
+In addition to the Markdown DSL, Markout provides tools for managing
+generated files and directories. Files and directories can be declared using
+a DSL and then validated or synchronized. Snapshot testing can be performed on
+generated files.
 
 ## Getting Started
 
-Add the markout dependency
+Add the `markout` dependency
 
 ```kotlin
 /* build.gradle.kts */
@@ -22,9 +35,9 @@ dependencies {
 
 #### File Generation
 
-If you want to use markout as a documentation generator, call
+If you want to use Markout as a documentation generator, call
 the `markout` function directly from your main method. Pass a path
-to the directory where you want markout to generate files.
+to the directory where you want Markout to generate files.
 The path can be relative or absolute.
 
 ```kotlin
@@ -39,7 +52,7 @@ fun main() = markout(Path(".")) {
 }
 ```
 
-Currently the Gradle application plugin is the best way to run a standalone markout project
+Currently the Gradle application plugin is the best way to run a standalone Markout project
 
 ```shell
 ./gradlew :my-project:run
@@ -47,7 +60,7 @@ Currently the Gradle application plugin is the best way to run a standalone mark
 
 #### Markdown Strings
 
-If you only want to use markout to generate Markdown strings then you can use
+If you only want to use Markout to generate Markdown strings then you can use
 `markdownString`
 
 ```kotlin
