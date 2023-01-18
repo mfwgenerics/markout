@@ -8,7 +8,7 @@ class SiteTest {
     @Test
     fun `matches test site`() = markout(
         Path("./testing/docs"),
-        mode = ExecutionMode.APPLY
+        mode = ExecutionMode.EXPECT
     ) {
         docusaurus {
             markdown("intro") {

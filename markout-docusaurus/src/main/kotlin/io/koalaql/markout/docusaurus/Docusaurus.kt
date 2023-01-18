@@ -9,5 +9,5 @@ interface Docusaurus {
     @MarkoutDsl
     fun file(name: String, contents: String)
     @MarkoutDsl
-    fun markdown(name: String, builder: DocusaurusMarkdown.() -> Unit)
+    fun markdown(name: String, builder: DocusaurusMarkdownFile.() -> Unit)
 }

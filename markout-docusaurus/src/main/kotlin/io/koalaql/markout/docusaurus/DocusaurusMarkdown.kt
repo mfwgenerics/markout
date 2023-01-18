@@ -28,7 +28,7 @@ interface DocusaurusMarkdown: Markdown {
     @MarkoutDsl
     fun callout(type: String, title: String = "", block: DocusaurusMarkdown.() -> Unit) {
         val contents = markdownString {
-            DocusaurusMarkdownImpl(this).block()
+            DocusaurusMarkdownWrapper(this).block()
         }
 
         var delimiter = ":::"

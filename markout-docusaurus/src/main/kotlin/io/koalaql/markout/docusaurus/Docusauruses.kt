@@ -1,10 +1,32 @@
 package io.koalaql.markout.docusaurus
 
+import io.koalaql.markout.MarkdownBuilder
 import io.koalaql.markout.Markout
 import io.koalaql.markout.MarkoutDsl
-import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdown
 import io.koalaql.markout.md.markdownString
+import io.koalaql.markout.text.AppendableLineWriter
+
+private fun docusaurusMdFile(
+    position: Int,
+    builder: DocusaurusMarkdownFile.() -> Unit
+): String {
+    val sb = StringBuilder()
+
+    lateinit var impl: MarkdownFileImpl
+    val lw = AppendableLineWriter(sb)
+
+    impl = MarkdownFileImpl(MarkdownBuilder(lw, top = true))
+
+    impl.sidebar(position)
+    impl.builder()
+
+    if (sb.isEmpty()) return ""
+
+    sb.append("\n")
+
+    return "$sb"
+}
 
 private class DirectoryContext(
     private val markout: Markout,
@@ -33,15 +55,10 @@ private class DirectoryContext(
         markout.file(name, contents)
     }
 
-    override fun markdown(name: String, builder: DocusaurusMarkdown.() -> Unit) {
+    override fun markdown(name: String, builder: DocusaurusMarkdownFile.() -> Unit) {
         val position = ++sidebarPosition
 
-        markout.markdown(name) {
-            DocusaurusMarkdownImpl(this).apply {
-                sidebar(position)
-                builder()
-            }
-        }
+        markout.markdown(name, docusaurusMdFile(position, builder))
     }
 
     fun category() {
@@ -85,15 +102,10 @@ fun Markout.docusaurus(block: Docusaurus.() -> Unit) {
             this@docusaurus.file(name, contents)
         }
 
-        override fun markdown(name: String, builder: DocusaurusMarkdown.() -> Unit) {
+        override fun markdown(name: String, builder: DocusaurusMarkdownFile.() -> Unit) {
             val position = ++sidebarPosition
 
-            file("$name.md", markdownString(trailingNewline = true) {
-                DocusaurusMarkdownImpl(this).apply {
-                    sidebar(position)
-                    builder()
-                }
-            })
+            this@docusaurus.markdown(name, docusaurusMdFile(position, builder))
         }
     }.block()
 }
