@@ -63,4 +63,7 @@ interface Markdown: MarkdownBlock {
 
     @MarkoutDsl
     fun table(builder: MarkdownTable.() -> Unit)
+
+    @MarkoutDsl
+    fun raw(markdown: String, block: Boolean = true)
 }

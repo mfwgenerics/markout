@@ -256,6 +256,14 @@ class MarkdownBuilder(
         }
     }
 
+    override fun raw(markdown: String, block: Boolean) {
+        if (block) blocked {
+            writer.raw(markdown)
+        } else {
+            writer.raw(markdown)
+        }
+    }
+
     fun footer() {
         val footnotes = bibliography.footnotes
         val references = bibliography.references

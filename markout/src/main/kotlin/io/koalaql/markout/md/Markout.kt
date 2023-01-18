@@ -5,7 +5,10 @@ import io.koalaql.markout.Markout
 import io.koalaql.markout.MarkoutDsl
 import io.koalaql.markout.text.AppendableLineWriter
 
-fun markdownString(builder: Markdown.() -> Unit): String {
+fun markdownString(
+    trailingNewline: Boolean = false,
+    builder: Markdown.() -> Unit
+): String {
     val sb = StringBuilder()
 
     MarkdownBuilder(AppendableLineWriter(sb), top = true).apply {
@@ -13,16 +16,25 @@ fun markdownString(builder: Markdown.() -> Unit): String {
         footer()
     }
 
+    if (sb.isEmpty()) return ""
+
+    if (trailingNewline) sb.append("\n")
+
     return "$sb"
 }
 
 @MarkoutDsl
-fun Markout.markdown(name: String, builder: Markdown.() -> Unit) {
+fun Markout.markdown(name: String, contents: String) {
     val suffixed = when {
         name.endsWith(".md", ignoreCase = true) ||
-        name.endsWith(".mdx", ignoreCase = true) -> name
+                name.endsWith(".mdx", ignoreCase = true) -> name
         else -> "$name.md"
     }
 
-    file(suffixed, markdownString(builder))
+    file(suffixed, contents)
+}
+
+@MarkoutDsl
+fun Markout.markdown(name: String, builder: Markdown.() -> Unit) {
+    markdown(name, markdownString(trailingNewline = true, builder))
 }
