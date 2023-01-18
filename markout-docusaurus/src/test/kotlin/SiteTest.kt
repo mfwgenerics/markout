@@ -17,15 +17,15 @@ class SiteTest {
                 p("Text")
             }
 
-            directory("tutorial-basics") {
-                label = "Tutorial - Basics"
+            directory("basics") {
+                label = "Basics"
 
                 link(
-                    description = "5 minutes to learn the most important Docusaurus concepts."
+                    description = "A basic description"
                 )
 
-                markdown("create-a-page") {
-                    h1("Create a Page")
+                markdown("code-blocks") {
+                    h1("Code Blocks")
 
                     code("jsx", "src/pages/my-react-page.js", """
                         import React from 'react';
@@ -48,7 +48,9 @@ class SiteTest {
                     """.trimIndent())
                 }
 
-                markdown("create-a-document") {
+                markdown("code-with-highlight") {
+                    h1("Code With Highlight")
+
                     code("md", "docs/hello.md", 1..4, """
                         ---
                         sidebar_label: 'Hi!'
@@ -60,10 +62,44 @@ class SiteTest {
                         This is my **first Docusaurus document**!
                     """.trimIndent())
                 }
+
+                markdown("admonitions-and-mdx.mdx") {
+                    h1("Markdown Features")
+
+                    tip {
+                        -"Use this awesome feature option"
+                    }
+
+                    danger("Take Care") {
+                        -"This action is "+i("dangerous")
+                    }
+
+                    raw("""
+                        export const Highlight = ({children, color}) => (
+                          <span
+                            style={{
+                              backgroundColor: color,
+                              borderRadius: '20px',
+                              color: '#fff',
+                              padding: '10px',
+                              cursor: 'pointer',
+                            }}
+                            onClick={() => {
+                              alert(`You clicked the color ${"$"}{color} with label ${"$"}{children}`)
+                            }}>
+                            {children}
+                          </span>
+                        );
+
+                        This is <Highlight color="#25c2a0">Docusaurus green</Highlight> !
+
+                        This is <Highlight color="#1877F2">Facebook blue</Highlight> !
+                    """.trimIndent())
+                }
             }
 
-            directory("tutorial-extras") {
-                label = "Tutorial - Extras"
+            directory("extras") {
+                label = "Descriptionless Link"
 
                 link()
             }

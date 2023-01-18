@@ -44,18 +44,18 @@ interface DocusaurusMarkdown: Markdown {
         callout("note", title, block)
 
     @MarkoutDsl
-    fun tip(type: String, title: String = "", block: DocusaurusMarkdown.() -> Unit) =
+    fun tip(title: String = "", block: DocusaurusMarkdown.() -> Unit) =
         callout("tip", title, block)
 
     @MarkoutDsl
-    fun info(type: String, title: String = "", block: DocusaurusMarkdown.() -> Unit) =
+    fun info(title: String = "", block: DocusaurusMarkdown.() -> Unit) =
         callout("info", title, block)
 
     @MarkoutDsl
-    fun caution(type: String, title: String = "", block: DocusaurusMarkdown.() -> Unit) =
+    fun caution(title: String = "", block: DocusaurusMarkdown.() -> Unit) =
         callout("caution", title, block)
 
     @MarkoutDsl
-    fun danger(type: String, title: String = "", block: DocusaurusMarkdown.() -> Unit) =
+    fun danger(title: String = "", block: DocusaurusMarkdown.() -> Unit) =
         callout("danger", title, block)
 }

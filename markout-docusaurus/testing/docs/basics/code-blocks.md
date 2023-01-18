@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Create a Page
+# Code Blocks
 
 ```jsx title="src/pages/my-react-page.js"
 import React from 'react';
