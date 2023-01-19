@@ -11,7 +11,6 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.inputStream
 import kotlin.io.path.readText
-import kotlin.io.path.writeText
 
 @MarkoutDsl
 interface Markout {
@@ -39,10 +38,7 @@ fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory 
     entries
 }
 
-private val METADATA_FILE_NAME = Path(".markout")
-
-private fun isEmpty(dir: Path) =
-    Files.newDirectoryStream(dir).use { directory -> !directory.iterator().hasNext() }
+val METADATA_FILE_NAME = Path(".markout")
 
 private fun validMetadataPath(dir: Path, path: String): Path? {
     if (path.isBlank()) return null
@@ -54,7 +50,7 @@ private fun validMetadataPath(dir: Path, path: String): Path? {
 }
 
 /* order is important here: metadata path should be the last to be deleted to allow crash recovery */
-private fun metadataPaths(dir: Path): Sequence<Path> =
+fun metadataPaths(dir: Path): Sequence<Path> =
     try {
         val metadata = dir.resolve(METADATA_FILE_NAME)
 
@@ -66,47 +62,6 @@ private fun metadataPaths(dir: Path): Sequence<Path> =
     } catch (ex: NoSuchFileException) {
         emptySequence()
     }
-
-private fun cleanDirectory(dir: Path) {
-    metadataPaths(dir).forEach { path ->
-        if (Files.isDirectory(path)) {
-            cleanDirectory(path)
-
-            if (isEmpty(path)) Files.delete(path)
-        } else {
-            Files.deleteIfExists(path)
-        }
-    }
-}
-
-private fun Output.write(path: Path) {
-    when (this) {
-        is OutputDirectory -> {
-            if (!Files.isDirectory(path)) {
-                Files.createDirectory(path)
-            }
-
-            val entries = entries()
-
-            /* write metadata first for graceful crash recovery */
-            path.resolve(METADATA_FILE_NAME).writeText(entries.keys.joinToString(
-                separator = "\n",
-                postfix = "\n"
-            ))
-
-            entries.forEach { (name, output) ->
-                output.write(path.resolve(name))
-            }
-        }
-        is OutputFile -> {
-            check (Files.notExists(path)) {
-                "$path already exists as a user created file"
-            }
-
-            writeTo(Files.newOutputStream(path))
-        }
-    }
-}
 
 private enum class DiffType {
     MISMATCH,
@@ -204,7 +159,6 @@ private fun executionModeProperty(): ExecutionMode {
     }
 }
 
-
 fun markout(
     path: Path,
     mode: ExecutionMode = executionModeProperty(),
@@ -216,8 +170,13 @@ fun markout(
 
     when (mode) {
         ExecutionMode.APPLY -> {
-            cleanDirectory(normalized)
-            output.write(normalized)
+            val tracked = TrackedFiles()
+
+            tracked.track(normalized)
+
+            tracked.write(output, normalized)
+
+            tracked.perform()
         }
         ExecutionMode.EXPECT -> {
             val diffs = arrayListOf<Diff>()
