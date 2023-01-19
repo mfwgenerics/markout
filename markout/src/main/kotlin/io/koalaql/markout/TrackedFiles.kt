@@ -64,11 +64,31 @@ class TrackedFiles {
     fun expect(dir: Path, output: Output): List<Diff> {
         trackAndWrite(dir, output)
 
+        val visited = linkedMapOf<Path, Boolean>()
+
         val diffs = arrayListOf<Diff>()
 
-        paths.forEach { (path, action) ->
-            action.expect(path, diffs)
+        /* we don't check paths if their parents have already failed */
+        fun visit(path: Path?): Boolean {
+            if (path == null) return true /* handle null parent case */
+            visited[path]?.let { return it }
+
+            val parentExpected = visit(path.parent)
+
+            if (!parentExpected) {
+                visited[path] = false
+                return false
+            }
+
+            val result = paths[path]
+                ?.expect(path, diffs)
+                ?:true
+
+            visited[path] = result
+            return result
         }
+
+        paths.keys.forEach { visit(it) }
 
         return diffs
     }

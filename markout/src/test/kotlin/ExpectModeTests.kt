@@ -36,8 +36,8 @@ class ExpectModeTests {
     fun `one present one missing`() {
         expectFailure(
             """
-            expected	test-data/missing-present/case2/test.txt
             unexpected	test-data/missing-present/case2/untracked.txt
+            expected	test-data/missing-present/case2/test.txt
             """.trimIndent()
         ) {
             markout(

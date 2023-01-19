@@ -20,20 +20,20 @@ data class WriteToFile(
         source.writeTo(Files.newOutputStream(path))
     }
 
-    override fun expect(path: Path, out: MutableList<Diff>) {
+    override fun expect(path: Path, out: MutableList<Diff>): Boolean {
         if (Files.notExists(path)) {
             out.add(Diff(DiffType.EXPECTED, path))
-            return
+            return false
         }
 
         if (Files.isDirectory(path)) {
             out.add(Diff(DiffType.MISMATCH, path))
-            return
+            return false
         }
 
         if (!tracked) {
             out.add(Diff(DiffType.UNTRACKED, path))
-            return
+            return false
         }
 
         val matcher = StreamMatcher(path.inputStream())
@@ -42,7 +42,9 @@ data class WriteToFile(
 
         if (!matcher.matched()) {
             out.add(Diff(DiffType.MISMATCH, path))
-            return
+            return false
         }
+
+        return true
     }
 }
