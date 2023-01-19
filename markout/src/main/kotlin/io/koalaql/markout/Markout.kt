@@ -1,5 +1,6 @@
 package io.koalaql.markout
 
+import io.koalaql.markout.files.*
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
@@ -9,7 +10,6 @@ import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import kotlin.io.path.Path
-import kotlin.io.path.inputStream
 import kotlin.io.path.readText
 
 @MarkoutDsl
@@ -92,63 +92,6 @@ class StreamMatcher(
     }
 }
 
-private fun Output.expect(
-    path: Path,
-    diffs: MutableList<Diff>,
-    untracked: Boolean
-) {
-    fun failed(type: DiffType, on: Path = path) {
-        diffs.add(Diff(type, on))
-    }
-
-    if (Files.notExists(path)) {
-        failed(DiffType.EXPECTED)
-        return
-    }
-
-    if (untracked) {
-        failed(DiffType.UNTRACKED)
-        return
-    }
-
-    when (this) {
-        is OutputDirectory -> {
-            if (!Files.isDirectory(path)) {
-                failed(DiffType.MISMATCH)
-                return
-            }
-
-            val entries = entries()
-
-            val tracked = metadataPaths(path)
-                .toMutableSet()
-
-            tracked.remove(path.resolve(METADATA_FILE_NAME))
-
-            entries.forEach { (name, output) ->
-                val nextPath = path.resolve(name)
-                val nextUntracked = !tracked.remove(nextPath)
-
-                output.expect(nextPath, diffs, nextUntracked)
-            }
-
-            tracked.forEach { failed(DiffType.UNEXPECTED, it) }
-        }
-        is OutputFile -> {
-            if (Files.isDirectory(path)) {
-                failed(DiffType.MISMATCH)
-                return
-            }
-
-            val matcher = StreamMatcher(path.inputStream())
-
-            writeTo(matcher)
-
-            if (!matcher.matched()) failed(DiffType.MISMATCH)
-        }
-    }
-}
-
 val MODE_ENV_VAR = "MARKOUT_MODE"
 
 private fun executionModeProperty(): ExecutionMode {
@@ -157,6 +100,56 @@ private fun executionModeProperty(): ExecutionMode {
         "expect" -> ExecutionMode.EXPECT
         else -> error("unexpected value `$value` for property $MODE_ENV_VAR")
     }
+}
+
+fun actionableFiles(output: Output, dir: Path): ActionableFiles {
+    val tracked = linkedSetOf<Path>()
+    val paths = linkedMapOf<Path, FileAction>()
+
+    fun track(dir: Path) {
+        metadataPaths(dir).forEach { path ->
+            if (Files.isDirectory(path)) {
+                track(path)
+            }
+
+            tracked.add(path)
+        }
+    }
+
+    fun write(output: Output, path: Path) {
+        when (output) {
+            is OutputDirectory -> {
+                paths[path] = DeclareDirectory(path in tracked)
+
+                val entries = output.entries()
+
+                /* write metadata first for graceful crash recovery */
+                val metadataPath = path.resolve(METADATA_FILE_NAME)
+
+                paths[metadataPath] = WriteMetadata(entries.keys)
+
+                entries.forEach { (name, output) ->
+                    write(output, path.resolve(name))
+                }
+            }
+            is OutputFile -> {
+                paths[path] = WriteToFile(
+                    tracked = paths.containsKey(path),
+                    output
+                )
+            }
+        }
+    }
+
+    track(dir)
+
+    tracked.forEach { path ->
+        paths[path] = DeleteFile
+    }
+
+    write(output, dir)
+
+    return ActionableFiles(paths)
 }
 
 fun markout(
@@ -168,25 +161,14 @@ fun markout(
 
     val normalized = path.normalize()
 
+    val actions = actionableFiles(output, normalized)
+
     when (mode) {
-        ExecutionMode.APPLY -> {
-            TrackedFiles().perform(normalized, output)
-        }
-        /*ExecutionMode.EXPECT -> {
-            val diffs = arrayListOf<Diff>()
-
-            output.expect(normalized, diffs, false)
-
-            if (diffs.isNotEmpty()) {
-                error(diffs.joinToString("\n"))
-            }
-        }*/
+        ExecutionMode.APPLY -> actions.perform()
         ExecutionMode.EXPECT -> {
-            val diffs = TrackedFiles().expect(normalized, output)
+            val diffs = actions.expect()
 
-            if (diffs.isNotEmpty()) {
-                error(diffs.joinToString("\n"))
-            }
+            if (diffs.isNotEmpty()) error(diffs.joinToString("\n"))
         }
     }
 }
