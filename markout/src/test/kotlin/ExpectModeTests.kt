@@ -3,11 +3,24 @@ import io.koalaql.markout.markout
 import kotlin.io.path.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ExpectModeTests {
+    private inline fun expectFailure(
+        expected: String,
+        block: () -> Unit
+    ) {
+        try {
+            block()
+            assert(false) { "expect mode shouldn't have succeeded!" }
+        } catch (ex: IllegalStateException) {
+            assertEquals(expected, ex.message)
+        }
+    }
+
     @Test
     fun `missing directory`() {
-        try {
+        expectFailure("expected\ttest-data/missing-dir/case1") {
             markout(
                 Path("./test-data/missing-dir"),
                 ExecutionMode.EXPECT
@@ -16,17 +29,17 @@ class ExpectModeTests {
                     file("test.txt", "TEST CONTENT")
                 }
             }
-        } catch (ex: IllegalStateException) {
-            assertEquals(
-                "expected\ttest-data/missing-dir/case1",
-                ex.message
-            )
         }
     }
 
     @Test
     fun `one present one missing`() {
-        try {
+        expectFailure(
+            """
+            unexpected	test-data/missing-present/case2/untracked.txt
+            expected	test-data/missing-present/case2/test.txt
+            """.trimIndent()
+        ) {
             markout(
                 Path("./test-data/missing-present"),
                 ExecutionMode.EXPECT
@@ -35,20 +48,12 @@ class ExpectModeTests {
                     file("test.txt", "TEST CONTENT")
                 }
             }
-        } catch (ex: IllegalStateException) {
-            assertEquals(
-                """
-                expected	test-data/missing-present/case2/test.txt
-                unexpected	test-data/missing-present/case2/untracked.txt
-                """.trimIndent(),
-                ex.message
-            )
         }
     }
 
     @Test
     fun `missing one file`() {
-        try {
+        expectFailure("unexpected\ttest-data/tree/file0.txt") {
             markout(
                 Path("./test-data/tree"),
                 ExecutionMode.EXPECT
@@ -63,8 +68,6 @@ class ExpectModeTests {
                     file("file1.txt", "content\n\n")
                 }
             }
-        } catch (ex: IllegalStateException) {
-            assertEquals("unexpected\ttest-data/tree/file0.txt", ex.message)
         }
     }
 
@@ -90,7 +93,13 @@ class ExpectModeTests {
 
     @Test
     fun `contents mismatch`() {
-        try {
+        expectFailure(
+            """
+            mismatch	test-data/tree/dir/nested/file2.txt
+            mismatch	test-data/tree/dir/file1.txt
+            mismatch	test-data/tree/file0.txt
+            """.trimIndent(),
+        ) {
             markout(
                 Path("./test-data/tree"),
                 ExecutionMode.EXPECT
@@ -107,21 +116,17 @@ class ExpectModeTests {
 
                 file("file0.txt", "")
             }
-        } catch (ex: IllegalStateException) {
-            assertEquals(
-                """
-                mismatch	test-data/tree/dir/nested/file2.txt
-                mismatch	test-data/tree/dir/file1.txt
-                mismatch	test-data/tree/file0.txt
-                """.trimIndent(),
-                ex.message
-            )
         }
     }
 
     @Test
     fun `treating file as directory, directory as file`() {
-        try {
+        expectFailure(
+            """
+            mismatch	test-data/tree/dir
+            mismatch	test-data/tree/file0.txt
+            """.trimIndent()
+        ) {
             markout(
                 Path("./test-data/tree"),
                 ExecutionMode.EXPECT
@@ -130,14 +135,6 @@ class ExpectModeTests {
 
                 directory("file0.txt") { }
             }
-        } catch (ex: IllegalStateException) {
-            assertEquals(
-                """
-                mismatch	test-data/tree/dir
-                mismatch	test-data/tree/file0.txt
-                """.trimIndent(),
-                ex.message
-            )
         }
     }
 
