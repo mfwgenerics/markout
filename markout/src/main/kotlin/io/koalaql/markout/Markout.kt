@@ -63,14 +63,14 @@ fun metadataPaths(dir: Path): Sequence<Path> =
         emptySequence()
     }
 
-private enum class DiffType {
+enum class DiffType {
     MISMATCH,
     UNTRACKED,
     EXPECTED,
     UNEXPECTED
 }
 
-private data class Diff(
+data class Diff(
     val type: DiffType,
     val path: Path
 ) {
@@ -170,13 +170,7 @@ fun markout(
 
     when (mode) {
         ExecutionMode.APPLY -> {
-            val tracked = TrackedFiles()
-
-            tracked.track(normalized)
-
-            tracked.write(output, normalized)
-
-            tracked.perform()
+            TrackedFiles().perform(normalized, output)
         }
         ExecutionMode.EXPECT -> {
             val diffs = arrayListOf<Diff>()
@@ -187,5 +181,18 @@ fun markout(
                 error(diffs.joinToString("\n"))
             }
         }
+        /*ExecutionMode.EXPECT -> {
+            val tracked = TrackedFiles()
+
+            tracked.track(normalized)
+
+            tracked.write(output, normalized)
+
+            val diffs = tracked.expect()
+
+            if (diffs.isNotEmpty()) {
+                error(diffs.joinToString("\n"))
+            }
+        }*/
     }
 }

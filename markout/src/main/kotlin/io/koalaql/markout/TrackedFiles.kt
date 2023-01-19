@@ -8,24 +8,23 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class TrackedFiles {
+    private val tracked = linkedSetOf<Path>()
     private val paths = linkedMapOf<Path, FileAction>()
 
-    fun track(dir: Path) {
+    private fun track(dir: Path) {
         metadataPaths(dir).forEach { path ->
             if (Files.isDirectory(path)) {
                 track(path)
-
-                paths[path] = ForgetDirectory
-            } else {
-                paths[path] = DeleteFile
             }
+
+            tracked.add(path)
         }
     }
 
-    fun write(output: Output, path: Path) {
+    private fun write(output: Output, path: Path) {
         when (output) {
             is OutputDirectory -> {
-                paths[path] = DeclareDirectory(paths[path]?:NoAction)
+                paths[path] = DeclareDirectory(path in tracked)
 
                 val entries = output.entries()
 
@@ -53,7 +52,31 @@ class TrackedFiles {
         }
     }
 
-    fun perform() {
+    private fun trackAndWrite(dir: Path, output: Output) {
+        track(dir)
+
+        tracked.forEach { path ->
+            paths[path] = DeleteFile
+        }
+
+        write(output, dir)
+    }
+
+    fun perform(dir: Path, output: Output) {
+        trackAndWrite(dir, output)
+
         paths.forEach { (path, action) -> action.perform(path) }
+    }
+
+    fun expect(dir: Path, output: Output): List<Diff> {
+        val diffs = arrayListOf<Diff>()
+
+        trackAndWrite(dir, output)
+
+        paths.forEach { (path, action) ->
+            action.expect(path, diffs)
+        }
+
+        return diffs
     }
 }
