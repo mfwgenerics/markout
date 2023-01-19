@@ -78,7 +78,7 @@ data class Diff(
         "${"$type".lowercase()}\t$path"
 }
 
-private class StreamMatcher(
+class StreamMatcher(
     private val input: InputStream
 ): OutputStream() {
     private var matches = true
@@ -172,7 +172,7 @@ fun markout(
         ExecutionMode.APPLY -> {
             TrackedFiles().perform(normalized, output)
         }
-        ExecutionMode.EXPECT -> {
+        /*ExecutionMode.EXPECT -> {
             val diffs = arrayListOf<Diff>()
 
             output.expect(normalized, diffs, false)
@@ -180,19 +180,13 @@ fun markout(
             if (diffs.isNotEmpty()) {
                 error(diffs.joinToString("\n"))
             }
-        }
-        /*ExecutionMode.EXPECT -> {
-            val tracked = TrackedFiles()
-
-            tracked.track(normalized)
-
-            tracked.write(output, normalized)
-
-            val diffs = tracked.expect()
+        }*/
+        ExecutionMode.EXPECT -> {
+            val diffs = TrackedFiles().expect(normalized, output)
 
             if (diffs.isNotEmpty()) {
                 error(diffs.joinToString("\n"))
             }
-        }*/
+        }
     }
 }

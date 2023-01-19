@@ -31,14 +31,7 @@ class TrackedFiles {
                 /* write metadata first for graceful crash recovery */
                 val metadataPath = path.resolve(METADATA_FILE_NAME)
 
-                paths[metadataPath] = WriteToFile(true) { stream ->
-                    stream.writer().use {
-                        it.append(entries.keys.joinToString(
-                            separator = "\n",
-                            postfix = "\n"
-                        ))
-                    }
-                }
+                paths[metadataPath] = WriteMetadata(entries.keys)
 
                 entries.forEach { (name, output) ->
                     write(output, path.resolve(name))
@@ -69,9 +62,9 @@ class TrackedFiles {
     }
 
     fun expect(dir: Path, output: Output): List<Diff> {
-        val diffs = arrayListOf<Diff>()
-
         trackAndWrite(dir, output)
+
+        val diffs = arrayListOf<Diff>()
 
         paths.forEach { (path, action) ->
             action.expect(path, diffs)
