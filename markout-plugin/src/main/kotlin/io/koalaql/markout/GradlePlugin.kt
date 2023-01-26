@@ -10,8 +10,8 @@ class GradlePlugin: Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         target.extensions.create("markout", MarkoutConfig::class.java)
 
-        fun execTask(name: String, builder: (JavaExec) -> Unit) {
-            tasks.register(name, JavaExec::class.java) {
+        fun execTask(name: String, builder: (JavaExec) -> Unit) = tasks
+            .register(name, JavaExec::class.java) {
                 val ext = target.extensions.getByType(MarkoutConfig::class.java)
 
                 it.group = "markout"
@@ -33,7 +33,6 @@ class GradlePlugin: Plugin<Project> {
 
                 builder(it)
             }
-        }
 
         val checkTask = execTask("markoutCheck") {
             it.description = "Check that Markout generated files are up-to-date."
