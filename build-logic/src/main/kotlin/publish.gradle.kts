@@ -29,7 +29,7 @@ publishing {
 
             pom {
                 name.set("Markout")
-                description.set("Source code capture plugin")
+                description.set("Markout is an executable documentation platform for Kotlin")
                 url.set("https://markout.koalaql.io")
 
                 licenses {
