@@ -10,41 +10,39 @@ class GradlePlugin: Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         target.extensions.create("markout", MarkoutConfig::class.java)
 
-        val checkTask = tasks.register("markoutCheck", JavaExec::class.java) {
-            it.group = "markout"
+        fun execTask(name: String, builder: (JavaExec) -> Unit) {
+            tasks.register(name, JavaExec::class.java) {
+                val ext = target.extensions.getByType(MarkoutConfig::class.java)
 
-            it.description = "Check that Markout generated files are up-to-date."
+                it.group = "markout"
 
-            it.classpath = project
-                .files()
-                .from(Callable { project
-                    .extensions
-                    .getByType(JavaPluginExtension::class.java)
-                    .sourceSets.getByName("main")
-                    .runtimeClasspath
+                it.classpath = project
+                    .files()
+                    .from(Callable { project
+                        .extensions
+                        .getByType(JavaPluginExtension::class.java)
+                        .sourceSets.getByName("main")
+                        .runtimeClasspath
+                    })
+
+                it.environment("MARKOUT_PATH", rootDir.absolutePath)
+
+                it.mainClass.set(checkNotNull(ext.mainClass) {
+                    "mainClass was not configured"
                 })
 
-            it.environment("MARKOUT_MODE", "expect")
-
-            it.mainClass.set("MainKt")
+                builder(it)
+            }
         }
 
-        tasks.register("markout", JavaExec::class.java) {
-            it.group = "markout"
+        val checkTask = execTask("markoutCheck") {
+            it.description = "Check that Markout generated files are up-to-date."
+            it.environment("MARKOUT_MODE", "expect")
+        }
+
+        execTask("markout") {
             it.description = "Generate and clean Markout files."
-
-            it.classpath = project
-                .files()
-                .from(Callable { project
-                    .extensions
-                    .getByType(JavaPluginExtension::class.java)
-                    .sourceSets.getByName("main")
-                    .runtimeClasspath
-                })
-
             it.environment("MARKOUT_MODE", "apply")
-
-            it.mainClass.set("MainKt")
         }
 
         tasks.named("check").configure {
