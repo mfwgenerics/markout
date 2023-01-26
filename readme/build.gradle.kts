@@ -9,10 +9,6 @@ plugins {
     id("io.koalaql.kapshot-plugin") version "0.1.1"
 }
 
-application {
-    mainClass.set("MainKt")
-}
-
 dependencies {
     implementation(project(":markout"))
 

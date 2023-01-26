@@ -93,6 +93,7 @@ class StreamMatcher(
 }
 
 val MODE_ENV_VAR = "MARKOUT_MODE"
+val PATH_ENV_VAR = "MARKOUT_PATH"
 
 private fun executionModeProperty(): ExecutionMode {
     return when (val value = System.getenv(MODE_ENV_VAR)) {
@@ -172,3 +173,16 @@ fun markout(
         }
     }
 }
+
+fun markout(
+    mode: ExecutionMode = executionModeProperty(),
+    builder: Markout.() -> Unit
+) = markout(
+    checkNotNull(System.getenv(PATH_ENV_VAR)
+        ?.takeIf { it.isNotBlank() }
+        ?.let { Path(it) }) {
+        "Missing path. Specify a path explicitly or set the $PATH_ENV_VAR environment variable"
+    },
+    mode,
+    builder
+)
