@@ -5,7 +5,7 @@ import kotlin.io.path.Path
 
 private val CURRENT_VERSION = "0.0.5"
 
-fun main() = markout(Path("..")) {
+fun main() = markout {
     directory("docs") {
         markdownDocs()
         fileGen()

@@ -1,5 +1,6 @@
 package io.koalaql.markout
 
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
@@ -25,11 +26,11 @@ class GradlePlugin: Plugin<Project> {
                         .runtimeClasspath
                     })
 
-                it.environment("MARKOUT_PATH", rootDir.absolutePath)
+                it.environment("MARKOUT_PATH", (ext.rootDir ?: rootDir).absolutePath)
 
-                it.mainClass.set(checkNotNull(ext.mainClass) {
-                    "mainClass was not configured"
-                })
+                if (ext.mainClass == null) throw GradleException("markout.mainClass was not configured")
+
+                it.mainClass.set(ext.mainClass)
 
                 builder(it)
             }
