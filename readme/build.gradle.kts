@@ -5,13 +5,12 @@ repositories {
 plugins {
     id("conventions")
 
+    id("io.koalaql.markout")
     id("io.koalaql.kapshot-plugin") version "0.1.1"
-
-    application
 }
 
-application {
-    mainClass.set("MainKt")
+markout {
+    mainClass = "MainKt"
 }
 
 dependencies {

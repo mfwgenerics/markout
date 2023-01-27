@@ -1,1 +1,0 @@
-MARKOUT_MODE=expect ./gradlew :readme:run > /dev/null

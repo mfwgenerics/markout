@@ -29,7 +29,7 @@ Add the `markout` dependency
 ```kotlin
 /* build.gradle.kts */
 dependencies {
-    implementation("io.koalaql:markout:0.0.5")
+    implementation("io.koalaql:markout:0.0.6")
 }
 ```
 
@@ -67,7 +67,7 @@ If you only want to use Markout to generate Markdown strings then you can use
 markdownString {
     h1("My Markdown")
 
-    -"Text with some "+i("italics")+"."
+    -"Text with some *italics*."
 }
 ```
 
