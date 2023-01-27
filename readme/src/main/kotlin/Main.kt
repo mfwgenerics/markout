@@ -3,7 +3,7 @@ import io.koalaql.markout.md.markdown
 import io.koalaql.markout.md.markdownString
 import kotlin.io.path.Path
 
-private val CURRENT_VERSION = "0.0.5"
+private val CURRENT_VERSION = "0.0.6"
 
 fun main() = markout {
     directory("docs") {
@@ -82,7 +82,7 @@ fun main() = markout {
                     markdownString {
                         h1("My Markdown")
 
-                        -"Text with some "+i("italics")+"."
+                        -"Text with some *italics*."
                     }
                 }
 
