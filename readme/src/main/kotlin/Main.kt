@@ -6,6 +6,12 @@ import kotlin.io.path.Path
 private val CURRENT_VERSION = "0.0.6"
 
 fun main() = markout {
+    directory(".github") {
+        directory("workflows") {
+
+        }
+    }
+
     directory("docs") {
         markdownDocs()
         fileGen()
