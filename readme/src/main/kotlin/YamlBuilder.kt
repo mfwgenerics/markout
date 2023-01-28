@@ -1,9 +1,14 @@
+import io.koalaql.markout.MarkoutDsl
 import io.koalaql.markout.text.AppendableLineWriter
 import io.koalaql.markout.text.LineWriter
 
+@MarkoutDsl
 interface YamlBuilder {
+    @MarkoutDsl
     operator fun String.minus(other: String)
+    @MarkoutDsl
     operator fun String.minus(block: YamlBuilder.() -> Unit)
+    @MarkoutDsl
     fun li(block:  (YamlBuilder.() -> Unit))
 
     fun raw(text: String)

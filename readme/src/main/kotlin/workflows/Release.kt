@@ -1,5 +1,6 @@
 package workflows
 
+import jobs
 import yaml
 
 val RELEASE_WORKFLOW = yaml {
@@ -13,7 +14,7 @@ val RELEASE_WORKFLOW = yaml {
         }
     }
 
-    "jobs" - {
+    jobs {
         "staging_repository" - {
             "runs-on" - "ubuntu-latest"
             "name" - "Create staging repository"
@@ -59,10 +60,10 @@ val RELEASE_WORKFLOW = yaml {
                     "run" - "./gradlew publish"
                     "env" - {
                         "REPOSITORY_ID" - "\${{ needs.staging_repository.outputs.repository_id }}"
-                        "SONATYPE_USERNAME" - "\${{ secrets.SONATYPE_USERNAME }}"
-                        "SONATYPE_PASSWORD" - "\${{ secrets.SONATYPE_PASSWORD }}"
-                        "GPG_PRIVATE_KEY" - "\${{ secrets.GPG_PRIVATE_KEY }}"
-                        "GPG_PRIVATE_PASSWORD" - "\${{ secrets.GPG_PRIVATE_PASSWORD }}"
+                        "SONATYPE_USERNAME" - secret("SONATYPE_USERNAME")
+                        "SONATYPE_PASSWORD" - secret("SONATYPE_PASSWORD")
+                        "GPG_PRIVATE_KEY" - secret("GPG_PRIVATE_KEY")
+                        "GPG_PRIVATE_PASSWORD" - secret("GPG_PRIVATE_PASSWORD")
                     }
                 }
 
