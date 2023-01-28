@@ -15,7 +15,7 @@ val RELEASE_WORKFLOW = yaml {
     }
 
     jobs {
-        "staging_repository" - {
+        val repo = "staging_repository" - {
             "runs-on" - "ubuntu-latest"
             "name" - "Create staging repository"
             "outputs" - {
@@ -27,10 +27,10 @@ val RELEASE_WORKFLOW = yaml {
                     "id" - "create"
                     "uses" - "nexus-actions/create-nexus-staging-repo@main"
                     "with" - {
-                        "username" - "\${{ secrets.SONATYPE_USERNAME }}"
-                        "password" - "\${{ secrets.SONATYPE_PASSWORD }}"
-                        "staging_profile_id" - "\${{ secrets.SONATYPE_PROFILE_ID }}"
-                        "description" - "\${{ github.repository }}/\${{ github.workflow }}#\${{ github.run_number }}"
+                        "username" - secret("SONATYPE_USERNAME")
+                        "password" - secret("SONATYPE_PASSWORD")
+                        "staging_profile_id" - secret("SONATYPE_PROFILE_ID")
+                        "description" - "${github("repository")}/${github("workflow")}#${github("run_number")}"
                         "base_url" - "https://s01.oss.sonatype.org/service/local/"
                     }
                 }
@@ -59,7 +59,7 @@ val RELEASE_WORKFLOW = yaml {
                     "name" - "Publish to Maven Central"
                     "run" - "./gradlew publish"
                     "env" - {
-                        "REPOSITORY_ID" - "\${{ needs.staging_repository.outputs.repository_id }}"
+                        "REPOSITORY_ID" - repo.outputs["repository_id"]
                         "SONATYPE_USERNAME" - secret("SONATYPE_USERNAME")
                         "SONATYPE_PASSWORD" - secret("SONATYPE_PASSWORD")
                         "GPG_PRIVATE_KEY" - secret("GPG_PRIVATE_KEY")
@@ -70,8 +70,8 @@ val RELEASE_WORKFLOW = yaml {
                 li {
                     "name" - "Publish Gradle plugin"
                     "env" - {
-                        "GRADLE_PUBLISH_KEY" - "\${{ secrets.GRADLE_PUBLISH_KEY }}"
-                        "GRADLE_PUBLISH_SECRET" - "\${{ secrets.GRADLE_PUBLISH_SECRET }}"
+                        "GRADLE_PUBLISH_KEY" - secret("GRADLE_PUBLISH_KEY")
+                        "GRADLE_PUBLISH_SECRET" - secret("GRADLE_PUBLISH_SECRET")
                     }
                     "run" - "./gradlew :markout-plugin:publishPlugins"
                 }
