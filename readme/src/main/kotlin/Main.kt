@@ -8,7 +8,68 @@ private val CURRENT_VERSION = "0.0.6"
 fun main() = markout {
     directory(".github") {
         directory("workflows") {
+            file("check.yml", """
+                name: Build and check
+                on: [push, pull_request]
+                jobs:
+                  build:
+                    runs-on: ubuntu-latest
+                    steps:
+                      - uses: actions/checkout@v2
+                      - uses: gradle/wrapper-validation-action@v1
+                      - uses: actions/setup-java@v1
+                        with:
+                          java-version: 19
+                      - run: ./gradlew check
+            """.trimIndent())
 
+            file("release.yml", """
+                name: Publish plugins and dependencies
+                on:
+                  release:
+                    types: [published]
+                    branches:
+                      - main
+                jobs:
+                  staging_repository:
+                    runs-on: ubuntu-latest
+                    name: Create staging repository
+                    outputs:
+                      repository_id: ${'$'}{{ steps.create.outputs.repository_id }}
+                    steps:
+                      - id: create
+                        uses: nexus-actions/create-nexus-staging-repo@main
+                        with:
+                          username: ${'$'}{{ secrets.SONATYPE_USERNAME }}
+                          password: ${'$'}{{ secrets.SONATYPE_PASSWORD }}
+                          staging_profile_id: ${'$'}{{ secrets.SONATYPE_PROFILE_ID }}
+                          description: ${'$'}{{ github.repository }}/${'$'}{{ github.workflow }}#${'$'}{{ github.run_number }}
+                          base_url: https://s01.oss.sonatype.org/service/local/
+                  publish:
+                    runs-on: ubuntu-latest
+                    name: Publish
+                    needs: staging_repository
+                    steps:
+                      - name: Checkout
+                        uses: actions/checkout@v2
+                      - name: Configure JDK
+                        uses: actions/setup-java@v1
+                        with:
+                          java-version: 19
+                      - name: Publish to Maven Central
+                        run: ./gradlew publish
+                        env:
+                          REPOSITORY_ID: ${'$'}{{ needs.staging_repository.outputs.repository_id }}
+                          SONATYPE_USERNAME: ${'$'}{{ secrets.SONATYPE_USERNAME }}
+                          SONATYPE_PASSWORD: ${'$'}{{ secrets.SONATYPE_PASSWORD }}
+                          GPG_PRIVATE_KEY: ${'$'}{{ secrets.GPG_PRIVATE_KEY }}
+                          GPG_PRIVATE_PASSWORD: ${'$'}{{ secrets.GPG_PRIVATE_PASSWORD }}
+                      - name: Publish Gradle plugin
+                        env:
+                          GRADLE_PUBLISH_KEY: ${'$'}{{ secrets.GRADLE_PUBLISH_KEY }}
+                          GRADLE_PUBLISH_SECRET: ${'$'}{{ secrets.GRADLE_PUBLISH_SECRET }}
+                        run: ./gradlew :markout-plugin:publishPlugins
+            """.trimIndent())
         }
     }
 
