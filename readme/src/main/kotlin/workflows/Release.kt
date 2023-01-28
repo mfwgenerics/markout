@@ -23,16 +23,15 @@ val RELEASE_WORKFLOW = yaml {
 
             "steps" - {
                 li {
-                    raw("""
-                                    id: create
-                                    uses: nexus-actions/create-nexus-staging-repo@main
-                                    with:
-                                      username: ${'$'}{{ secrets.SONATYPE_USERNAME }}
-                                      password: ${'$'}{{ secrets.SONATYPE_PASSWORD }}
-                                      staging_profile_id: ${'$'}{{ secrets.SONATYPE_PROFILE_ID }}
-                                      description: ${'$'}{{ github.repository }}/${'$'}{{ github.workflow }}#${'$'}{{ github.run_number }}
-                                      base_url: https://s01.oss.sonatype.org/service/local/
-                                """.trimIndent())
+                    "id" - "create"
+                    "uses" - "nexus-actions/create-nexus-staging-repo@main"
+                    "with" - {
+                        "username" - "\${{ secrets.SONATYPE_USERNAME }}"
+                        "password" - "\${{ secrets.SONATYPE_PASSWORD }}"
+                        "staging_profile_id" - "\${{ secrets.SONATYPE_PROFILE_ID }}"
+                        "description" - "\${{ github.repository }}/\${{ github.workflow }}#\${{ github.run_number }}"
+                        "base_url" - "https://s01.oss.sonatype.org/service/local/"
+                    }
                 }
             }
         }
