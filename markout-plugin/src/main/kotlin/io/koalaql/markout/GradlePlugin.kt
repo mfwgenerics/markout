@@ -45,8 +45,8 @@ class GradlePlugin: Plugin<Project> {
             it.environment("MARKOUT_MODE", "apply")
         }
 
-        tasks.named("check").configure {
-            it.dependsOn(checkTask)
-        }
+        tasks
+            .matching { it.name == "check" }
+            .configureEach { it.dependsOn(checkTask) }
     }
 }

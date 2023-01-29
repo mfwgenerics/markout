@@ -6,6 +6,7 @@ plugins {
     id("conventions")
 
     id("io.koalaql.markout")
+
     id("io.koalaql.kapshot-plugin") version "0.1.1"
 }
 
