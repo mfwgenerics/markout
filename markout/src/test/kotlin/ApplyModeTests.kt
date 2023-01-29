@@ -22,6 +22,8 @@ class ApplyModeTests {
                 markout(rootDir) {
                     file("untracked.txt", "changed contents")
                 }
+
+                assert(false) { "failed to fail on run #${ix+1}" }
             } catch (ex: IllegalStateException) {
                 assertEquals("test-data/untracked/untracked.txt already exists", ex.message)
             }

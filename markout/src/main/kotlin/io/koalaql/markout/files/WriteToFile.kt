@@ -9,14 +9,9 @@ import java.nio.file.Path
 import kotlin.io.path.inputStream
 
 data class WriteToFile(
-    private val tracked: Boolean,
     private val source: OutputFile
 ): FileAction {
     override fun perform(path: Path) {
-        check (tracked || Files.notExists(path)) {
-            "$path already exists"
-        }
-
         source.writeTo(Files.newOutputStream(path))
     }
 
@@ -28,11 +23,6 @@ data class WriteToFile(
 
         if (Files.isDirectory(path)) {
             out.add(Diff(DiffType.MISMATCH, path))
-            return false
-        }
-
-        if (!tracked) {
-            out.add(Diff(DiffType.UNTRACKED, path))
             return false
         }
 

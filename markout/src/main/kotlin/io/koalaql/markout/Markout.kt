@@ -9,8 +9,7 @@ import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.readText
+import kotlin.io.path.*
 
 @MarkoutDsl
 interface Markout {
@@ -50,8 +49,10 @@ private fun validMetadataPath(dir: Path, path: String): Path? {
 }
 
 /* order is important here: metadata path should be the last to be deleted to allow crash recovery */
-fun metadataPaths(dir: Path): Sequence<Path> =
-    try {
+fun metadataPaths(dir: Path): Sequence<Path> {
+    if (!Files.isDirectory(dir)) return emptySequence()
+
+    return try {
         val metadata = dir.resolve(METADATA_FILE_NAME)
 
         metadata
@@ -62,6 +63,7 @@ fun metadataPaths(dir: Path): Sequence<Path> =
     } catch (ex: NoSuchFileException) {
         emptySequence()
     }
+}
 
 enum class DiffType {
     MISMATCH,
@@ -103,52 +105,70 @@ private fun executionModeProperty(): ExecutionMode {
     }
 }
 
-fun actionableFiles(output: Output, dir: Path): ActionableFiles {
-    val tracked = linkedSetOf<Path>()
+fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
     val paths = linkedMapOf<Path, FileAction>()
 
-    fun track(dir: Path) {
-        metadataPaths(dir).forEach { path ->
-            if (Files.isDirectory(path)) {
-                track(path)
-            }
-
-            tracked.add(path)
+    fun markDeletions(path: Path) {
+        metadataPaths(path).forEach {
+            markDeletions(it)
         }
-    }
 
-    fun write(output: Output, path: Path) {
-        when (output) {
-            is OutputDirectory -> {
-                paths[path] = DeclareDirectory(path in tracked)
-
-                val entries = output.entries()
-
-                /* write metadata first for graceful crash recovery */
-                val metadataPath = path.resolve(METADATA_FILE_NAME)
-
-                paths[metadataPath] = WriteMetadata(entries.keys)
-
-                entries.forEach { (name, output) ->
-                    write(output, path.resolve(name))
-                }
-            }
-            is OutputFile -> {
-                paths[path] = WriteToFile(
-                    tracked = paths.containsKey(path),
-                    output
-                )
-            }
-        }
-    }
-
-    track(dir)
-
-    tracked.forEach { path ->
         paths[path] = DeleteFile
     }
 
-    write(output, dir)
+    fun reconcile(output: OutputDirectory, dir: Path) {
+        val entries = output.entries().toMutableMap()
+
+        metadataPaths(dir).forEach { path ->
+            when (val entry = entries.remove(path.name)) {
+                is OutputDirectory -> {
+                    paths[path] = DeclareDirectory(true)
+
+                    reconcile(entry, path)
+                }
+                else -> {
+                    markDeletions(path)
+
+                    if (entry is OutputFile) {
+                        paths[path] = WriteToFile(entry)
+                    }
+                }
+            }
+        }
+
+        entries.iterator().let {
+            it.forEach { (name, _) ->
+                val path = dir.resolve(name)
+
+                if (Files.exists(path)) {
+                    it.remove()
+
+                    paths[path] = AlreadyExistsError
+                }
+            }
+        }
+
+        val metadataPath = dir.resolve(METADATA_FILE_NAME)
+
+        paths[metadataPath] = WriteMetadata(entries.keys)
+
+        entries.forEach { (name, entry) ->
+            val path = dir.resolve(name)
+
+            when (entry) {
+                is OutputDirectory -> {
+                    paths[path] = DeclareDirectory(false)
+
+                    reconcile(entry, path)
+                }
+                is OutputFile -> {
+                    paths[path] = WriteToFile(entry)
+                }
+            }
+        }
+    }
+
+    reconcile(output, dir)
 
     return ActionableFiles(paths)
 }
