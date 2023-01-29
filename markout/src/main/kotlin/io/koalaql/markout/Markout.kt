@@ -118,9 +118,10 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
 
     fun reconcile(output: OutputDirectory, dir: Path) {
         val entries = output.entries().toMutableMap()
+        val remaining = entries.toMutableMap()
 
         metadataPaths(dir).forEach { path ->
-            when (val entry = entries.remove(path.name)) {
+            when (val entry = remaining.remove(path.name)) {
                 is OutputDirectory -> {
                     paths[path] = DeclareDirectory(true)
 
@@ -136,12 +137,13 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
             }
         }
 
-        entries.iterator().let {
+        remaining.iterator().let {
             it.forEach { (name, _) ->
                 val path = dir.resolve(name)
 
                 if (Files.exists(path)) {
                     it.remove()
+                    entries.remove(name)
 
                     paths[path] = AlreadyExistsError
                 }
@@ -152,7 +154,7 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
 
         paths[metadataPath] = WriteMetadata(entries.keys)
 
-        entries.forEach { (name, entry) ->
+        remaining.forEach { (name, entry) ->
             val path = dir.resolve(name)
 
             when (entry) {
