@@ -1,9 +1,8 @@
 import io.koalaql.markout.markout
+import org.junit.Rule
 import org.junit.Test
-import kotlin.io.path.Path
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.readText
-import kotlin.io.path.writeText
+import org.junit.rules.TemporaryFolder
+import kotlin.io.path.*
 import kotlin.test.assertEquals
 
 class ApplyModeTests {
@@ -34,5 +33,69 @@ class ApplyModeTests {
                 message = "run #${ix+1}:"
             )
         }
+    }
+
+    @JvmField
+    @Rule
+    val tempFolder = TemporaryFolder()
+
+    @Test
+    fun `files created, removed and overwritten`() {
+        val rootDir = Path(tempFolder.root.path)
+
+        // fresh state
+        markout(rootDir) {
+            file("modify-me.txt", "unmodified")
+            file("delete-me.txt", "undeleted")
+
+            directory("nested") {
+                file("modify-me.txt", "unmodified")
+                file("delete-me.txt", "undeleted")
+            }
+        }
+
+        rootDir
+            .apply {
+                assertEquals(resolve(".markout").readText(), "modify-me.txt\ndelete-me.txt\nnested\n")
+                assert(resolve("create-me.txt").notExists())
+                assertEquals(resolve("modify-me.txt").readText(), "unmodified")
+                assertEquals(resolve("delete-me.txt").readText(), "undeleted")
+
+                resolve("nested").apply {
+                    assert(exists() && isDirectory())
+
+                    assertEquals(resolve(".markout").readText(), "modify-me.txt\ndelete-me.txt\n")
+                    assert(resolve("create-me.txt").notExists())
+                    assertEquals(resolve("modify-me.txt").readText(), "unmodified")
+                    assertEquals(resolve("delete-me.txt").readText(), "undeleted")
+                }
+            }
+
+        markout(rootDir) {
+            file("create-me.txt", "created")
+            file("modify-me.txt", "modified")
+
+            directory("nested") {
+                file("create-me.txt", "created")
+                file("modify-me.txt", "modified")
+            }
+        }
+
+        rootDir
+            .apply {
+                assertEquals(resolve(".markout").readText(), "create-me.txt\nmodify-me.txt\nnested\n")
+                assertEquals(resolve("create-me.txt").readText(), "created")
+                assertEquals(resolve("modify-me.txt").readText(), "modified")
+                assert(resolve("delete-me.txt").notExists())
+
+                resolve("nested").apply {
+                    assert(exists() && isDirectory())
+
+                    assertEquals(resolve(".markout").readText(), "create-me.txt\nmodify-me.txt\n")
+                    assertEquals(resolve("create-me.txt").readText(), "created")
+                    assertEquals(resolve("modify-me.txt").readText(), "modified")
+                    assert(resolve("delete-me.txt").notExists())
+                }
+            }
     }
 }
