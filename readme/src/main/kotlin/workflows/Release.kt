@@ -2,6 +2,7 @@ package workflows
 
 import io.koalaql.markout.Markout
 import io.koalaql.markout.workflow
+import it.krzeminski.githubactions.actions.ActionWithOutputs
 import it.krzeminski.githubactions.actions.actions.CheckoutV3
 import it.krzeminski.githubactions.actions.actions.SetupJavaV3
 import it.krzeminski.githubactions.actions.gradle.WrapperValidationActionV1
@@ -12,6 +13,34 @@ import it.krzeminski.githubactions.domain.triggers.Release
 import it.krzeminski.githubactions.dsl.expressions.Contexts
 import it.krzeminski.githubactions.dsl.expressions.expr
 
+class CreateNexusStagingRepo(
+    val username: String,
+    val password: String,
+    val stagingProfileId: String,
+    val description: String,
+    val baseUrl: String
+) : ActionWithOutputs<CreateNexusStagingRepo.Outputs>(
+    "nexus-actions",
+    "create-nexus-staging-repo",
+    "main"
+) {
+    override fun toYamlArguments() = linkedMapOf(
+        "username" to username,
+        "password" to password,
+        "staging_profile_id" to stagingProfileId,
+        "description" to description,
+        "base_url" to baseUrl
+    )
+
+    override fun buildOutputObject(stepId: String) = Outputs(stepId)
+
+    class Outputs(private val stepId: String) {
+        val repositoryId: String = "steps.$stepId.outputs.repository_id"
+
+        operator fun get(outputName: String) = "steps.$stepId.outputs.$outputName"
+    }
+}
+
 fun Markout.releaseYml() = workflow("release2",
     name = "Publish plugins and dependencies",
     on = listOf(Push(), Release(
@@ -21,41 +50,14 @@ fun Markout.releaseYml() = workflow("release2",
         ),
     )),
 ) {
-    /*
-
-    name: Publish plugins and dependencies
-on:
-  release:
-    types: [published]
-    branches:
-      - main
-jobs:
-  staging_repository:
-    runs-on: ubuntu-latest
-    name: Create staging repository
-    outputs:
-      repository_id: ${{ steps.create.outputs.repository_id }}
-    steps:
-      - id: create
-        uses: nexus-actions/create-nexus-staging-repo@main
-        with:
-          username: ${{ secrets.SONATYPE_USERNAME }}
-          password: ${{ secrets.SONATYPE_PASSWORD }}
-          staging_profile_id: ${{ secrets.SONATYPE_PROFILE_ID }}
-          description: ${{ github.repository }}/${{ github.workflow }}#${{ github.run_number }}
-          base_url: https://s01.oss.sonatype.org/service/local/
-     */
-
     val staging = job("staging_repository", runsOn = RunnerType.UbuntuLatest) {
-        uses(CheckoutV3())
-        uses(WrapperValidationActionV1())
-        uses(
-            SetupJavaV3(
-            javaVersion = "19",
-            distribution = SetupJavaV3.Distribution.Temurin
-        )
-        )
-        run("./gradlew check")
+        uses(CreateNexusStagingRepo(
+            username = expr { secrets.getValue("SONATYPE_USERNAME") },
+            password =  expr { secrets.getValue("SONATYPE_PASSWORD") },
+            stagingProfileId =  expr { secrets.getValue("STAGING_PROFILE_ID") },
+            description = "${expr { github.repository }}/${expr { github.workflow }}/${expr { github.run_number }}",
+            baseUrl = "https://s01.oss.sonatype.org/service/local/"
+        ))
     }
 
     job("publish",
