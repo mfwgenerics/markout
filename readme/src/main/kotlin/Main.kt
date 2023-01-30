@@ -1,11 +1,18 @@
 import io.koalaql.markout.markout
 import io.koalaql.markout.md.markdown
 import io.koalaql.markout.md.markdownString
+import workflows.checkWorkflow
 import kotlin.io.path.Path
 
 private val CURRENT_VERSION = "0.0.6"
 
 fun main() = markout {
+    directory(".github") {
+        directory("workflows") {
+            checkWorkflow()
+        }
+    }
+
     directory("docs") {
         markdownDocs()
         fileGen()

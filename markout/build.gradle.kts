@@ -3,7 +3,7 @@ repositories {
 }
 
 plugins {
-    id("publish")
+    id("publish-1.8")
 }
 
 dependencies {
@@ -11,3 +11,5 @@ dependencies {
 
     testImplementation(kotlin("test"))
 }
+
+//compatibility(JavaVersion.VERSION_1_8)
