@@ -1,12 +1,23 @@
+# This file was generated using Kotlin DSL (readme/not-a-real-file).
+# If you want to modify the workflow, please change the Kotlin file and regenerate this YAML file.
+# Generated with https://github.com/krzema12/github-workflows-kt
+
 name: Build and check
-on: [push, pull_request]
+on:
+  push: {}
+  pull_request: {}
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: gradle/wrapper-validation-action@v1
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 19
-      - run: ./gradlew check
+    - id: step-0
+      uses: actions/checkout@v3
+    - id: step-1
+      uses: gradle/wrapper-validation-action@v1
+    - id: step-2
+      uses: actions/setup-java@v3
+      with:
+        java-version: 19
+        distribution: temurin
+    - id: step-3
+      run: ./gradlew check
