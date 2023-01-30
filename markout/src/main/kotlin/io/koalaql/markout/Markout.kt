@@ -141,7 +141,7 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
             it.forEach { (name, _) ->
                 val path = dir.resolve(name)
 
-                if (Files.exists(path)) {
+                if (Files.exists(path) && !Files.isDirectory(path)) {
                     it.remove()
                     entries.remove(name)
 

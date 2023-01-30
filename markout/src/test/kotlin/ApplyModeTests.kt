@@ -37,11 +37,11 @@ class ApplyModeTests {
 
     @JvmField
     @Rule
-    val tempFolder = TemporaryFolder()
+    val tempFolderForCreate = TemporaryFolder()
 
     @Test
     fun `files created, removed and overwritten`() {
-        val rootDir = Path(tempFolder.root.path)
+        val rootDir = Path(tempFolderForExisting.root.path)
 
         // fresh state
         markout(rootDir) {
@@ -97,5 +97,33 @@ class ApplyModeTests {
                     assert(resolve("delete-me.txt").notExists())
                 }
             }
+    }
+
+    @JvmField
+    @Rule
+    val tempFolderForExisting = TemporaryFolder()
+
+    @Test
+    fun `can use existing directory`() {
+        val rootDir = Path(tempFolderForExisting.root.path).apply {
+            resolve("existing-dir").createDirectory()
+        }
+
+        markout(rootDir) {
+            directory("existing-dir") {
+                file("new-file.txt", "successfully created")
+            }
+        }
+
+        rootDir.apply {
+            assertEquals(resolve(".markout").readText(), "existing-dir\n")
+
+            resolve("existing-dir").apply {
+                assertEquals(resolve(".markout").readText(), "new-file.txt\n")
+
+                assert(isDirectory())
+                assertEquals(resolve("new-file.txt").readText(), "successfully created")
+            }
+        }
     }
 }
