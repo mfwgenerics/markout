@@ -9,7 +9,7 @@ import it.krzeminski.githubactions.domain.RunnerType
 import it.krzeminski.githubactions.domain.triggers.PullRequest
 import it.krzeminski.githubactions.domain.triggers.Push
 
-fun Markout.checkWorkflow() = workflow("check",
+fun Markout.checkYml() = workflow("check",
     name = "Build and check",
     on = listOf(Push(), PullRequest()),
 ) {
