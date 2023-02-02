@@ -5,7 +5,9 @@ import io.koalaql.markout.DiffType
 import io.koalaql.markout.stream.StreamMatcher
 import io.koalaql.markout.output.OutputFile
 import java.nio.file.Files
+import java.nio.file.OpenOption
 import java.nio.file.Path
+import java.nio.file.StandardOpenOption
 import kotlin.io.path.inputStream
 
 data class WriteToFile(
@@ -26,7 +28,7 @@ data class WriteToFile(
             return false
         }
 
-        val matcher = StreamMatcher(path.inputStream())
+        val matcher = StreamMatcher(Files.newByteChannel(path, StandardOpenOption.READ))
 
         source.writeTo(matcher)
 
