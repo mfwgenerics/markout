@@ -37,11 +37,11 @@ class ApplyModeTests {
 
     @JvmField
     @Rule
-    val tempFolderForCreate = TemporaryFolder()
+    val temp = TemporaryFolder()
 
     @Test
     fun `files created, removed and overwritten`() {
-        val rootDir = Path(tempFolderForExisting.root.path)
+        val rootDir = Path(temp.root.path)
 
         // fresh state
         markout(rootDir) {
@@ -99,13 +99,9 @@ class ApplyModeTests {
             }
     }
 
-    @JvmField
-    @Rule
-    val tempFolderForExisting = TemporaryFolder()
-
     @Test
     fun `can use existing directory`() {
-        val rootDir = Path(tempFolderForExisting.root.path).apply {
+        val rootDir = Path(temp.root.path).apply {
             resolve("existing-dir").createDirectory()
         }
 
