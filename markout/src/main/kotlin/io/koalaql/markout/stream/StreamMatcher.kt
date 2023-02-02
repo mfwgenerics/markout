@@ -12,39 +12,41 @@ class StreamMatcher(
 
     private var matches = true
 
-    private fun read(): Int {
-        val b = ByteArray(1)
-
-        val count = channel.read(ByteBuffer.wrap(b))
-
-        if (count == 1) return b[0].toInt() and 0xFF
-
-        return -1
-    }
-
-    override fun write(byte: Int) {
-        if (matches) {
-            val position = channel.position()
-
-            matches = read() == byte and 0xFF
-
-            if (!matches) channel.position(position)
-        }
-
-        if (!matches && mode == StreamMode.OVERWRITE) {
-            channel.write(ByteBuffer.wrap(byteArrayOf(byte.toByte())))
-        }
-    }
-
     private fun ensureEnoughBuffer(needed: Int) {
         if (buffer.size >= needed) return
-
         buffer = ByteArray(needed)
     }
 
-    /*override fun write(b: ByteArray, off: Int, len: Int) {
-        ensureEnoughBuffer(len)
-    }*/
+    override fun write(b: ByteArray, off: Int, len: Int) {
+        if (matches) {
+            ensureEnoughBuffer(len)
+
+            val existing = ByteBuffer.wrap(buffer, 0, len)
+            val incoming = ByteBuffer.wrap(b, off, len)
+
+            var read = channel.read(existing)
+
+            if (read < 0) read = 0
+
+            if (read == len) {
+                existing.rewind()
+
+                if (existing.mismatch(incoming) == -1) return
+            }
+
+            channel.position(channel.position() - read.toLong())
+
+            matches = false
+        }
+
+        if (mode == StreamMode.OVERWRITE) {
+            channel.write(ByteBuffer.wrap(b, off, len))
+        }
+    }
+
+    override fun write(byte: Int) {
+        write(byteArrayOf(byte.toByte()))
+    }
 
     override fun close() {
         if (channel.size() != channel.position()) {

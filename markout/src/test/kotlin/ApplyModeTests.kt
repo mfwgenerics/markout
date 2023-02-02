@@ -118,7 +118,7 @@ class ApplyModeTests {
                 assertEquals(resolve(".markout").readText(), "new-file.txt\n")
 
                 assert(isDirectory())
-                assertEquals(resolve("new-file.txt").readText(), "successfully created")
+                assertEquals("successfully created", resolve("new-file.txt").readText())
             }
         }
     }
