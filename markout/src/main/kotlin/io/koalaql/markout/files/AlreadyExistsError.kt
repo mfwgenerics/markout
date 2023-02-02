@@ -9,8 +9,7 @@ object AlreadyExistsError: FileAction {
         error("$path already exists")
     }
 
-    override fun expect(path: Path, out: MutableList<Diff>): Boolean {
-        out.add(Diff(DiffType.UNTRACKED, path))
-        return false
+    override fun expect(path: Path): Diff {
+        return Diff(DiffType.UNTRACKED, path)
     }
 }

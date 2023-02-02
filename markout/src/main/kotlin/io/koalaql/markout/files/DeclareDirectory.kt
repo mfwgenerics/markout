@@ -13,17 +13,15 @@ data class DeclareDirectory(
         if (!Files.isDirectory(path)) Files.createDirectory(path)
     }
 
-    override fun expect(path: Path, out: MutableList<Diff>): Boolean {
+    override fun expect(path: Path): Diff? {
         if (Files.notExists(path)) {
-            out.add(Diff(DiffType.EXPECTED, path))
-            return false
+            return Diff(DiffType.EXPECTED, path)
         }
 
         if (!Files.isDirectory(path)) {
-            out.add(Diff(DiffType.MISMATCH, path))
-            return false
+            return Diff(DiffType.MISMATCH, path)
         }
 
-        return true
+        return null
     }
 }

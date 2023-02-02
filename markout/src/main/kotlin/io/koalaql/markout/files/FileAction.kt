@@ -5,5 +5,5 @@ import java.nio.file.Path
 
 sealed interface FileAction {
     fun perform(path: Path)
-    fun expect(path: Path, out: MutableList<Diff>): Boolean
+    fun expect(path: Path): Diff?
 }

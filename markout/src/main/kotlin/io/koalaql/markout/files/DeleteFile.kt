@@ -17,16 +17,12 @@ object DeleteFile: FileAction {
         }
     }
 
-    override fun expect(path: Path, out: MutableList<Diff>): Boolean {
-        if (Files.exists(path)) {
-            out.add(Diff(
-                DiffType.UNEXPECTED,
-                path
-            ))
+    override fun expect(path: Path): Diff? {
+        if (Files.notExists(path)) return null
 
-            return false
-        }
-
-        return true
+        return Diff(
+            DiffType.UNEXPECTED,
+            path
+        )
     }
 }

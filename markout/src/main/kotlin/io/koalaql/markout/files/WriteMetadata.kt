@@ -14,5 +14,5 @@ data class WriteMetadata(
         ))
     }
 
-    override fun expect(path: Path, out: MutableList<Diff>): Boolean = true
+    override fun expect(path: Path): Diff? = null
 }

@@ -27,9 +27,11 @@ class ActionableFiles(
                 return false
             }
 
-            val result = paths[path]
-                ?.expect(path, diffs)
-                ?:true
+            val diff = paths[path]?.expect(path)
+
+            if (diff != null) diffs.add(diff)
+
+            val result = diff == null
 
             visited[path] = result
             return result
