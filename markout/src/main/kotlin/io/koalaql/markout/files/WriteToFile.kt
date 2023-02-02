@@ -2,7 +2,7 @@ package io.koalaql.markout.files
 
 import io.koalaql.markout.Diff
 import io.koalaql.markout.DiffType
-import io.koalaql.markout.StreamMatcher
+import io.koalaql.markout.stream.StreamMatcher
 import io.koalaql.markout.output.OutputFile
 import java.nio.file.Files
 import java.nio.file.Path

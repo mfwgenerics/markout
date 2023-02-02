@@ -80,19 +80,6 @@ data class Diff(
         "${"$type".lowercase()}\t$path"
 }
 
-class StreamMatcher(
-    private val input: InputStream
-): OutputStream() {
-    private var matches = true
-
-    fun matched(): Boolean {
-        return matches && input.read() == -1
-    }
-
-    override fun write(byte: Int) {
-        matches = matches && input.read() == byte and 0xFF
-    }
-}
 
 val MODE_ENV_VAR = "MARKOUT_MODE"
 val PATH_ENV_VAR = "MARKOUT_PATH"
