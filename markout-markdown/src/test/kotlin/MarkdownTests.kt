@@ -1,6 +1,6 @@
 import io.koalaql.markout.md.markdownString
-import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.Test
 
 class MarkdownTests {
     @Test

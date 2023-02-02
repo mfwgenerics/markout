@@ -9,7 +9,7 @@ plugins {
 dependencies {
     api(kotlin("reflect"))
 
-    api(project(":markout-markdown"))
+    api(project(":markout"))
 
     testImplementation(kotlin("test"))
 }
