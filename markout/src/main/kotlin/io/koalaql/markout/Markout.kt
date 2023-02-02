@@ -174,7 +174,9 @@ fun markout(
     val actions = actionableFiles(output, normalized)
 
     when (mode) {
-        ExecutionMode.APPLY -> actions.perform()
+        ExecutionMode.APPLY -> {
+            actions.perform().forEach { println(it) }
+        }
         ExecutionMode.EXPECT -> {
             val diffs = actions.expect()
 

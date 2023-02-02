@@ -6,8 +6,8 @@ import java.nio.file.Path
 class ActionableFiles(
     private val paths: Map<Path, FileAction>
 ) {
-    fun perform() {
-        paths.forEach { (path, action) -> action.perform(path) }
+    fun perform(): List<Diff> {
+        return paths.mapNotNull { (path, action) -> action.perform(path) }
     }
 
     fun expect(): List<Diff> {
