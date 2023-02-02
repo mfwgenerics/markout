@@ -8,6 +8,8 @@ class StreamMatcher(
     private val channel: SeekableByteChannel,
     private val mode: StreamMode = StreamMode.CHECK
 ): OutputStream() {
+    private var buffer = ByteArray(0)
+
     private var matches = true
 
     private fun read(): Int {
@@ -22,15 +24,27 @@ class StreamMatcher(
 
     override fun write(byte: Int) {
         if (matches) {
+            val position = channel.position()
+
             matches = read() == byte and 0xFF
 
-            if (!matches) channel.position(channel.position() - 1)
+            if (!matches) channel.position(position)
         }
 
         if (!matches && mode == StreamMode.OVERWRITE) {
             channel.write(ByteBuffer.wrap(byteArrayOf(byte.toByte())))
         }
     }
+
+    private fun ensureEnoughBuffer(needed: Int) {
+        if (buffer.size >= needed) return
+
+        buffer = ByteArray(needed)
+    }
+
+    /*override fun write(b: ByteArray, off: Int, len: Int) {
+        ensureEnoughBuffer(len)
+    }*/
 
     override fun close() {
         if (channel.size() != channel.position()) {

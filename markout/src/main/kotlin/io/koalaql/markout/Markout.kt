@@ -110,7 +110,7 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
         metadataPaths(dir).forEach { path ->
             when (val entry = remaining.remove(path.name)) {
                 is OutputDirectory -> {
-                    paths[path] = DeclareDirectory(true)
+                    paths[path] = DeclareDirectory
 
                     reconcile(entry, path)
                 }
@@ -146,7 +146,7 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
 
             when (entry) {
                 is OutputDirectory -> {
-                    paths[path] = DeclareDirectory(false)
+                    paths[path] = DeclareDirectory
 
                     reconcile(entry, path)
                 }

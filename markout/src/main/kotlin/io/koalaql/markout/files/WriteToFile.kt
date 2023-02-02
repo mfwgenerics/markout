@@ -4,6 +4,7 @@ import io.koalaql.markout.Diff
 import io.koalaql.markout.DiffType
 import io.koalaql.markout.stream.StreamMatcher
 import io.koalaql.markout.output.OutputFile
+import io.koalaql.markout.stream.StreamMode
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
@@ -11,8 +12,24 @@ import java.nio.file.StandardOpenOption
 data class WriteToFile(
     private val source: OutputFile
 ): FileAction {
-    override fun perform(path: Path) {
-        source.writeTo(Files.newOutputStream(path))
+    override fun perform(path: Path): Diff? {
+        val needsCreation = Files.notExists(path)
+
+        val matcher = StreamMatcher(
+            if (needsCreation) {
+                Files.newByteChannel(path, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
+            } else {
+                Files.newByteChannel(path, StandardOpenOption.READ, StandardOpenOption.WRITE)
+            },
+            StreamMode.OVERWRITE
+        )
+
+        source.writeTo(matcher)
+
+        if (needsCreation) return Diff(DiffType.EXPECTED, path)
+        if (!matcher.matched()) return Diff(DiffType.MISMATCH, path)
+
+        return null
     }
 
     override fun expect(path: Path): Diff? {
