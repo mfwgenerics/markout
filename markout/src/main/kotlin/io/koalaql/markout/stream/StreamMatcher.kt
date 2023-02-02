@@ -21,7 +21,15 @@ class StreamMatcher(
     }
 
     override fun write(byte: Int) {
-        matches = matches && read() == byte and 0xFF
+        if (matches) {
+            matches = read() == byte and 0xFF
+
+            if (!matches) channel.position(channel.position() - 1)
+        }
+
+        if (!matches && mode == StreamMode.OVERWRITE) {
+            channel.write(ByteBuffer.wrap(byteArrayOf(byte.toByte())))
+        }
     }
 
     override fun close() {
