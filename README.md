@@ -61,10 +61,10 @@ Currently the Gradle application plugin is the best way to run a standalone Mark
 #### Markdown Strings
 
 If you only want to use Markout to generate Markdown strings then you can use
-`markdownString`
+`markdown` as a standalone function
 
 ```kotlin
-markdownString {
+markdown {
     h1("My Markdown")
 
     -"Text with some *italics*."

@@ -2,7 +2,7 @@ import io.koalaql.kapshot.Capturable
 import io.koalaql.kapshot.Source
 import io.koalaql.markout.MarkoutDsl
 import io.koalaql.markout.md.Markdown
-import io.koalaql.markout.md.markdownString
+import io.koalaql.markout.md.markdown
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputFile
@@ -21,7 +21,7 @@ fun Markdown.example(block: CapturedBuilderBlock) {
     h3("Kotlin")
     code("kotlin", block.source.text)
 
-    val rendered = markdownString { with(block) { build() } }
+    val rendered = markdown { with(block) { build() } }
 
     h3("Generated")
     code("markdown", rendered)

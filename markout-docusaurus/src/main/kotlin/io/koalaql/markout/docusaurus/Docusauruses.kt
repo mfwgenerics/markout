@@ -2,26 +2,33 @@ package io.koalaql.markout.docusaurus
 
 import io.koalaql.markout.Markout
 import io.koalaql.markout.MarkoutDsl
-import io.koalaql.markout.md.markdown
-import io.koalaql.markout.md.markdownString
+import io.koalaql.markout.md.markdownTo
+import io.koalaql.markout.md.withMdSuffix
+import io.koalaql.markout.text.AppendableLineWriter
+import java.io.OutputStream
 
 private fun docusaurusMdFile(
+    output: OutputStream,
     position: Int,
     builder: DocusaurusMarkdownFile.() -> Unit
-): String {
-    lateinit var header: String
+) {
+    lateinit var impl: MarkdownFileImpl
 
-    val body = markdownString(trailingNewline = true) {
-        val impl = MarkdownFileImpl(this, position)
+    val writer = output.writer()
+    val lw = AppendableLineWriter(writer)
+
+    markdownTo(lw.onWrite {
+        lw.raw(impl.header())
+        lw.newline()
+    }) {
+        impl = MarkdownFileImpl(this, position)
 
         impl.builder()
-
-        header = impl.header()
     }
 
-    if (body.isEmpty()) return header
+    lw.newline()
 
-    return "$header\n$body"
+    writer.flush()
 }
 
 private class DirectoryContext(
@@ -54,7 +61,9 @@ private class DirectoryContext(
     override fun markdown(name: String, builder: DocusaurusMarkdownFile.() -> Unit) {
         val position = ++sidebarPosition
 
-        markout.markdown(name, docusaurusMdFile(position, builder))
+        markout.file(withMdSuffix(name)) {
+            docusaurusMdFile(it, position, builder)
+        }
     }
 
     fun category() {
@@ -101,7 +110,9 @@ fun Markout.docusaurus(block: Docusaurus.() -> Unit) {
         override fun markdown(name: String, builder: DocusaurusMarkdownFile.() -> Unit) {
             val position = ++sidebarPosition
 
-            this@docusaurus.markdown(name, docusaurusMdFile(position, builder))
+            this@docusaurus.file(withMdSuffix(name)) {
+                docusaurusMdFile(it, position, builder)
+            }
         }
     }.block()
 }

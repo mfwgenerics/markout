@@ -5,25 +5,25 @@ import io.koalaql.markout.DiffType
 import java.nio.file.Files
 import java.nio.file.Path
 
-data class DeclareDirectory(
-    private val delete: Boolean,
-): FileAction {
-    override fun perform(path: Path) {
-        DeleteFile.perform(path)
-        if (!Files.isDirectory(path)) Files.createDirectory(path)
+object DeclareDirectory: FileAction {
+    override fun perform(path: Path): Diff? {
+        if (Files.isDirectory(path)) return null
+
+        if (Files.deleteIfExists(path)) return Diff(DiffType.MISMATCH, path)
+
+        Files.createDirectory(path)
+        return Diff(DiffType.EXPECTED, path)
     }
 
-    override fun expect(path: Path, out: MutableList<Diff>): Boolean {
+    override fun expect(path: Path): Diff? {
         if (Files.notExists(path)) {
-            out.add(Diff(DiffType.EXPECTED, path))
-            return false
+            return Diff(DiffType.EXPECTED, path)
         }
 
         if (!Files.isDirectory(path)) {
-            out.add(Diff(DiffType.MISMATCH, path))
-            return false
+            return Diff(DiffType.MISMATCH, path)
         }
 
-        return true
+        return null
     }
 }

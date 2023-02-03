@@ -1,4 +1,4 @@
-import io.koalaql.markout.md.markdownString
+import io.koalaql.markout.md.markdown
 import kotlin.test.assertEquals
 import kotlin.test.Test
 
@@ -20,7 +20,7 @@ class MarkdownTests {
             test
             ```
             """.trimIndent(),
-            markdownString {
+            markdown {
                 h1 {
                     t("Example "); b("Header")
                 }
@@ -59,7 +59,7 @@ class MarkdownTests {
             > > Block
             > > ```
             """.trimIndent(),
-            markdownString {
+            markdown {
                 p {
                     t("non-quote")
                 }
@@ -92,7 +92,7 @@ class MarkdownTests {
             > * * 1
             >   * 2
             """.trimIndent(),
-            markdownString {
+            markdown {
                 quote {
                     t("A list")
 
@@ -122,7 +122,7 @@ class MarkdownTests {
 
     @Test
     fun `ordered list prefix length`() {
-        val giantList = markdownString {
+        val giantList = markdown {
             ol {
                 repeat(100) {
                     li("two\nlines")
@@ -168,7 +168,7 @@ class MarkdownTests {
             1. two
                lines
             """.trimIndent(),
-            markdownString {
+            markdown {
                 ol {
                     li(0, "two\nlines")
                     li("two\nlines")
@@ -190,7 +190,7 @@ class MarkdownTests {
             - [x] Task *2*?
             - [ ] Task 3
             """.trimIndent(),
-            markdownString {
+            markdown {
                 t("Checklists!")
 
                 cl {
@@ -222,7 +222,7 @@ class MarkdownTests {
             [2]: https://example.com/something "Something1"
             [3]: https://example.com/something "Something 2"
             """.trimIndent(),
-            markdownString {
+            markdown {
                 h1 {
                     t("Link "); i("in"); t(" "); a("https://example.com", "Header")
                 }
@@ -264,7 +264,7 @@ class MarkdownTests {
 
             [1]: https://example.com
             """.trimIndent(),
-            markdownString {
+            markdown {
                 h1("Table")
 
                 table {
@@ -312,7 +312,7 @@ class MarkdownTests {
             
             [1]: https://example.com
             """.trimIndent(),
-            markdownString {
+            markdown {
                 p {
                     t("test"); footnote("Test note")
                 }
@@ -353,7 +353,7 @@ class MarkdownTests {
             ```
             ````
             """.trimIndent(),
-            markdownString { code("```") }
+            markdown { code("```") }
         )
 
         assertEquals(
@@ -362,7 +362,7 @@ class MarkdownTests {
             ````
             `````
             """.trimIndent(),
-            markdownString { code("````") }
+            markdown { code("````") }
         )
 
         assertEquals(
@@ -371,7 +371,7 @@ class MarkdownTests {
             ``` ````` ``
             ``````
             """.trimIndent(),
-            markdownString { code("``` ````` ``") }
+            markdown { code("``` ````` ``") }
         )
     }
 
@@ -379,7 +379,7 @@ class MarkdownTests {
     fun `empty blocks don't produce extra whitespace`() {
         assertEquals(
             "",
-            markdownString {
+            markdown {
                 p { }
                 table {  }
                 p { }
@@ -388,7 +388,7 @@ class MarkdownTests {
 
         assertEquals(
             "a",
-            markdownString {
+            markdown {
                 p { }
                 t("a")
             }
@@ -400,7 +400,7 @@ class MarkdownTests {
             
             below
             """.trimIndent(),
-            markdownString {
+            markdown {
                 p { +"above" }
                 p { }
                 +""
@@ -416,7 +416,7 @@ class MarkdownTests {
             
             below
             """.trimIndent(),
-            markdownString {
+            markdown {
                 +"above"
                 p { }
                 +"below"
@@ -430,7 +430,7 @@ class MarkdownTests {
     fun `single reference has appropriate whitespace`() {
         assertEquals(
             "[1]: https://example.com",
-            markdownString {
+            markdown {
                 cite("https://example.com")
             }
         )
@@ -443,7 +443,7 @@ class MarkdownTests {
             Part 2 of Line 1  
             Line 2
         """.trimIndent(),
-            markdownString {
+            markdown {
                 p {
                     -"Line 1."
                     -"Part 2 of Line 1"
@@ -473,7 +473,7 @@ class MarkdownTests {
                
                ![](inline)![](inline)
         """.trimIndent(),
-            markdownString {
+            markdown {
                 img("block")
                 img("block")
 
