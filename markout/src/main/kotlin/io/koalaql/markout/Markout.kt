@@ -15,6 +15,9 @@ import kotlin.io.path.*
 interface Markout {
     @MarkoutDsl
     fun directory(name: String, builder: Markout.() -> Unit)
+
+    @MarkoutDsl
+    fun file(name: String, output: OutputFile)
     @MarkoutDsl
     fun file(name: String, contents: String)
 }
@@ -27,8 +30,12 @@ fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory 
             entries[name] = buildOutput(builder)
         }
 
+        override fun file(name: String, output: OutputFile) {
+            entries[name] = output
+        }
+
         override fun file(name: String, contents: String) {
-            entries[name] = OutputFile { out ->
+            return file(name) { out ->
                 out.writer().use { it.append(contents) }
             }
         }

@@ -3,7 +3,6 @@ package io.koalaql.markout.docusaurus
 import io.koalaql.markout.Markout
 import io.koalaql.markout.MarkoutDsl
 import io.koalaql.markout.md.markdown
-import io.koalaql.markout.md.markdownString
 
 private fun docusaurusMdFile(
     position: Int,
@@ -11,7 +10,7 @@ private fun docusaurusMdFile(
 ): String {
     lateinit var header: String
 
-    val body = markdownString(trailingNewline = true) {
+    val body = markdown {
         val impl = MarkdownFileImpl(this, position)
 
         impl.builder()
@@ -21,7 +20,7 @@ private fun docusaurusMdFile(
 
     if (body.isEmpty()) return header
 
-    return "$header\n$body"
+    return "$header\n$body\n"
 }
 
 private class DirectoryContext(
