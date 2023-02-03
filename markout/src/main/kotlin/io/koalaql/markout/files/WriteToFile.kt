@@ -24,7 +24,7 @@ data class WriteToFile(
             StreamMode.OVERWRITE
         )
 
-        source.writeTo(matcher)
+        matcher.use { source.writeTo(it) }
 
         if (needsCreation) return Diff(DiffType.EXPECTED, path)
         if (!matcher.matched()) return Diff(DiffType.MISMATCH, path)
@@ -38,7 +38,7 @@ data class WriteToFile(
 
         val matcher = StreamMatcher(Files.newByteChannel(path, StandardOpenOption.READ))
 
-        source.writeTo(matcher)
+        matcher.use { source.writeTo(it) }
 
         if (!matcher.matched()) return Diff(DiffType.MISMATCH, path)
 

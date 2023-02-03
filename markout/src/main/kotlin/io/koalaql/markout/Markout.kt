@@ -36,7 +36,10 @@ fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory 
 
         override fun file(name: String, contents: String) {
             return file(name) { out ->
-                out.writer().use { it.append(contents) }
+                out.writer().apply {
+                    append(contents)
+                    flush()
+                }
             }
         }
     }.builder()

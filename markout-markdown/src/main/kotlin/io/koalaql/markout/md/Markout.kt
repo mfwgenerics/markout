@@ -4,21 +4,29 @@ import io.koalaql.markout.MarkdownBuilder
 import io.koalaql.markout.Markout
 import io.koalaql.markout.MarkoutDsl
 import io.koalaql.markout.text.AppendableLineWriter
+import io.koalaql.markout.text.LineWriter
+
+fun markdownTo(
+    writer: LineWriter,
+    builder: Markdown.() -> Unit
+) {
+    MarkdownBuilder(writer, top = true).apply {
+        builder()
+        footer()
+    }
+}
 
 fun markdown(
     builder: Markdown.() -> Unit
 ): String {
     val sb = StringBuilder()
 
-    MarkdownBuilder(AppendableLineWriter(sb), top = true).apply {
-        builder()
-        footer()
-    }
+    markdownTo(AppendableLineWriter(sb), builder)
 
     return "$sb"
 }
 
-private fun withSuffix(name: String) = when {
+fun withMdSuffix(name: String) = when {
     name.endsWith(".md", ignoreCase = true) ||
     name.endsWith(".mdx", ignoreCase = true) -> name
     else -> "$name.md"
@@ -26,23 +34,20 @@ private fun withSuffix(name: String) = when {
 
 @MarkoutDsl
 fun Markout.markdown(name: String, contents: String) {
-    file(withSuffix(name), contents)
+    file(withMdSuffix(name), contents)
 }
 
 @MarkoutDsl
 fun Markout.markdown(name: String, builder: Markdown.() -> Unit) {
-    file(withSuffix(name)) { out ->
+    file(withMdSuffix(name)) { out ->
         val writer = out.writer()
 
         val lw = AppendableLineWriter(writer)
 
-        MarkdownBuilder(lw, top = true).apply {
-            builder()
-            footer()
-        }
+        markdownTo(lw, builder)
 
         lw.newline()
 
-        writer.close()
+        writer.flush()
     }
 }
