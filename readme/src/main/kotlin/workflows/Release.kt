@@ -6,6 +6,7 @@ import it.krzeminski.githubactions.actions.ActionWithOutputs
 import it.krzeminski.githubactions.actions.actions.CheckoutV3
 import it.krzeminski.githubactions.actions.actions.SetupJavaV3
 import it.krzeminski.githubactions.actions.gradle.WrapperValidationActionV1
+import it.krzeminski.githubactions.domain.JobOutputs
 import it.krzeminski.githubactions.domain.RunnerType
 import it.krzeminski.githubactions.domain.triggers.PullRequest
 import it.krzeminski.githubactions.domain.triggers.Push
@@ -41,7 +42,7 @@ class CreateNexusStagingRepo(
     }
 }
 
-fun Markout.releaseYml() = workflow("release2",
+fun Markout.releaseYml() = workflow("release",
     name = "Publish plugins and dependencies",
     on = listOf(Push(), Release(
         mapOf(
@@ -52,15 +53,20 @@ fun Markout.releaseYml() = workflow("release2",
 ) {
     val staging = job("staging_repository",
         name = "Create staging repository",
-        runsOn = RunnerType.UbuntuLatest
+        runsOn = RunnerType.UbuntuLatest,
+        outputs = object : JobOutputs() {
+            var repository_id by output()
+        }
     ) {
-        uses(CreateNexusStagingRepo(
+        val step = uses(CreateNexusStagingRepo(
             username = expr { secrets.getValue("SONATYPE_USERNAME") },
             password =  expr { secrets.getValue("SONATYPE_PASSWORD") },
             stagingProfileId = expr { secrets.getValue("SONATYPE_PROFILE_ID") },
             description = "${expr { github.repository }}/${expr { github.workflow }}#${expr { github.run_number }}",
             baseUrl = "https://s01.oss.sonatype.org/service/local/"
         ))
+
+        jobOutputs.repository_id = step.outputs.repositoryId
     }
 
     job("publish",
@@ -79,7 +85,7 @@ fun Markout.releaseYml() = workflow("release2",
             name = "Publish to Maven Central",
             command = "./gradlew publish",
             env = linkedMapOf(
-                "REPOSITORY_ID" to expr { "needs.staging_repository.outputs.repository_id" },
+                "REPOSITORY_ID" to expr { staging.outputs.repository_id },
                 "SONATYPE_USERNAME" to expr { secrets.getValue("SONATYPE_USERNAME") },
                 "SONATYPE_PASSWORD" to expr { secrets.getValue("SONATYPE_PASSWORD") },
                 "GPG_PRIVATE_KEY" to expr { secrets.getValue("GPG_PRIVATE_KEY") },
