@@ -11,5 +11,3 @@ dependencies {
 
     testImplementation(kotlin("test"))
 }
-
-//compatibility(JavaVersion.VERSION_1_8)

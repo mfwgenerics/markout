@@ -50,12 +50,15 @@ fun Markout.releaseYml() = workflow("release2",
         ),
     )),
 ) {
-    val staging = job("staging_repository", runsOn = RunnerType.UbuntuLatest) {
+    val staging = job("staging_repository",
+        name = "Create staging repository",
+        runsOn = RunnerType.UbuntuLatest
+    ) {
         uses(CreateNexusStagingRepo(
             username = expr { secrets.getValue("SONATYPE_USERNAME") },
             password =  expr { secrets.getValue("SONATYPE_PASSWORD") },
-            stagingProfileId =  expr { secrets.getValue("STAGING_PROFILE_ID") },
-            description = "${expr { github.repository }}/${expr { github.workflow }}/${expr { github.run_number }}",
+            stagingProfileId = expr { secrets.getValue("SONATYPE_PROFILE_ID") },
+            description = "${expr { github.repository }}/${expr { github.workflow }}#${expr { github.run_number }}",
             baseUrl = "https://s01.oss.sonatype.org/service/local/"
         ))
     }
