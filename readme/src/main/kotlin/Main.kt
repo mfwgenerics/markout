@@ -1,6 +1,5 @@
 import io.koalaql.markout.markout
 import io.koalaql.markout.md.markdown
-import io.koalaql.markout.md.markdownString
 import workflows.checkYml
 import workflows.releaseYml
 import kotlin.io.path.Path
@@ -85,10 +84,10 @@ fun main() = markout {
                 h4("Markdown Strings")
 
                 -"If you only want to use Markout to generate Markdown strings then you can use"
-                -"`${::markdownString.name}`"
+                -"`markdown` as a standalone function"
 
                 val result = code {
-                    markdownString {
+                    markdown {
                         h1("My Markdown")
 
                         -"Text with some *italics*."

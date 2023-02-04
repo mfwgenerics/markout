@@ -3,13 +3,13 @@ repositories {
 }
 
 plugins {
-    id("publish-1.8")
+    id("publish")
 }
 
 dependencies {
     api(kotlin("reflect"))
 
-    api(project(":markout-markdown"))
+    api(project(":markout"))
 
     testImplementation(kotlin("test"))
 }

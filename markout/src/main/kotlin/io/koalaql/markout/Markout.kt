@@ -15,6 +15,9 @@ import kotlin.io.path.*
 interface Markout {
     @MarkoutDsl
     fun directory(name: String, builder: Markout.() -> Unit)
+
+    @MarkoutDsl
+    fun file(name: String, output: OutputFile)
     @MarkoutDsl
     fun file(name: String, contents: String)
 }
@@ -27,9 +30,16 @@ fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory 
             entries[name] = buildOutput(builder)
         }
 
+        override fun file(name: String, output: OutputFile) {
+            entries[name] = output
+        }
+
         override fun file(name: String, contents: String) {
-            entries[name] = OutputFile { out ->
-                out.writer().use { it.append(contents) }
+            return file(name) { out ->
+                out.writer().apply {
+                    append(contents)
+                    flush()
+                }
             }
         }
     }.builder()
@@ -80,19 +90,6 @@ data class Diff(
         "${"$type".lowercase()}\t$path"
 }
 
-class StreamMatcher(
-    private val input: InputStream
-): OutputStream() {
-    private var matches = true
-
-    fun matched(): Boolean {
-        return matches && input.read() == -1
-    }
-
-    override fun write(byte: Int) {
-        matches = matches && input.read() == byte and 0xFF
-    }
-}
 
 val MODE_ENV_VAR = "MARKOUT_MODE"
 val PATH_ENV_VAR = "MARKOUT_PATH"
@@ -123,7 +120,7 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
         metadataPaths(dir).forEach { path ->
             when (val entry = remaining.remove(path.name)) {
                 is OutputDirectory -> {
-                    paths[path] = DeclareDirectory(true)
+                    paths[path] = DeclareDirectory
 
                     reconcile(entry, path)
                 }
@@ -159,7 +156,7 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
 
             when (entry) {
                 is OutputDirectory -> {
-                    paths[path] = DeclareDirectory(false)
+                    paths[path] = DeclareDirectory
 
                     reconcile(entry, path)
                 }
@@ -187,7 +184,9 @@ fun markout(
     val actions = actionableFiles(output, normalized)
 
     when (mode) {
-        ExecutionMode.APPLY -> actions.perform()
+        ExecutionMode.APPLY -> {
+            actions.perform().forEach { println(it) }
+        }
         ExecutionMode.EXPECT -> {
             val diffs = actions.expect()
 

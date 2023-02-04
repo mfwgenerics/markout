@@ -9,24 +9,29 @@ object DeleteFile: FileAction {
     private fun isEmpty(dir: Path) =
         Files.newDirectoryStream(dir).use { directory -> !directory.iterator().hasNext() }
 
-    override fun perform(path: Path) {
+    override fun perform(path: Path): Diff? {
         if (Files.isDirectory(path)) {
-            if (isEmpty(path)) Files.delete(path)
-        } else {
-            Files.deleteIfExists(path)
-        }
-    }
+            if (isEmpty(path)) {
+                Files.delete(path)
 
-    override fun expect(path: Path, out: MutableList<Diff>): Boolean {
-        if (Files.exists(path)) {
-            out.add(Diff(
+                return Diff(DiffType.UNEXPECTED, path)
+            }
+        } else {
+            if (Files.deleteIfExists(path)) return Diff(
                 DiffType.UNEXPECTED,
                 path
-            ))
-
-            return false
+            )
         }
 
-        return true
+        return null
+    }
+
+    override fun expect(path: Path): Diff? {
+        if (Files.notExists(path)) return null
+
+        return Diff(
+            DiffType.UNEXPECTED,
+            path
+        )
     }
 }
