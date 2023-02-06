@@ -11,7 +11,7 @@ dependencies {
 
     api(project(":markout"))
 
-    api("it.krzeminski:github-actions-kotlin-dsl:0.35.0")
+    api("it.krzeminski:github-actions-kotlin-dsl:0.36.0")
 
     testImplementation(kotlin("test"))
 }

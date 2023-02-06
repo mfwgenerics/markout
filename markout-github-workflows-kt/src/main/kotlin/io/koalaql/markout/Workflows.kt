@@ -29,7 +29,6 @@ fun Markout.workflow(
         name = name,
         on = on,
         env = env,
-        sourceFile = Path("not-a-real-file"),
         concurrency = concurrency,
         yamlConsistencyJobCondition = null,
         _customArguments = customArguments,

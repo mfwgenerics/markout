@@ -1,5 +1,5 @@
-# This file was generated using Kotlin DSL (readme/not-a-real-file).
-# If you want to modify the workflow, please change the Kotlin file and regenerate this YAML file.
+# This file was generated using a Kotlin DSL.
+# If you want to modify the workflow, please change the Kotlin source and regenerate this YAML file.
 # Generated with https://github.com/krzema12/github-workflows-kt
 
 name: Build and check
