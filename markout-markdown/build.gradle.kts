@@ -3,7 +3,7 @@ repositories {
 }
 
 plugins {
-    id("publish")
+    id("publish-1.8")
 }
 
 dependencies {
