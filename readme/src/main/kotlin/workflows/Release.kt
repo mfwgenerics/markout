@@ -44,7 +44,7 @@ class CreateNexusStagingRepo(
 
 fun Markout.releaseYml() = workflow("release",
     name = "Publish plugins and dependencies",
-    on = listOf(Push(), Release(
+    on = listOf(Release(
         mapOf(
             "types" to listOf("published"),
             "branches" to listOf("main")

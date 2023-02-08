@@ -4,7 +4,6 @@
 
 name: Publish plugins and dependencies
 on:
-  push: {}
   release:
     types:
     - published
