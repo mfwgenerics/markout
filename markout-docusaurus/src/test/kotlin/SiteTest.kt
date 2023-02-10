@@ -8,7 +8,7 @@ class SiteTest {
     @Test
     fun `matches test site`() = markout(
         Path("./testing"),
-        mode = ExecutionMode.APPLY
+        mode = ExecutionMode.EXPECT
     ) {
         docusaurus {
             configure {
