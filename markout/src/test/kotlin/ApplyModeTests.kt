@@ -122,4 +122,35 @@ class ApplyModeTests {
             }
         }
     }
+
+    @Test
+    fun `directories are cleaned up`() {
+        val rootDir = Path(temp.root.path).apply {
+        }
+
+        markout(rootDir) {
+            directory("existing-dir") {
+                file("new-file.txt", "successfully created")
+            }
+        }
+
+        rootDir.apply {
+            assertEquals(resolve(".markout").readText(), "existing-dir\n")
+
+            resolve("existing-dir").apply {
+                assertEquals(resolve(".markout").readText(), "new-file.txt\n")
+
+                assert(isDirectory())
+                assertEquals("successfully created", resolve("new-file.txt").readText())
+            }
+        }
+
+        markout(rootDir) { }
+
+        rootDir.apply {
+            resolve("existing-dir").apply {
+                assert(notExists())
+            }
+        }
+    }
 }
