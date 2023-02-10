@@ -6,6 +6,8 @@ import io.koalaql.markout.md.markdownTo
 import io.koalaql.markout.md.withMdSuffix
 import io.koalaql.markout.text.AppendableLineWriter
 import java.io.OutputStream
+import kotlin.io.path.Path
+import kotlin.io.path.name
 
 private fun docusaurusMdFile(
     output: OutputStream,
@@ -91,33 +93,55 @@ private class DirectoryContext(
 @MarkoutDsl
 fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
     object : DocusaurusRoot {
-        private var sidebarPosition = 0
-
         override fun bootstrap() {
-            directory("static") {
+            this@docusaurus.directory("static") {
                 file(".nojekyll", "")
             }
-        }
 
-        override fun directory(name: String, builder: DocusaurusDirectory.() -> Unit) {
-            val position = ++sidebarPosition
-
-            this@docusaurus.directory(name) {
-                val ctx = DirectoryContext(this, position)
-                ctx.builder()
-                ctx.category()
+            fun copyResource(path: String, name: String = Path(path).name) {
+                this@docusaurus.file(name) { out ->
+                    Resources.open(path).use { it.copyTo(out) }
+                }
             }
+
+            copyResource("/bootstrap/gitignore", ".gitignore")
+            copyResource("/bootstrap/babel.config.js")
+            copyResource("/bootstrap/docusaurus.config.js")
+            copyResource("/bootstrap/package.json")
+            copyResource("/bootstrap/sidebars.js")
+            copyResource("/bootstrap/tsconfig.json")
+            copyResource("/bootstrap/yarn.lock")
         }
 
-        override fun file(name: String, contents: String) {
-            this@docusaurus.file(name, contents)
-        }
+        override fun docs(block: Docusaurus.() -> Unit) {
+            this@docusaurus.directory("docs") {
+                val markout = this
 
-        override fun markdown(name: String, builder: DocusaurusMarkdownFile.() -> Unit) {
-            val position = ++sidebarPosition
+                object : Docusaurus {
+                    private var sidebarPosition = 0
 
-            this@docusaurus.file(withMdSuffix(name)) {
-                docusaurusMdFile(it, position, builder)
+                    override fun directory(name: String, builder: DocusaurusDirectory.() -> Unit) {
+                        val position = ++sidebarPosition
+
+                        markout.directory(name) {
+                            val ctx = DirectoryContext(this, position)
+                            ctx.builder()
+                            ctx.category()
+                        }
+                    }
+
+                    override fun file(name: String, contents: String) {
+                        markout.file(name, contents)
+                    }
+
+                    override fun markdown(name: String, builder: DocusaurusMarkdownFile.() -> Unit) {
+                        val position = ++sidebarPosition
+
+                        markout.file(withMdSuffix(name)) {
+                            docusaurusMdFile(it, position, builder)
+                        }
+                    }
+                }.block()
             }
         }
     }.block()

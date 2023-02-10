@@ -7,105 +7,107 @@ import kotlin.io.path.Path
 class SiteTest {
     @Test
     fun `matches test site`() = markout(
-        Path("./testing/docs"),
+        Path("./testing"),
         mode = ExecutionMode.EXPECT
     ) {
         docusaurus {
             bootstrap()
 
-            markdown("intro") {
-                slug = "/"
+            docs {
+                markdown("intro") {
+                    slug = "/"
 
-                h1("Intro")
+                    h1("Intro")
 
-                p("Text")
-            }
+                    p("Text")
+                }
 
-            directory("basics") {
-                label = "Basics"
+                directory("basics") {
+                    label = "Basics"
 
-                link(
-                    description = "A basic description"
-                )
+                    link(
+                        description = "A basic description"
+                    )
 
-                markdown("code-blocks") {
-                    h1("Code Blocks")
+                    markdown("code-blocks") {
+                        h1("Code Blocks")
 
-                    code("jsx", "src/pages/my-react-page.js", """
-                        import React from 'react';
-                        import Layout from '@theme/Layout';
+                        code("jsx", "src/pages/my-react-page.js", """
+                            import React from 'react';
+                            import Layout from '@theme/Layout';
+    
+                            export default function MyReactPage() {
+                              return (
+                                <Layout>
+                                  <h1>My React page</h1>
+                                  <p>This is a React page</p>
+                                </Layout>
+                              );
+                            }
+                        """.trimIndent())
 
-                        export default function MyReactPage() {
-                          return (
-                            <Layout>
-                              <h1>My React page</h1>
-                              <p>This is a React page</p>
-                            </Layout>
-                          );
+                        code("mdx", "src/pages/my-markdown-page.md", """
+                            # My Markdown page
+    
+                            This is a Markdown page
+                        """.trimIndent())
+                    }
+
+                    markdown("code-with-highlight") {
+                        h1("Code With Highlight")
+
+                        code("md", "docs/hello.md", 1..4, """
+                            ---
+                            sidebar_label: 'Hi!'
+                            sidebar_position: 3
+                            ---
+    
+                            # Hello
+    
+                            This is my **first Docusaurus document**!
+                        """.trimIndent())
+                    }
+
+                    markdown("admonitions-and-mdx.mdx") {
+                        h1("Markdown Features")
+
+                        tip {
+                            -"Use this awesome feature option"
                         }
-                    """.trimIndent())
 
-                    code("mdx", "src/pages/my-markdown-page.md", """
-                        # My Markdown page
+                        danger("Take Care") {
+                            -"This action is "+i("dangerous")
+                        }
 
-                        This is a Markdown page
-                    """.trimIndent())
-                }
-
-                markdown("code-with-highlight") {
-                    h1("Code With Highlight")
-
-                    code("md", "docs/hello.md", 1..4, """
-                        ---
-                        sidebar_label: 'Hi!'
-                        sidebar_position: 3
-                        ---
-
-                        # Hello
-
-                        This is my **first Docusaurus document**!
-                    """.trimIndent())
-                }
-
-                markdown("admonitions-and-mdx.mdx") {
-                    h1("Markdown Features")
-
-                    tip {
-                        -"Use this awesome feature option"
+                        raw("""
+                            export const Highlight = ({children, color}) => (
+                              <span
+                                style={{
+                                  backgroundColor: color,
+                                  borderRadius: '20px',
+                                  color: '#fff',
+                                  padding: '10px',
+                                  cursor: 'pointer',
+                                }}
+                                onClick={() => {
+                                  alert(`You clicked the color ${"$"}{color} with label ${"$"}{children}`)
+                                }}>
+                                {children}
+                              </span>
+                            );
+    
+                            This is <Highlight color="#25c2a0">Docusaurus green</Highlight> !
+    
+                            This is <Highlight color="#1877F2">Facebook blue</Highlight> !
+                        """.trimIndent())
                     }
-
-                    danger("Take Care") {
-                        -"This action is "+i("dangerous")
-                    }
-
-                    raw("""
-                        export const Highlight = ({children, color}) => (
-                          <span
-                            style={{
-                              backgroundColor: color,
-                              borderRadius: '20px',
-                              color: '#fff',
-                              padding: '10px',
-                              cursor: 'pointer',
-                            }}
-                            onClick={() => {
-                              alert(`You clicked the color ${"$"}{color} with label ${"$"}{children}`)
-                            }}>
-                            {children}
-                          </span>
-                        );
-
-                        This is <Highlight color="#25c2a0">Docusaurus green</Highlight> !
-
-                        This is <Highlight color="#1877F2">Facebook blue</Highlight> !
-                    """.trimIndent())
                 }
-            }
 
-            directory("extras") {
-                label = "Descriptionless Link"
+                directory("extras") {
+                    label = "Descriptionless Link"
 
-                link()
+                    link()
+                }
             }
         }
     }

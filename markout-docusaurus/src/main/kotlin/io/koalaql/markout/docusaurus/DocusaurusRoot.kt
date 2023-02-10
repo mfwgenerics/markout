@@ -2,7 +2,10 @@ package io.koalaql.markout.docusaurus
 
 import io.koalaql.markout.MarkoutDsl
 
-interface DocusaurusRoot: Docusaurus {
+@MarkoutDsl
+interface DocusaurusRoot {
     @MarkoutDsl
     fun bootstrap()
+    @MarkoutDsl
+    fun docs(block: Docusaurus.() -> Unit)
 }
