@@ -4,7 +4,7 @@ import io.koalaql.markout.Markout
 import io.koalaql.markout.docusaurus.docusaurus
 
 fun Markout.setupDocusaurus() = docusaurus {
-    bootstrap()
+    configure()
 
     docs {
         markdown("hello") {

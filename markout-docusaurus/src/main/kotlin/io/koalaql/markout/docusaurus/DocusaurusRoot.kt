@@ -5,7 +5,7 @@ import io.koalaql.markout.MarkoutDsl
 @MarkoutDsl
 interface DocusaurusRoot {
     @MarkoutDsl
-    fun bootstrap(block: DocusaurusSettings.() -> Unit)
+    fun configure(block: DocusaurusSettings.() -> Unit)
     @MarkoutDsl
     fun docs(block: Docusaurus.() -> Unit)
 }

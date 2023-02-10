@@ -11,10 +11,17 @@ class SiteTest {
         mode = ExecutionMode.APPLY
     ) {
         docusaurus {
-            bootstrap {
+            configure {
                 title = "Test Site"
                 tagline = "Test Tagline"
                 url = "http://localhost:3000"
+
+                github = "https://github.com/mfwgenerics/markout"
+
+                logo {
+                    alt = "My Logo"
+                    src = "img/logo.svg"
+                }
             }
 
             docs {

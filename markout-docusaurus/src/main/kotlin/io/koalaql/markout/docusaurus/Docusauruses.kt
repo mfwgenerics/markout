@@ -93,7 +93,7 @@ private class DirectoryContext(
 @MarkoutDsl
 fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
     object : DocusaurusRoot {
-        override fun bootstrap(block: DocusaurusSettings.() -> Unit) {
+        override fun configure(block: DocusaurusSettings.() -> Unit) {
             this@docusaurus.directory("static") {
                 file(".nojekyll", "")
             }

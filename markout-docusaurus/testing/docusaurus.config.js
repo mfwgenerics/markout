@@ -8,55 +8,50 @@ const config = {
   title: 'Test Site',
   tagline: 'Test Tagline',
   url: 'http://localhost:3000',
-baseUrl: '/',
-onBrokenLinks: 'throw',
-onBrokenMarkdownLinks: 'warn',
-favicon: 'img/favicon.ico',
-
-i18n: {
-defaultLocale: 'en',
-locales: ['en'],
-},
-
-presets: [
-[
-  'classic',
-  /** @type {import('@docusaurus/preset-classic').Options} */
+  baseUrl: '/',
+  onBrokenLinks: 'throw',
+  onBrokenMarkdownLinks: 'warn',
+  favicon: 'img/favicon.ico',
+  
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en'],
+  },
+  
+  presets: [
+    [
+      'classic',
+      /** @type {import('@docusaurus/preset-classic').Options} */
+      ({
+        docs: {
+          routeBasePath: '/',
+          sidebarPath: require.resolve('./sidebars.js'),
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+          editUrl:
+            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+        },
+        blog: false
+      }),
+    ],
+  ],
+  
+themeConfig:
+  /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
   ({
-    docs: {
-      routeBasePath: '/',
-      sidebarPath: require.resolve('./sidebars.js'),
-      // Please change this to your repo.
-      // Remove this to remove the "edit this page" links.
-      editUrl:
-        'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-    },
-    blog: false
-  }),
-],
-],  themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
-      navbar: {
-        title: 'My Site',
+    navbar: {
+      title: 'Test Site',
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: 'My Logo',
+          src: 'img/logo.svg'
         },
         items: [
           {
-            type: 'doc',
-            docId: 'intro',
-            position: 'left',
-            label: 'Tutorial',
-          },
-          {to: '/blog', label: 'Blog', position: 'left'},
-          {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/mfwgenerics/markout',
             label: 'GitHub',
             position: 'right',
           },
-        ],
+        ],    
       },
       footer: {
         style: 'dark',
