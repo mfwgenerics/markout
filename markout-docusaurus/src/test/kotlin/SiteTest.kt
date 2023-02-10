@@ -11,6 +11,8 @@ class SiteTest {
         mode = ExecutionMode.EXPECT
     ) {
         docusaurus {
+            bootstrap()
+
             markdown("intro") {
                 slug = "/"
 

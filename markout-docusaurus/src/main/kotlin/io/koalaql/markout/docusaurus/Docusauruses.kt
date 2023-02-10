@@ -89,9 +89,15 @@ private class DirectoryContext(
 }
 
 @MarkoutDsl
-fun Markout.docusaurus(block: Docusaurus.() -> Unit) {
-    object : Docusaurus {
+fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
+    object : DocusaurusRoot {
         private var sidebarPosition = 0
+
+        override fun bootstrap() {
+            directory("static") {
+                file(".nojekyll", "")
+            }
+        }
 
         override fun directory(name: String, builder: DocusaurusDirectory.() -> Unit) {
             val position = ++sidebarPosition
