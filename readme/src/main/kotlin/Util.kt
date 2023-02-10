@@ -5,6 +5,7 @@ import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdown
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
+import io.koalaql.markout.output.OutputEntry
 import io.koalaql.markout.output.OutputFile
 import io.koalaql.markout.text.AppendableLineWriter
 import io.koalaql.markout.text.LineWriter
@@ -81,18 +82,18 @@ private fun drawFileTree(
 ) {
     when (output) {
         is OutputDirectory -> {
-            val entries = (mapOf(".markout" to OutputFile { }) + output.entries())
+            val entries = (mapOf(".markout" to OutputEntry(false, OutputFile { })) + output.entries())
                 .entries
                 .toList()
 
-            entries.forEachIndexed { ix, (key, output) ->
+            entries.forEachIndexed { ix, (key, entry) ->
                 val p = if (ix < entries.size - 1) prefix.pre else prefix.post
 
                 writer.inline(p.before)
                 writer.inline(key)
                 writer.newline()
 
-                drawFileTree(PIPES_PREFIX, output, writer.prefixed(p.indent))
+                drawFileTree(PIPES_PREFIX, entry.output, writer.prefixed(p.indent))
             }
         }
         is OutputFile -> { }

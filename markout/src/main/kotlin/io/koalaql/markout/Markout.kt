@@ -1,8 +1,12 @@
 package io.koalaql.markout
 
 import io.koalaql.markout.files.*
+import io.koalaql.markout.name.FileName
+import io.koalaql.markout.name.TrackedName
+import io.koalaql.markout.name.UntrackedName
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
+import io.koalaql.markout.output.OutputEntry
 import io.koalaql.markout.output.OutputFile
 import java.io.InputStream
 import java.io.OutputStream
@@ -14,33 +18,51 @@ import kotlin.io.path.*
 @MarkoutDsl
 interface Markout {
     @MarkoutDsl
-    fun directory(name: String, builder: Markout.() -> Unit)
+    fun directory(name: FileName, builder: Markout.() -> Unit)
 
     @MarkoutDsl
-    fun file(name: String, output: OutputFile)
+    fun file(name: FileName, output: OutputFile)
     @MarkoutDsl
-    fun file(name: String, contents: String)
+    fun file(name: FileName, contents: String) = file(name) { out ->
+        out.writer().apply {
+            append(contents)
+            flush()
+        }
+    }
+
+    @MarkoutDsl
+    fun directory(name: String, builder: Markout.() -> Unit) =
+        directory(TrackedName(name), builder)
+
+    @MarkoutDsl
+    fun file(name: String, output: OutputFile) =
+        file(TrackedName(name), output)
+
+    @MarkoutDsl
+    fun file(name: String, contents: String) =
+        file(TrackedName(name), contents)
 }
 
 fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory {
-    val entries = linkedMapOf<String, Output>()
+    val entries = linkedMapOf<String, OutputEntry>()
+
+    fun set(name: FileName, output: Output) {
+        entries[name.name] = OutputEntry(
+            tracked = when (name) {
+                is TrackedName -> true
+                is UntrackedName -> false
+            },
+            output = output
+        )
+    }
 
     object : Markout {
-        override fun directory(name: String, builder: Markout.() -> Unit) {
-            entries[name] = buildOutput(builder)
+        override fun directory(name: FileName, builder: Markout.() -> Unit) {
+            set(name, buildOutput(builder))
         }
 
-        override fun file(name: String, output: OutputFile) {
-            entries[name] = output
-        }
-
-        override fun file(name: String, contents: String) {
-            return file(name) { out ->
-                out.writer().apply {
-                    append(contents)
-                    flush()
-                }
-            }
+        override fun file(name: FileName, output: OutputFile) {
+            set(name, output)
         }
     }.builder()
 
@@ -118,17 +140,21 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
         val remaining = entries.toMutableMap()
 
         metadataPaths(dir).forEach { path ->
-            when (val entry = remaining.remove(path.name)) {
+            val entry = remaining.remove(path.name)
+
+            val output = entry?.output
+
+            when (output) {
                 is OutputDirectory -> {
                     paths[path] = DeclareDirectory
 
-                    reconcile(entry, path)
+                    reconcile(output, path)
                 }
                 else -> {
                     markDeletions(path)
 
-                    if (entry is OutputFile) {
-                        paths[path] = WriteToFile(entry)
+                    if (output is OutputFile) {
+                        paths[path] = WriteToFile(output)
                     }
                 }
             }
@@ -154,14 +180,16 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
         remaining.forEach { (name, entry) ->
             val path = dir.resolve(name)
 
-            when (entry) {
+            val output = entry.output
+
+            when (output) {
                 is OutputDirectory -> {
                     paths[path] = DeclareDirectory
 
-                    reconcile(entry, path)
+                    reconcile(output, path)
                 }
                 is OutputFile -> {
-                    paths[path] = WriteToFile(entry)
+                    paths[path] = WriteToFile(output)
                 }
             }
         }
