@@ -93,7 +93,7 @@ private class DirectoryContext(
 @MarkoutDsl
 fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
     object : DocusaurusRoot {
-        override fun bootstrap() {
+        override fun bootstrap(block: DocusaurusSettings.() -> Unit) {
             this@docusaurus.directory("static") {
                 file(".nojekyll", "")
             }
@@ -104,9 +104,19 @@ fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
                 }
             }
 
+            this@docusaurus.file("docusaurus.config.js") {
+                val writer = it.writer()
+
+                buildConfigJs(
+                    AppendableLineWriter(writer),
+                    block
+                )
+
+                writer.flush()
+            }
+
             copyResource("/bootstrap/gitignore", ".gitignore")
             copyResource("/bootstrap/babel.config.js")
-            copyResource("/bootstrap/docusaurus.config.js")
             copyResource("/bootstrap/package.json")
             copyResource("/bootstrap/sidebars.js")
             copyResource("/bootstrap/tsconfig.json")

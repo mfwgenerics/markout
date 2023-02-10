@@ -1,3 +1,4 @@
+import docusaurus.setupDocusaurus
 import io.koalaql.markout.markout
 import io.koalaql.markout.md.markdown
 import workflows.checkYml
@@ -12,6 +13,10 @@ fun main() = markout {
             checkYml()
             releaseYml()
         }
+    }
+
+    directory("docusaurus") {
+        setupDocusaurus()
     }
 
     directory("docs") {

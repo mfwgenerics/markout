@@ -17,6 +17,7 @@ markout {
 dependencies {
     implementation(project(":markout"))
     implementation(project(":markout-markdown"))
+    implementation(project(":markout-docusaurus"))
     implementation(project(":markout-github-workflows-kt"))
 
     implementation(kotlin("reflect"))

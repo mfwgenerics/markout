@@ -8,10 +8,14 @@ class SiteTest {
     @Test
     fun `matches test site`() = markout(
         Path("./testing"),
-        mode = ExecutionMode.EXPECT
+        mode = ExecutionMode.APPLY
     ) {
         docusaurus {
-            bootstrap()
+            bootstrap {
+                title = "Test Site"
+                tagline = "Test Tagline"
+                url = "http://localhost:3000"
+            }
 
             docs {
                 markdown("intro") {

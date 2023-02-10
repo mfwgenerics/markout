@@ -1,7 +1,7 @@
 static
-docusaurus.config.js
 .gitignore
 babel.config.js
+docusaurus.config.js
 package.json
 sidebars.js
 tsconfig.json

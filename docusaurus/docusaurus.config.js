@@ -32,10 +32,7 @@ const config = {
           editUrl:
             'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
         },
-        blog: false,
-        theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
+        blog: false
       }),
     ],
   ],
@@ -45,10 +42,10 @@ const config = {
     ({
       navbar: {
         title: 'My Site',
-        logo: {
+        /*logo: {
           alt: 'My Site Logo',
           src: 'img/logo.svg',
-        },
+        },*/
         items: [
           {
             type: 'doc',
