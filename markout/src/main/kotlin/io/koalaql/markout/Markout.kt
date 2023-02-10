@@ -141,7 +141,6 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
 
         metadataPaths(dir).forEach { path ->
             val entry = remaining.remove(path.name)
-
             val output = entry?.output
 
             when (output) {
@@ -175,7 +174,12 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
 
         val metadataPath = dir.resolve(METADATA_FILE_NAME)
 
-        paths[metadataPath] = WriteMetadata(entries.keys)
+        paths[metadataPath] = WriteMetadata(entries
+            .asSequence()
+            .filter { it.value.tracked }
+            .map { it.key }
+            .toList()
+        )
 
         remaining.forEach { (name, entry) ->
             val path = dir.resolve(name)
