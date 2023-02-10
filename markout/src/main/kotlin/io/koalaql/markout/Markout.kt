@@ -81,20 +81,22 @@ private fun validMetadataPath(dir: Path, path: String): Path? {
 }
 
 /* order is important here: metadata path should be the last to be deleted to allow crash recovery */
-fun metadataPaths(dir: Path): Sequence<Path> {
+fun metadataPaths(dir: Path, untracked: Sequence<String> = emptySequence()): Sequence<Path> {
     if (!Files.isDirectory(dir)) return emptySequence()
 
-    return try {
-        val metadata = dir.resolve(METADATA_FILE_NAME)
+    val metadata = dir.resolve(METADATA_FILE_NAME)
 
+    val tracked = try {
         metadata
             .readText()
             .splitToSequence("\n")
-            .mapNotNull { validMetadataPath(dir, it) }
-            .plusElement(metadata) /* plusElement rather than plus bc Path : Iterable<Path> */
     } catch (ex: NoSuchFileException) {
         emptySequence()
     }
+
+    return (tracked + untracked)
+        .mapNotNull { validMetadataPath(dir, it) }
+        .plusElement(metadata) /* plusElement rather than plus bc Path : Iterable<Path> */
 }
 
 enum class DiffType {
@@ -139,7 +141,10 @@ fun actionableFiles(output: OutputDirectory, dir: Path): ActionableFiles {
         val entries = output.entries().toMutableMap()
         val remaining = entries.toMutableMap()
 
-        metadataPaths(dir).forEach { path ->
+        metadataPaths(
+            dir,
+            entries.asSequence().filterNot { it.value.tracked }.map { it.key }
+        ).forEach { path ->
             val entry = remaining.remove(path.name)
             val output = entry?.output
 

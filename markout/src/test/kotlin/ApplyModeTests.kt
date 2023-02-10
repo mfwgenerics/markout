@@ -1,4 +1,5 @@
 import io.koalaql.markout.markout
+import io.koalaql.markout.name.UntrackedName
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -6,11 +7,15 @@ import kotlin.io.path.*
 import kotlin.test.assertEquals
 
 class ApplyModeTests {
+    @JvmField
+    @Rule
+    val temp = TemporaryFolder()
+
     @Test
-    fun `untracked files are never overwritten`() {
+    fun `existing files are never overwritten by tracked write`() {
         val untrackedContents = "test generated file"
 
-        val rootDir = Path("./test-data/untracked")
+        val rootDir = Path(temp.root.path)
             .apply {
                 resolve("untracked.txt").writeText(untrackedContents)
                 resolve(".markout").deleteIfExists()
@@ -24,7 +29,7 @@ class ApplyModeTests {
 
                 assert(false) { "failed to fail on run #${ix+1}" }
             } catch (ex: IllegalStateException) {
-                assertEquals("test-data/untracked/untracked.txt already exists", ex.message)
+                assertEquals("${temp.root.path}/untracked.txt already exists", ex.message)
             }
 
             assertEquals(
@@ -35,9 +40,25 @@ class ApplyModeTests {
         }
     }
 
-    @JvmField
-    @Rule
-    val temp = TemporaryFolder()
+    @Test
+    fun `explicit untracked files can be overwritten`() {
+        val untrackedContents = "test generated file"
+
+        val rootDir = Path(temp.root.path)
+            .apply {
+                resolve("untracked.txt").writeText(untrackedContents)
+                resolve(".markout").deleteIfExists()
+            }
+
+        markout(rootDir) {
+            file(UntrackedName("untracked.txt"), "changed contents")
+        }
+
+        assertEquals(
+            "changed contents",
+            rootDir.resolve("untracked.txt").readText()
+        )
+    }
 
     @Test
     fun `files created, removed and overwritten`() {
