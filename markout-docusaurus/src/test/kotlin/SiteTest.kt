@@ -22,6 +22,10 @@ class SiteTest {
                     alt = "My Logo"
                     src = "img/logo.svg"
                 }
+
+                footer {
+                    copyright = "Copyright © 2023 My Project"
+                }
             }
 
             docs {

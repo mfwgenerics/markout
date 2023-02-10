@@ -5,26 +5,28 @@ import io.koalaql.markout.text.LineWriter
 
 @MarkoutDsl
 interface DocusaurusLogo {
-    @MarkoutDsl
     var alt: String
-    @MarkoutDsl
     var src: String
 }
 
 @MarkoutDsl
+interface DocusaurusFooter {
+    var copyright: String
+}
+
+@MarkoutDsl
 interface DocusaurusSettings {
-    @MarkoutDsl
     var title: String
-    @MarkoutDsl
     var tagline: String
-    @MarkoutDsl
     var url: String
 
-    @MarkoutDsl
     var github: String
 
     @MarkoutDsl
     fun logo(block: DocusaurusLogo.() -> Unit)
+
+    @MarkoutDsl
+    fun footer(block: DocusaurusFooter.() -> Unit)
 }
 
 fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
@@ -36,11 +38,18 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
         override var github: String = ""
 
         var logo: DocusaurusLogo? = null
+        var footer: DocusaurusFooter? = null
 
         override fun logo(block: DocusaurusLogo.() -> Unit) {
             logo = object : DocusaurusLogo {
                 override var alt: String = ""
                 override var src: String = ""
+            }.apply(block)
+        }
+
+        override fun footer(block: DocusaurusFooter.() -> Unit) {
+            footer = object : DocusaurusFooter {
+                override var copyright: String = ""
             }.apply(block)
         }
     }.apply(builder)
@@ -119,19 +128,14 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
 
     with (out.prefixed("        ")) {
         settings.logo?.apply {
-            inline("logo: {")
-            newline()
+            line("logo: {")
 
             alt.takeIf { it.isNotBlank() }?.let {
-                inline("  alt: '${alt}',")
-                newline()
+                line("  alt: '${alt}',")
             }
 
-            inline("  src: '${src}'")
-
-            newline()
-            inline("},")
-            newline()
+            line("  src: '${src}'")
+            line("},")
         }
 
         settings.github.takeIf { it.isNotBlank() }?.let {
@@ -147,54 +151,23 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
         }
     }
 
+    out.newline()
+    out.line("      },")
+
+    with (out.prefixed("      ")) {
+        settings.footer?.apply {
+            line("footer: {")
+            line("  style: 'dark',")
+
+            copyright.takeIf { it.isNotBlank() }?.let {
+                line("  copyright: '$it',")
+            }
+
+            line("},")
+        }
+    }
+
     out.raw("""
-        
-          },
-          footer: {
-            style: 'dark',
-            links: [
-              {
-                title: 'Docs',
-                items: [
-                  {
-                    label: 'Tutorial',
-                    to: '/docs/intro',
-                  },
-                ],
-              },
-              {
-                title: 'Community',
-                items: [
-                  {
-                    label: 'Stack Overflow',
-                    href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-                  },
-                  {
-                    label: 'Discord',
-                    href: 'https://discordapp.com/invite/docusaurus',
-                  },
-                  {
-                    label: 'Twitter',
-                    href: 'https://twitter.com/docusaurus',
-                  },
-                ],
-              },
-              {
-                title: 'More',
-                items: [
-                  {
-                    label: 'Blog',
-                    to: '/blog',
-                  },
-                  {
-                    label: 'GitHub',
-                    href: 'https://github.com/facebook/docusaurus',
-                  },
-                ],
-              },
-            ],
-            copyright: `Copyright © ${"$"}{new Date ().getFullYear()} My Project, Inc. Built with Docusaurus.`,
-          },
           prism: {
             theme: lightCodeTheme,
             darkTheme: darkCodeTheme,

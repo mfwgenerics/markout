@@ -16,6 +16,11 @@ interface LineWriter {
     fun inline(text: String)
     fun newline()
 
+    fun line(text: String) {
+        inline(text)
+        newline()
+    }
+
     fun raw(text: String) {
         if (text.isEmpty()) return
 
