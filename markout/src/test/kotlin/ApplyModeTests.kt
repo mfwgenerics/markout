@@ -61,6 +61,25 @@ class ApplyModeTests {
     }
 
     @Test
+    fun `untracked files are created but not removed`() {
+        val rootDir = Path(temp.root.path)
+
+        markout(rootDir) {
+            file("tracked.txt", "I won't exist soon")
+            file(UntrackedName("untracked.txt"), "I will still exist")
+        }
+
+        markout(rootDir) { }
+
+        assertEquals(
+            "I will still exist",
+            rootDir.resolve("untracked.txt").readText()
+        )
+
+        assert(rootDir.resolve("tracked.txt").notExists())
+    }
+
+    @Test
     fun `files created, removed and overwritten`() {
         val rootDir = Path(temp.root.path)
 
