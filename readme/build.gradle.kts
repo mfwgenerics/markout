@@ -137,9 +137,9 @@ abstract class RunDocusaurus: DefaultTask() {
             .getCurrentOperatingSystem()
 
         val args = if (os.isLinux) {
-            listOf("--use-yarnrc=linux.yarnrc", "start")
+            listOf("--use-yarnrc=linux.yarnrc", "--silent", "start")
         } else {
-            listOf("start")
+            listOf("--silent", "start")
         }
 
         val nodeExecConfiguration = NodeExecConfiguration(
@@ -186,6 +186,11 @@ abstract class RunDocusaurus: DefaultTask() {
                 )
             }
         } else {
+            project.logger.warn("""
+                WARNING: $path was run non-continuously and will not reload changes
+                WARNING: You probably want to run this with `./gradlew $path --continuous` instead 
+            """.trimIndent())
+
             val start = buildYarnStart()
 
             start()
@@ -193,11 +198,13 @@ abstract class RunDocusaurus: DefaultTask() {
     }
 }
 
-tasks.getByName("yarn_install") {
+tasks.register<YarnTask>("docusaurusInstall") {
     dependsOn("markout")
+
+    args.set(listOf("install", "--silent"))
 }
 
-tasks.register<RunDocusaurus>("runDocusaurus") {
-    dependsOn("yarn_install")
+tasks.register<RunDocusaurus>("docusaurusStart") {
+    dependsOn("docusaurusInstall")
     dependsOn("markout")
 }
