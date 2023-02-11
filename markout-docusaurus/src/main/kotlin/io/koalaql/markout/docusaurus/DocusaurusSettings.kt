@@ -31,7 +31,7 @@ interface DocusaurusSettings {
 
 fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
     val settings = object : DocusaurusSettings {
-        override var title: String = ""
+        override var title: String = "Docusaurus Site"
         override var tagline: String = ""
         override var url: String = ""
 
@@ -53,6 +53,10 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
             }.apply(block)
         }
     }.apply(builder)
+
+    check(settings.url.isNotBlank()) {
+        "Docusaurus should be configured with an url"
+    }
 
     out.raw("""
         // @ts-check
