@@ -213,11 +213,13 @@ class ApplyModeTests {
 
     @Test
     fun `directories are cleaned up`() {
-        val rootDir = Path(temp.root.path).apply {
-        }
+        val rootDir = Path(temp.root.path)
 
         markout(rootDir) {
             directory("existing-dir") {
+                directory("inner-dir") {
+
+                }
                 file("new-file.txt", "successfully created")
             }
         }
@@ -226,7 +228,7 @@ class ApplyModeTests {
             assertEquals(resolve(".markout").readText(), "existing-dir\n")
 
             resolve("existing-dir").apply {
-                assertEquals(resolve(".markout").readText(), "new-file.txt\n")
+                assertEquals(resolve(".markout").readText(), "inner-dir\nnew-file.txt\n")
 
                 assert(isDirectory())
                 assertEquals("successfully created", resolve("new-file.txt").readText())
@@ -240,5 +242,42 @@ class ApplyModeTests {
                 assert(notExists())
             }
         }
+    }
+
+    @Test
+    fun `no empty dotfiles`() {
+        val rootDir = Path(temp.root.path)
+
+        markout(rootDir) {
+            directory("new-dir") { }
+        }
+
+        assert(rootDir.resolve("new-dir/.markout").notExists())
+
+        markout(rootDir) {
+            directory("new-dir") {
+                file("temp.txt", "temporarily exists")
+            }
+        }
+
+        assertEquals(
+            "new-dir\n",
+            rootDir.resolve(".markout").readText()
+        )
+
+        assertEquals(
+            "temp.txt\n",
+            rootDir.resolve("new-dir/.markout").readText()
+        )
+
+        markout(rootDir) {
+            directory("new-dir") { }
+        }
+
+        assert(rootDir.resolve("new-dir/.markout").notExists())
+
+        markout(rootDir) { }
+
+        assert(rootDir.resolve(".markout").notExists())
     }
 }
