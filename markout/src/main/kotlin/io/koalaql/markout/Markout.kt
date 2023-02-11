@@ -18,6 +18,9 @@ import kotlin.io.path.*
 @MarkoutDsl
 interface Markout {
     @MarkoutDsl
+    fun untracked(name: String) = UntrackedName(name)
+
+    @MarkoutDsl
     fun directory(name: FileName, builder: Markout.() -> Unit)
 
     @MarkoutDsl

@@ -1,6 +1,4 @@
 import io.koalaql.markout.markout
-import io.koalaql.markout.name.UntrackedName
-import io.koalaql.markout.name.untracked
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
