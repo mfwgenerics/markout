@@ -1,3 +1,7 @@
+import org.gradle.deployment.internal.Deployment
+import org.gradle.deployment.internal.DeploymentHandle
+import org.gradle.deployment.internal.DeploymentRegistry
+
 repositories {
     mavenCentral()
 }
@@ -34,7 +38,55 @@ tasks.getByName("yarn_start") {
     dependsOn("markout")
 }
 
-tasks.register<DefaultTask>("installDocusaurus") {
+class Handle(
+    private val onStop: () -> Unit,
+): DeploymentHandle {
+    var stopped: Boolean = false
+
+    /*Handle(NodeExecRunner runner, List<String> args, Runnable onStop) {
+        Thread.start { run(runner, args) }
+
+        // Gradle won't shut down deployments on SIGINT
+        // Under some circumstances, the child process could detach
+        Runtime.runtime.addShutdownHook {
+            onStop.run()
+        }
+    }*/
+
+    override fun start(deployment: Deployment) {
+        error("yeet")
+    }
+
+    override fun isRunning(): Boolean = !stopped
+
+    override fun stop() {
+        onStop()
+        stopped = true
+    }
+}
+
+open class ContinuousTask: DefaultTask() {
+    @TaskAction
+    fun start() {
+        if (project.gradle.startParameter.isContinuous) {
+            val deploymentRegistry = services.get(DeploymentRegistry::class.java)
+
+            val deploymentHandle = deploymentRegistry.get(path, Handle::class.java)
+
+            if (deploymentHandle == null) {
+                deploymentRegistry.start(
+                    path,
+                    DeploymentRegistry.ChangeBehavior.NONE,
+                    Handle::class.java
+                )
+            }
+        } else {
+            error("should run in continuous")
+        }
+    }
+}
+
+tasks.register<ContinuousTask>("installDocusaurus") {
     dependsOn("markout")
     dependsOn("yarn_start")
 }
