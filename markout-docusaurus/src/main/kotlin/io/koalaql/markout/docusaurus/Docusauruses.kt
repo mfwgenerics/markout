@@ -94,17 +94,17 @@ private class DirectoryContext(
 fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
     object : DocusaurusRoot {
         override fun configure(block: DocusaurusSettings.() -> Unit) {
-            this@docusaurus.directory("static") {
+            this@docusaurus.directory(this@docusaurus.untracked("static")) {
                 file(".nojekyll", "")
             }
 
             fun copyResource(path: String, name: String = Path(path).name) {
-                this@docusaurus.file(name) { out ->
+                this@docusaurus.file(this@docusaurus.untracked(name)) { out ->
                     Resources.open(path).use { it.copyTo(out) }
                 }
             }
 
-            this@docusaurus.file("docusaurus.config.js") {
+            this@docusaurus.file(this@docusaurus.untracked("docusaurus.config.js")) {
                 val writer = it.writer()
 
                 buildConfigJs(
@@ -124,7 +124,7 @@ fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
         }
 
         override fun docs(block: Docusaurus.() -> Unit) {
-            this@docusaurus.directory("docs") {
+            this@docusaurus.directory(this@docusaurus.untracked("docs")) {
                 val markout = this
 
                 object : Docusaurus {
