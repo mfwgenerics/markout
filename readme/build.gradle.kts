@@ -193,6 +193,10 @@ abstract class RunDocusaurus: DefaultTask() {
     }
 }
 
+tasks.getByName("yarn_install") {
+    dependsOn("markout")
+}
+
 tasks.register<RunDocusaurus>("runDocusaurus") {
     dependsOn("yarn_install")
     dependsOn("markout")
