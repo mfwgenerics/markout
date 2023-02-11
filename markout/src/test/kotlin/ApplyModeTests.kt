@@ -1,5 +1,6 @@
 import io.koalaql.markout.markout
 import io.koalaql.markout.name.UntrackedName
+import io.koalaql.markout.name.untracked
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -51,7 +52,7 @@ class ApplyModeTests {
             }
 
         markout(rootDir) {
-            file(UntrackedName("untracked.txt"), "changed contents")
+            file(untracked("untracked.txt"), "changed contents")
         }
 
         assertEquals(
@@ -66,7 +67,7 @@ class ApplyModeTests {
 
         markout(rootDir) {
             file("tracked.txt", "I won't exist soon")
-            file(UntrackedName("untracked.txt"), "I will still exist")
+            file(untracked("untracked.txt"), "I will still exist")
         }
 
         assertEquals(
@@ -105,7 +106,7 @@ class ApplyModeTests {
 
         markout(rootDir) {
             file("tracked.txt", "I won't exist soon")
-            file(UntrackedName("untracked.txt"), "I will still exist")
+            file(untracked("untracked.txt"), "I will still exist")
         }
 
         assertEquals(
