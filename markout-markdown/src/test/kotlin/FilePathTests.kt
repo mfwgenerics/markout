@@ -12,8 +12,10 @@ class FilePathTests {
             out.inline(name)
             out.newline()
 
-            if (entry is OutputDirectory) {
-                extractPaths(entry, out.prefixed("$name/"))
+            val output = entry.output
+
+            if (output is OutputDirectory) {
+                extractPaths(output, out.prefixed("$name/"))
             }
         }
     }

@@ -6,11 +6,15 @@ import kotlin.io.path.*
 import kotlin.test.assertEquals
 
 class ApplyModeTests {
+    @JvmField
+    @Rule
+    val temp = TemporaryFolder()
+
     @Test
-    fun `untracked files are never overwritten`() {
+    fun `existing files are never overwritten by tracked write`() {
         val untrackedContents = "test generated file"
 
-        val rootDir = Path("./test-data/untracked")
+        val rootDir = Path(temp.root.path)
             .apply {
                 resolve("untracked.txt").writeText(untrackedContents)
                 resolve(".markout").deleteIfExists()
@@ -24,7 +28,7 @@ class ApplyModeTests {
 
                 assert(false) { "failed to fail on run #${ix+1}" }
             } catch (ex: IllegalStateException) {
-                assertEquals("test-data/untracked/untracked.txt already exists", ex.message)
+                assertEquals("${temp.root.path}/untracked.txt already exists", ex.message)
             }
 
             assertEquals(
@@ -35,9 +39,93 @@ class ApplyModeTests {
         }
     }
 
-    @JvmField
-    @Rule
-    val temp = TemporaryFolder()
+    @Test
+    fun `explicit untracked files can be overwritten`() {
+        val untrackedContents = "test generated file"
+
+        val rootDir = Path(temp.root.path)
+            .apply {
+                resolve("untracked.txt").writeText(untrackedContents)
+                resolve(".markout").deleteIfExists()
+            }
+
+        markout(rootDir) {
+            file(untracked("untracked.txt"), "changed contents")
+        }
+
+        assertEquals(
+            "changed contents",
+            rootDir.resolve("untracked.txt").readText()
+        )
+    }
+
+    @Test
+    fun `untracked files are created but not removed`() {
+        val rootDir = Path(temp.root.path)
+
+        markout(rootDir) {
+            file("tracked.txt", "I won't exist soon")
+            file(untracked("untracked.txt"), "I will still exist")
+        }
+
+        assertEquals(
+            "I will still exist",
+            rootDir.resolve("untracked.txt").readText()
+        )
+
+        assertEquals(
+            "tracked.txt\n",
+            rootDir.resolve(".markout").readText()
+        )
+
+        markout(rootDir) { }
+
+        assertEquals(
+            "I will still exist",
+            rootDir.resolve("untracked.txt").readText()
+        )
+
+        assert(rootDir.resolve("tracked.txt").notExists())
+    }
+
+    @Test
+    fun `tracked files can become untracked`() {
+        val rootDir = Path(temp.root.path)
+
+        markout(rootDir) {
+            file("tracked.txt", "I won't exist soon")
+            file("untracked.txt", "I will still exist")
+        }
+
+        assertEquals(
+            "tracked.txt\nuntracked.txt\n",
+            rootDir.resolve(".markout").readText()
+        )
+
+        markout(rootDir) {
+            file("tracked.txt", "I won't exist soon")
+            file(untracked("untracked.txt"), "I will still exist")
+        }
+
+        assertEquals(
+            "I will still exist",
+            rootDir.resolve("untracked.txt").readText()
+        )
+
+        assertEquals(
+            "tracked.txt\n",
+            rootDir.resolve(".markout").readText()
+        )
+
+        markout(rootDir) { }
+
+        assertEquals(
+            "I will still exist",
+            rootDir.resolve("untracked.txt").readText()
+        )
+
+        assert(rootDir.resolve("tracked.txt").notExists())
+    }
 
     @Test
     fun `files created, removed and overwritten`() {
@@ -121,5 +209,75 @@ class ApplyModeTests {
                 assertEquals("successfully created", resolve("new-file.txt").readText())
             }
         }
+    }
+
+    @Test
+    fun `directories are cleaned up`() {
+        val rootDir = Path(temp.root.path)
+
+        markout(rootDir) {
+            directory("existing-dir") {
+                directory("inner-dir") {
+
+                }
+                file("new-file.txt", "successfully created")
+            }
+        }
+
+        rootDir.apply {
+            assertEquals(resolve(".markout").readText(), "existing-dir\n")
+
+            resolve("existing-dir").apply {
+                assertEquals(resolve(".markout").readText(), "inner-dir\nnew-file.txt\n")
+
+                assert(isDirectory())
+                assertEquals("successfully created", resolve("new-file.txt").readText())
+            }
+        }
+
+        markout(rootDir) { }
+
+        rootDir.apply {
+            resolve("existing-dir").apply {
+                assert(notExists())
+            }
+        }
+    }
+
+    @Test
+    fun `no empty dotfiles`() {
+        val rootDir = Path(temp.root.path)
+
+        markout(rootDir) {
+            directory("new-dir") { }
+        }
+
+        assert(rootDir.resolve("new-dir/.markout").notExists())
+
+        markout(rootDir) {
+            directory("new-dir") {
+                file("temp.txt", "temporarily exists")
+            }
+        }
+
+        assertEquals(
+            "new-dir\n",
+            rootDir.resolve(".markout").readText()
+        )
+
+        assertEquals(
+            "temp.txt\n",
+            rootDir.resolve("new-dir/.markout").readText()
+        )
+
+        markout(rootDir) {
+            directory("new-dir") { }
+        }
+
+        assert(rootDir.resolve("new-dir/.markout").notExists())
+
+        markout(rootDir) { }
+
+        assert(rootDir.resolve(".markout").notExists())
     }
 }
