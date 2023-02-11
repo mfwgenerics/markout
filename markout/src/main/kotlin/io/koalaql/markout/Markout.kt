@@ -97,6 +97,7 @@ fun metadataPaths(dir: Path, untracked: Sequence<String> = emptySequence()): Seq
     return (tracked + untracked)
         .mapNotNull { validMetadataPath(dir, it) }
         .plusElement(metadata) /* plusElement rather than plus bc Path : Iterable<Path> */
+        .distinct()
 }
 
 enum class DiffType {

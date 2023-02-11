@@ -69,6 +69,55 @@ class ApplyModeTests {
             file(UntrackedName("untracked.txt"), "I will still exist")
         }
 
+        assertEquals(
+            "I will still exist",
+            rootDir.resolve("untracked.txt").readText()
+        )
+
+        assertEquals(
+            "tracked.txt\n",
+            rootDir.resolve(".markout").readText()
+        )
+
+        markout(rootDir) { }
+
+        assertEquals(
+            "I will still exist",
+            rootDir.resolve("untracked.txt").readText()
+        )
+
+        assert(rootDir.resolve("tracked.txt").notExists())
+    }
+
+    @Test
+    fun `tracked files can become untracked`() {
+        val rootDir = Path(temp.root.path)
+
+        markout(rootDir) {
+            file("tracked.txt", "I won't exist soon")
+            file("untracked.txt", "I will still exist")
+        }
+
+        assertEquals(
+            "tracked.txt\nuntracked.txt\n",
+            rootDir.resolve(".markout").readText()
+        )
+
+        markout(rootDir) {
+            file("tracked.txt", "I won't exist soon")
+            file(UntrackedName("untracked.txt"), "I will still exist")
+        }
+
+        assertEquals(
+            "I will still exist",
+            rootDir.resolve("untracked.txt").readText()
+        )
+
+        assertEquals(
+            "tracked.txt\n",
+            rootDir.resolve(".markout").readText()
+        )
+
         markout(rootDir) { }
 
         assertEquals(
