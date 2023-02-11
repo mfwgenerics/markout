@@ -121,6 +121,7 @@ fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
             copyResource("/bootstrap/sidebars.js")
             copyResource("/bootstrap/tsconfig.json")
             copyResource("/bootstrap/yarn.lock")
+            copyResource("/bootstrap/linux.yarnrc")
         }
 
         override fun docs(block: Docusaurus.() -> Unit) {

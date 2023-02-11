@@ -1,6 +1,17 @@
+import com.github.gradle.node.yarn.exec.YarnExecRunner
+import com.github.gradle.node.exec.NodeExecConfiguration
 import org.gradle.deployment.internal.Deployment
 import org.gradle.deployment.internal.DeploymentHandle
 import org.gradle.deployment.internal.DeploymentRegistry
+import com.github.gradle.node.NodeExtension
+import com.github.gradle.node.util.ProjectApiHelper
+import com.github.gradle.node.util.PlatformHelper
+import com.github.gradle.node.variant.VariantComputer
+import com.github.gradle.node.yarn.task.YarnTask
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
 
 repositories {
     mavenCentral()
@@ -30,63 +41,159 @@ dependencies {
 }
 
 node {
+    download.set(true)
+
     nodeProjectDir.set(File("$rootDir/docusaurus"))
 }
 
-tasks.getByName("yarn_start") {
-    dependsOn("yarn_install")
-    dependsOn("markout")
-}
+class StopHandle {
+    private companion object {
+        val uninitMarker = { }
+        val stoppedMarker = { }
+    }
 
-class Handle(
-    private val onStop: () -> Unit,
-): DeploymentHandle {
-    var stopped: Boolean = false
+    private val onStop = AtomicReference(uninitMarker)
 
-    /*Handle(NodeExecRunner runner, List<String> args, Runnable onStop) {
-        Thread.start { run(runner, args) }
+    val isStopped = onStop.get() === stoppedMarker
 
-        // Gradle won't shut down deployments on SIGINT
-        // Under some circumstances, the child process could detach
-        Runtime.runtime.addShutdownHook {
-            onStop.run()
+    fun onStop(stop: () -> Unit) {
+        val calledYet = AtomicBoolean(false)
+
+        val runsOnce = {
+            if (!calledYet.getAndSet(true)) stop()
         }
-    }*/
 
-    override fun start(deployment: Deployment) {
-        error("yeet")
+        val marker = onStop.getAndSet(runsOnce)
+
+        if (marker === stoppedMarker) {
+            runsOnce()
+        } else check (marker === uninitMarker) {
+            "internal error: onStop was called twice"
+        }
     }
 
-    override fun isRunning(): Boolean = !stopped
-
-    override fun stop() {
-        onStop()
-        stopped = true
+    fun stop() {
+        onStop.getAndSet(stoppedMarker).invoke()
     }
 }
 
-open class ContinuousTask: DefaultTask() {
+fun interface Spawn {
+    operator fun invoke(dispose: StopHandle)
+}
+
+open class DocusaurusHandle @Inject constructor (
+    private val spawn: Spawn
+): DeploymentHandle {
+    private val handle = StopHandle()
+
+    override fun start(deployment: Deployment) { spawn(handle) }
+    override fun isRunning(): Boolean = !handle.isStopped
+    override fun stop() { handle.stop() }
+}
+
+abstract class RunDocusaurus: DefaultTask() {
+    @get:Inject
+    abstract val objects: ObjectFactory
+
+    @get:Inject
+    abstract val providers: ProviderFactory
+
+    @get:Optional
+    @get:Input
+    val yarnCommand = objects.listProperty<String>()
+
+    @get:Optional
+    @get:Input
+    val args = objects.listProperty<String>()
+
+    @get:Input
+    val ignoreExitValue = objects.property<Boolean>().convention(false)
+
+    @get:Internal
+    val workingDir = objects.directoryProperty()
+
+    @get:Input
+    val environment = objects.mapProperty<String, String>()
+
+    @get:Internal
+    val execOverrides = objects.property<Action<ExecSpec>>()
+
+    @get:Internal
+    val projectHelper = ProjectApiHelper.newInstance(project)
+
+    @get:Internal
+    val nodeExtension = NodeExtension[project]
+
+    @get:Internal
+    var platformHelper = PlatformHelper.INSTANCE
+
+    @get:Internal
+    internal val variantComputer by lazy {
+        VariantComputer(platformHelper)
+    }
+
+    private fun buildYarnStart(): () -> ExecResult {
+        val os = DefaultNativePlatform
+            .getCurrentOperatingSystem()
+
+        val args = if (os.isLinux) {
+            listOf("--use-yarnrc=linux.yarnrc", "start")
+        } else {
+            listOf("start")
+        }
+
+        val nodeExecConfiguration = NodeExecConfiguration(
+            args,
+            environment.get(),
+            workingDir.asFile.orNull,
+            ignoreExitValue.get(),
+            execOverrides.orNull
+        )
+
+        val yarnExecRunner = objects.newInstance(YarnExecRunner::class.java)
+
+        return {
+            yarnExecRunner.executeYarnCommand(
+                projectHelper,
+                nodeExtension,
+                nodeExecConfiguration,
+                variantComputer
+            )
+        }
+    }
+
     @TaskAction
     fun start() {
         if (project.gradle.startParameter.isContinuous) {
             val deploymentRegistry = services.get(DeploymentRegistry::class.java)
 
-            val deploymentHandle = deploymentRegistry.get(path, Handle::class.java)
+            val deploymentHandle = deploymentRegistry.get(path, DocusaurusHandle::class.java)
 
             if (deploymentHandle == null) {
+                val start = buildYarnStart()
+
                 deploymentRegistry.start(
                     path,
                     DeploymentRegistry.ChangeBehavior.NONE,
-                    Handle::class.java
+                    DocusaurusHandle::class.java,
+                    Spawn {
+                        val thread = thread { start() }
+
+                        it.onStop {
+                            thread.interrupt()
+                        }
+                    }
                 )
             }
         } else {
-            error("should run in continuous")
+            val start = buildYarnStart()
+
+            start()
         }
     }
 }
 
-tasks.register<ContinuousTask>("installDocusaurus") {
+tasks.register<RunDocusaurus>("runDocusaurus") {
+    dependsOn("yarn_install")
     dependsOn("markout")
-    dependsOn("yarn_start")
 }
