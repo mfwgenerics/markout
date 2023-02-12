@@ -137,9 +137,9 @@ abstract class RunDocusaurus: DefaultTask() {
             .getCurrentOperatingSystem()
 
         val args = if (os.isLinux) {
-            listOf("--use-yarnrc=linux.yarnrc", "--silent", "start")
+            listOf("--non-interactive", "--use-yarnrc=linux.yarnrc", "--silent", "start")
         } else {
-            listOf("--silent", "start")
+            listOf("--non-interactive", "--silent", "start")
         }
 
         val nodeExecConfiguration = NodeExecConfiguration(
@@ -187,7 +187,7 @@ abstract class RunDocusaurus: DefaultTask() {
             }
         } else {
             project.logger.warn("""
-                WARNING: $path was run non-continuously and will not reload changes
+                WARNING: $path was run non-continuously and will not hot reload changes
                 WARNING: You probably want to run this with `./gradlew $path --continuous` instead 
             """.trimIndent())
 
@@ -201,10 +201,37 @@ abstract class RunDocusaurus: DefaultTask() {
 tasks.register<YarnTask>("docusaurusInstall") {
     dependsOn("markout")
 
-    args.set(listOf("install", "--silent"))
+    args.set(listOf(
+        "--silent",
+        "--non-interactive",
+        "install",
+        "--frozen-lockfile",
+    ))
+}
+
+tasks.register<YarnTask>("docusaurusCheckInstall") {
+    dependsOn("markoutCheck")
+
+    args.set(listOf(
+        "--silent",
+        "--non-interactive",
+        "install",
+        "--frozen-lockfile",
+    ))
 }
 
 tasks.register<RunDocusaurus>("docusaurusStart") {
     dependsOn("docusaurusInstall")
     dependsOn("markout")
+}
+
+tasks.register<YarnTask>("docusaurusBuild") {
+    dependsOn("markoutCheck")
+    dependsOn("docusaurusCheckInstall")
+
+    args.set(listOf(
+        "--silent",
+        "--non-interactive",
+        "build",
+    ))
 }
