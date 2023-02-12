@@ -1,0 +1,6 @@
+# workaround for Linux issue where yarn doesn't terminate node on shutdown when run through gradle-node-plugin
+# see https://github.com/node-gradle/gradle-node-plugin/issues/65#issuecomment-872062591
+
+# this file is used with --use-yarnrc
+
+script-shell "/usr/bin/bash"

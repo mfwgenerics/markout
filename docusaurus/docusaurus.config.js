@@ -5,9 +5,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Test Site',
-  tagline: 'Test Tagline',
-  url: 'http://localhost:3000',
+  title: 'Docusaurus Site',
+  url: 'https://localhost:3000',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -40,22 +39,8 @@ themeConfig:
   /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
   ({
     navbar: {
-      title: 'Test Site',
-        logo: {
-          alt: 'My Logo',
-          src: 'img/logo.svg'
-        },
-        items: [
-          {
-            href: 'https://github.com/mfwgenerics/markout',
-            label: 'GitHub',
-            position: 'right',
-          },
-        ],
-      },
-      footer: {
-        style: 'dark',
-        copyright: 'Copyright © 2023 My Project',
+      title: 'Docusaurus Site',
+
       },
       prism: {
         theme: lightCodeTheme,
