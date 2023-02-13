@@ -27,22 +27,17 @@ fun Markout.setupDocusaurus() = docusaurus {
                 -"to "+a("https://github.com/Kotlin/kotlinx-knit", "kotlinx-knit")
             }
 
-            h2("Why")
+            h2("Project Purpose")
 
             p {
                 -"Documenting code is a time-consuming and error-prone process."
                 -"Handwritten sample code is vulnerable to typos and syntax errors"
                 -"and it silently goes out of date as projects evolve."
-                -"Results shown in documentation are not guaranteed to match the"
+                -"Results shown in documentation are also not guaranteed to match the"
                 -"real behavior of the code. Markout seeks to address this by allowing"
                 -"your docs to execute code from your project and embed the results."
-            }
-
-            p {
-                -"Markout is designed to integrate with "+a("https://github.com/mfwgenerics/kapshot", "Kapshot")+","
-                -"a minimal Kotlin compiler plugin that allows source code to be"
-                -"captured and inspected at runtime."
-                -"Kapshot allows us to have fully executable and testable sample code blocks."
+                -"Your generated documentation is checked into Git and used to perform"
+                -"snapshot testing on future builds."
             }
 
             p {
@@ -57,6 +52,13 @@ fun Markout.setupDocusaurus() = docusaurus {
                 )
                 -"to enable hot reloads and previews as you code."
                 -"Docusaurus support is optional and provided through a separate Gradle plugin."
+            }
+
+            p {
+                -"Markout is designed to integrate with "+a("https://github.com/mfwgenerics/kapshot", "Kapshot")+","
+                -"a minimal Kotlin compiler plugin that allows source code to be"
+                -"captured and inspected at runtime."
+                -"Kapshot is the magic ingredient that enables fully executable and testable sample code blocks."
             }
         }
     }
