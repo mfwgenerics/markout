@@ -5,7 +5,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Docusaurus Site',
+  title: 'Markout',
   url: 'https://localhost:3000',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -39,8 +39,14 @@ themeConfig:
   /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
   ({
     navbar: {
-      title: 'Docusaurus Site',
-
+      title: 'Markout',
+        items: [
+          {
+            href: 'https://github.com/mfwgenerics/markout',
+            label: 'GitHub',
+            position: 'right',
+          },
+        ],
       },
       prism: {
         theme: lightCodeTheme,
