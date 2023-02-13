@@ -19,6 +19,7 @@ interface DocusaurusSettings {
     var title: String
     var tagline: String
     var url: String
+    var baseUrl: String
 
     var github: String
 
@@ -34,6 +35,7 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
         override var title: String = "Docusaurus Site"
         override var tagline: String = ""
         override var url: String = ""
+        override var baseUrl: String = "/"
 
         override var github: String = ""
 
@@ -90,7 +92,7 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
     }
 
     out.prefixed("  ").raw("""
-        baseUrl: '/',
+        baseUrl: '${settings.baseUrl}',
         onBrokenLinks: 'throw',
         onBrokenMarkdownLinks: 'warn',
         favicon: 'img/favicon.ico',
