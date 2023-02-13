@@ -11,6 +11,8 @@ fun Markout.setupDocusaurus() = docusaurus {
         title = "Markout"
 
         github = "https://github.com/mfwgenerics/markout"
+
+        metadata = mapOf("google-site-verification" to "E-XuQoF0UqA8bzoXL3yY7bs9KuQFsQ2yrSkYuIp6Gqs")
     }
 
     docs {

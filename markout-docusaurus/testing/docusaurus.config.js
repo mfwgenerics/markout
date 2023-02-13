@@ -45,22 +45,22 @@ themeConfig:
           alt: 'My Logo',
           src: 'img/logo.svg'
         },
-        items: [
-          {
-            href: 'https://github.com/mfwgenerics/markout',
-            label: 'GitHub',
-            position: 'right',
-          },
-        ],
-      },
+      items: [
+        {
+          href: 'https://github.com/mfwgenerics/markout',
+          label: 'GitHub',
+          position: 'right',
+        },
+      ],
+    },
       footer: {
         style: 'dark',
         copyright: 'Copyright © 2023 My Project',
       },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
-      },
-    }),
+    prism: {
+      theme: lightCodeTheme,
+      darkTheme: darkCodeTheme,
+    },
+  }),
 };
 module.exports = config;

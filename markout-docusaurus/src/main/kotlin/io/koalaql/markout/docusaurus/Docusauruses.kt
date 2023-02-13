@@ -95,7 +95,7 @@ fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
     object : DocusaurusRoot {
         override fun configure(block: DocusaurusSettings.() -> Unit) {
             this@docusaurus.directory(this@docusaurus.untracked("static")) {
-                file(".nojekyll", "")
+                file(untracked(".nojekyll"), "")
             }
 
             fun copyResource(path: String, name: String = Path(path).name) {

@@ -40,18 +40,21 @@ themeConfig:
   ({
     navbar: {
       title: 'Markout',
-        items: [
-          {
-            href: 'https://github.com/mfwgenerics/markout',
-            label: 'GitHub',
-            position: 'right',
-          },
-        ],
-      },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
-      },
-    }),
+      items: [
+        {
+          href: 'https://github.com/mfwgenerics/markout',
+          label: 'GitHub',
+          position: 'right',
+        },
+      ],
+    },
+    metadata: [
+      {"name": "google-site-verification", "content": "E-XuQoF0UqA8bzoXL3yY7bs9KuQFsQ2yrSkYuIp6Gqs"}
+    ],
+    prism: {
+      theme: lightCodeTheme,
+      darkTheme: darkCodeTheme,
+    },
+  }),
 };
 module.exports = config;

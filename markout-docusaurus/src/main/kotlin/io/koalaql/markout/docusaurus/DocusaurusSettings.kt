@@ -23,6 +23,8 @@ interface DocusaurusSettings {
 
     var github: String
 
+    var metadata: Map<String, String>
+
     @MarkoutDsl
     fun logo(block: DocusaurusLogo.() -> Unit)
 
@@ -38,6 +40,8 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
         override var baseUrl: String = "/"
 
         override var github: String = ""
+
+        override var metadata: Map<String, String> = emptyMap()
 
         var logo: DocusaurusLogo? = null
         var footer: DocusaurusFooter? = null
@@ -143,7 +147,9 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
             line("  src: '${src}'")
             line("},")
         }
+    }
 
+    with (out.prefixed("      ")) {
         settings.github.takeIf { it.isNotBlank() }?.let {
             raw("""
                 items: [
@@ -158,7 +164,7 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
     }
 
     out.newline()
-    out.line("      },")
+    out.line("    },")
 
     with (out.prefixed("      ")) {
         settings.footer?.apply {
@@ -173,12 +179,24 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
         }
     }
 
+    with (out.prefixed("    ")) {
+        if (settings.metadata.isNotEmpty()) {
+            line("metadata: [")
+            with (prefixed("  ")) {
+                settings.metadata.forEach { (name, content) ->
+                    line("""{"name": "$name", "content": "$content"}""")
+                }
+            }
+            line("],")
+        }
+    }
+
     out.raw("""
-          prism: {
-            theme: lightCodeTheme,
-            darkTheme: darkCodeTheme,
-          },
-        }),
+        prism: {
+          theme: lightCodeTheme,
+          darkTheme: darkCodeTheme,
+        },
+      }),
     };
     module.exports = config;
     """.trimIndent())
