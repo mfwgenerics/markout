@@ -1,7 +1,4 @@
-pluginManagement {
-    includeBuild("build-logic")
-}
-
+includeBuild("build-logic")
 includeBuild("markout-plugin")
 includeBuild("markout-docusaurus-plugin")
 
