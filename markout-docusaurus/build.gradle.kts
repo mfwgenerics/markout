@@ -9,7 +9,7 @@ plugins {
 dependencies {
     api(kotlin("reflect"))
 
-    api(project(":markout-markdown"))
+    api("io.koalaql:markout-markdown")
 
     testImplementation(kotlin("test"))
 }

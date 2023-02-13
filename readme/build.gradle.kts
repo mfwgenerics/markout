@@ -16,10 +16,10 @@ markout {
 }
 
 dependencies {
-    implementation(project(":markout"))
-    implementation(project(":markout-markdown"))
-    implementation(project(":markout-docusaurus"))
-    implementation(project(":markout-github-workflows-kt"))
+    implementation("io.koalaql:markout")
+    implementation("io.koalaql:markout-markdown")
+    implementation("io.koalaql:markout-docusaurus")
+    implementation("io.koalaql:markout-github-workflows-kt")
 
     implementation(kotlin("reflect"))
 }
