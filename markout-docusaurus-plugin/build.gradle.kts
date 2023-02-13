@@ -1,28 +1,8 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    id("conventions")
-
-    id("java-gradle-plugin")
-    id("com.gradle.plugin-publish") version "1.1.0"
-}
-
-java {
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
-repositories {
-    gradlePluginPortal()
+    id("publish-plugin")
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin-api"))
     implementation("com.github.node-gradle:gradle-node-plugin:3.5.1")
 }
 
