@@ -5,7 +5,8 @@ import io.koalaql.markout.docusaurus.docusaurus
 
 fun Markout.setupDocusaurus() = docusaurus {
     configure {
-        url = "https://localhost:3000"
+        url = "https://mfwgenerics.github.io/"
+        baseUrl = "/markout/"
 
         title = "Markout"
 

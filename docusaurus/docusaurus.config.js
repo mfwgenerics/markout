@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Markout',
-  url: 'https://localhost:3000',
-  baseUrl: '/',
+  url: 'https://mfwgenerics.github.io/',
+  baseUrl: '/markout/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
