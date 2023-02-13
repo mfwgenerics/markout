@@ -17,8 +17,13 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
+repositories {
+    gradlePluginPortal()
+}
+
 dependencies {
     implementation(kotlin("gradle-plugin-api"))
+    implementation("com.github.node-gradle:gradle-node-plugin:3.5.1")
 }
 
 pluginBundle {
@@ -30,10 +35,10 @@ pluginBundle {
 gradlePlugin {
     plugins {
         create("markoutPlugin") {
-            id = "io.koalaql.markout-docusaurus"
-            displayName = "Markout Plugin"
-            description = "Plugin Support for Markout: an executable documentation platform and Markdown DSL for Kotlin"
-            implementationClass = "io.koalaql.markout.GradlePlugin"
+            id = "io.koalaql.markout"
+            displayName = "Markout Docusaurus Plugin"
+            description = "Plugin Support for Markout Powered Docusaurus Sites"
+            implementationClass = "io.koalaql.markout.docusaurus.GradlePlugin"
         }
     }
 }
