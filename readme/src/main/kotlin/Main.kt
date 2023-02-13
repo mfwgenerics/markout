@@ -2,6 +2,7 @@ import docusaurus.setupDocusaurus
 import io.koalaql.markout.markout
 import io.koalaql.markout.md.markdown
 import workflows.checkYml
+import workflows.deployGhPagesYml
 import workflows.releaseYml
 import kotlin.io.path.Path
 
@@ -12,6 +13,7 @@ fun main() = markout {
         directory("workflows") {
             checkYml()
             releaseYml()
+            deployGhPagesYml()
         }
     }
 
