@@ -33,15 +33,15 @@ fun Markout.setupDocusaurus() = docusaurus {
                 -"Documentation written this way can be tested and verified on every build."
                 -"Sample code becomes error proof, stays up-to-date and forms an"
                 -"extra test suite for your project. Markout can serve as an alternative"
-                -"to "+a("https://github.com/Kotlin/kotlinx-knit", "kotlinx-knit")
+                -"to "+a("https://github.com/Kotlin/kotlinx-knit", "kotlinx-knit")+"."
             }
 
-            h2("Project Purpose")
+            h2("Project purpose")
 
             p {
                 -"Documenting code is a time-consuming and error-prone process."
-                -"Handwritten sample code is vulnerable to typos and syntax errors"
-                -"and it silently goes out of date as projects evolve."
+                -"Not only is handwritten sample code vulnerable to typos and syntax errors,"
+                -"it silently goes out of date as projects evolve."
                 -"Results shown in documentation are also not guaranteed to match the"
                 -"real behavior of the code. Markout seeks to address this by allowing"
                 -"your docs to execute code from your project and embed the results."
@@ -72,9 +72,9 @@ fun Markout.setupDocusaurus() = docusaurus {
 
             h2("How it works")
 
-            -"Markout generates files by running code in a Kotlin project with the Markout Gradle plugin applied."
+            -"Markout generates files by running code from Kotlin projects with the Markout Gradle plugin applied."
             -"You supply a `main` method which invokes a `markout` block to describe how files should be generated."
-            -"This code runs every time files are generated or checked."
+            -"This code runs every time files are generated or verified."
 
             var fileTree: String = ""
 
@@ -102,11 +102,11 @@ fun Markout.setupDocusaurus() = docusaurus {
             }}")
 
             -"When the code above is run using `:markout`, it generates the following files"
-            -"and merges them into the project directory."
+            -"and creates them into the project directory."
 
             code(fileTree)
 
-            -"The `:markoutCheck` task then verifies that these files match subsequent reruns of the code."
+            -"The `:markoutCheck` task then verifies that these files match subsequent runs of the code."
         }
     }
 }
