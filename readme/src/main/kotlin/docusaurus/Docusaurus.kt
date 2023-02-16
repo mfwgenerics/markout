@@ -1,7 +1,13 @@
 package docusaurus
 
+import drawFileTree
+import io.koalaql.kapshot.CapturedBlock
 import io.koalaql.markout.Markout
+import io.koalaql.markout.buildOutput
 import io.koalaql.markout.docusaurus.docusaurus
+import io.koalaql.markout.md.markdown
+import io.koalaql.markout.output.OutputDirectory
+import io.koalaql.markout.output.OutputEntry
 
 fun Markout.setupDocusaurus() = docusaurus {
     configure {
@@ -63,6 +69,44 @@ fun Markout.setupDocusaurus() = docusaurus {
                 -"captured and inspected at runtime."
                 -"Kapshot is the magic ingredient that enables fully executable and testable sample code blocks."
             }
+
+            h2("How it works")
+
+            -"Markout generates files by running code in a Kotlin project with the Markout Gradle plugin applied."
+            -"You supply a `main` method which invokes a `markout` block to describe how files should be generated."
+            -"This code runs every time files are generated or checked."
+
+            var fileTree: String = ""
+
+            fun markout(builder: Markout.() -> Unit) {
+                fileTree = drawFileTree(object : OutputDirectory {
+                    override fun entries(): Map<String, OutputEntry> = mapOf("my-project" to OutputEntry(
+                        tracked = false,
+                        buildOutput(builder)
+                    ))
+                }, dotfiles = false)
+            }
+
+            fun execBlock(block: CapturedBlock<Unit>): String =
+                block.source.text.also { block.invoke() }
+
+            code("kotlin", "Main.kt", "fun main() = ${execBlock {
+                markout {
+                    file("README.txt", "Hello world!")
+
+                    directory("docs") {
+                        file("INTRO.txt", "Another text file!")
+                        file("OUTRO.txt", "A final text file")
+                    }
+                }
+            }}")
+
+            -"When the code above is run using `:markout`, it generates the following files"
+            -"and merges them into the project directory."
+
+            code(fileTree)
+
+            -"The `:markoutCheck` task then verifies that these files match subsequent reruns of the code."
         }
     }
 }
