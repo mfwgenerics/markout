@@ -13,9 +13,6 @@ markout {
 }
 
 dependencies {
-    implementation("io.koalaql:markout")
-    implementation("io.koalaql:markout-markdown")
-    implementation("io.koalaql:markout-docusaurus")
     implementation("io.koalaql:markout-github-workflows-kt")
 
     implementation(kotlin("reflect"))
