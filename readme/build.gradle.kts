@@ -5,10 +5,7 @@ repositories {
 plugins {
     id("conventions")
 
-    id("io.koalaql.markout")
     id("io.koalaql.markout-docusaurus")
-
-    id("io.koalaql.kapshot-plugin") version "0.1.1"
 }
 
 markout {
@@ -16,10 +13,7 @@ markout {
 }
 
 dependencies {
-    implementation(project(":markout"))
-    implementation(project(":markout-markdown"))
-    implementation(project(":markout-docusaurus"))
-    implementation(project(":markout-github-workflows-kt"))
+    implementation("io.koalaql:markout-github-workflows-kt")
 
     implementation(kotlin("reflect"))
 }

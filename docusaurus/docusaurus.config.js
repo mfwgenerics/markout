@@ -54,6 +54,7 @@ themeConfig:
     prism: {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
+      additionalLanguages: ["kotlin", "java"],
     },
   }),
 };

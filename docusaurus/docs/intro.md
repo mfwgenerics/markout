@@ -35,3 +35,33 @@ Markout is designed to integrate with [Kapshot](https://github.com/mfwgenerics/k
 a minimal Kotlin compiler plugin that allows source code to be
 captured and inspected at runtime.
 Kapshot is the magic ingredient that enables fully executable and testable sample code blocks.
+
+## How it works
+
+Markout generates files by running code in a Kotlin project with the Markout Gradle plugin applied.
+You supply a `main` method which invokes a `markout` block to describe how files should be generated.
+This code runs every time files are generated or checked.
+
+```kotlin title="Main.kt"
+fun main() = markout {
+    file("README.txt", "Hello world!")
+
+    directory("docs") {
+        file("INTRO.txt", "Another text file!")
+        file("OUTRO.txt", "A final text file")
+    }
+}
+```
+
+When the code above is run using `:markout`, it generates the following files
+and merges them into the project directory.
+
+```
+my-project
+├─ README.txt
+└─ docs
+   ├─ INTRO.txt
+   └─ OUTRO.txt
+```
+
+The `:markoutCheck` task then verifies that these files match subsequent reruns of the code.

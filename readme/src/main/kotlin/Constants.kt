@@ -1,0 +1,1 @@
+const val MARKOUT_VERSION: String = "0.0.7"

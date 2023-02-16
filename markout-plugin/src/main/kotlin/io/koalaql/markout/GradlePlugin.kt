@@ -6,9 +6,12 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.JavaExec
 import java.util.concurrent.Callable
+import io.koalaql.markout_plugin.BuildConfig
 
 class GradlePlugin: Plugin<Project> {
     override fun apply(target: Project) = with(target) {
+        dependencies.add("api", "io.koalaql:markout:${BuildConfig.VERSION}")
+
         target.extensions.create("markout", MarkoutConfig::class.java)
 
         val configureTask = tasks.register("markoutConfigure", DefaultTask::class.java) {

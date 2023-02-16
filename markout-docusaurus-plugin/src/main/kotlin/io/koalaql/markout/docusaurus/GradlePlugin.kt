@@ -10,6 +10,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 import com.github.gradle.node.yarn.task.YarnTask
+import io.koalaql.markout_plugin.BuildConfig
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
@@ -186,7 +187,14 @@ abstract class RunDocusaurus: DefaultTask() {
 
 class GradlePlugin: Plugin<Project> {
     override fun apply(target: Project) = with (target) {
-        plugins.apply("com.github.node-gradle.node")
+        dependencies.add("api", "io.koalaql:markout-markdown:${BuildConfig.VERSION}")
+        dependencies.add("api", "io.koalaql:markout-docusaurus:${BuildConfig.VERSION}")
+
+        with(plugins) {
+            apply("com.github.node-gradle.node")
+            apply("io.koalaql.markout")
+            apply("io.koalaql.kapshot-plugin")
+        }
 
         extensions.configure(NodeExtension::class.java) {
             it.download.set(true)

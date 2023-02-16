@@ -195,6 +195,7 @@ fun buildConfigJs(out: LineWriter, builder: DocusaurusSettings.() -> Unit) {
         prism: {
           theme: lightCodeTheme,
           darkTheme: darkCodeTheme,
+          additionalLanguages: ["kotlin", "java"],
         },
       }),
     };

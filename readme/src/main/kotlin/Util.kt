@@ -78,13 +78,16 @@ private val PIPES_PREFIX = Prefix(
 private fun drawFileTree(
     prefix: Prefix,
     output: Output,
-    writer: LineWriter
+    writer: LineWriter,
+    dotfiles: Boolean = true
 ) {
     when (output) {
         is OutputDirectory -> {
-            val entries = (mapOf(".markout" to OutputEntry(false, OutputFile { })) + output.entries())
-                .entries
-                .toList()
+            val entries = if (dotfiles) {
+                (mapOf(".markout" to OutputEntry(false, OutputFile { })) + output.entries())
+            } else {
+                output.entries()
+            }.toList()
 
             entries.forEachIndexed { ix, (key, entry) ->
                 val p = if (ix < entries.size - 1) prefix.pre else prefix.post
@@ -93,12 +96,12 @@ private fun drawFileTree(
                 writer.inline(key)
                 writer.newline()
 
-                drawFileTree(PIPES_PREFIX, entry.output, writer.prefixed(p.indent))
+                drawFileTree(PIPES_PREFIX, entry.output, writer.prefixed(p.indent), dotfiles)
             }
         }
         is OutputFile -> { }
     }
 }
 
-fun drawFileTree(output: Output): String =
-    "${StringBuilder().also { drawFileTree(NO_PREFIX, output, AppendableLineWriter(it).trimmedLines()) }}"
+fun drawFileTree(output: Output, dotfiles: Boolean = true): String =
+    "${StringBuilder().also { drawFileTree(NO_PREFIX, output, AppendableLineWriter(it).trimmedLines(), dotfiles) }}"

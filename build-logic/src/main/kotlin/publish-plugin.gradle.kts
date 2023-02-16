@@ -5,6 +5,12 @@ plugins {
 
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish")
+
+    id("com.github.gmazzo.buildconfig")
+}
+
+buildConfig {
+    buildConfigField("String", "VERSION", "\"${project.version}\"")
 }
 
 java {
@@ -14,6 +20,19 @@ java {
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+}
+
+tasks.getByName("publishPlugins") {
+    doFirst {
+        val version = "${project.version}"
+
+        val isValid = !version.endsWith(".dirty")
+            && version.count { it == '-' } < 2
+
+        check(isValid) {
+            "project.version ${project.version} does not appear to be a valid release version"
+        }
     }
 }
 

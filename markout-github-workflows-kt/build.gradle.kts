@@ -9,7 +9,7 @@ plugins {
 dependencies {
     api(kotlin("reflect"))
 
-    api(project(":markout"))
+    api("io.koalaql:markout")
 
     api("it.krzeminski:github-actions-kotlin-dsl:0.36.0")
 

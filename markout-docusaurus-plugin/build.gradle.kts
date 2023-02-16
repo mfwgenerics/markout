@@ -4,6 +4,8 @@ plugins {
 
 dependencies {
     implementation("com.github.node-gradle:gradle-node-plugin:3.5.1")
+    implementation("io.koalaql:kapshot-plugin-gradle:0.1.1")
+    implementation("io.koalaql:markout-plugin")
 }
 
 pluginBundle {
@@ -15,7 +17,7 @@ pluginBundle {
 gradlePlugin {
     plugins {
         create("markoutPlugin") {
-            id = "io.koalaql.markout"
+            id = "io.koalaql.markout-docusaurus"
             displayName = "Markout Docusaurus Plugin"
             description = "Plugin Support for Markout Powered Docusaurus Sites"
             implementationClass = "io.koalaql.markout.docusaurus.GradlePlugin"
