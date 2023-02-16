@@ -82,21 +82,14 @@ fun Markout.releaseYml() = workflow("release",
         )
 
         run(
-            name = "Publish to Maven Central",
+            name = "Publish Plugins and Libraries",
             command = "./gradlew publish",
             env = linkedMapOf(
                 "REPOSITORY_ID" to expr { staging.outputs.repository_id },
                 "SONATYPE_USERNAME" to expr { secrets.getValue("SONATYPE_USERNAME") },
                 "SONATYPE_PASSWORD" to expr { secrets.getValue("SONATYPE_PASSWORD") },
                 "GPG_PRIVATE_KEY" to expr { secrets.getValue("GPG_PRIVATE_KEY") },
-                "GPG_PRIVATE_PASSWORD" to expr { secrets.getValue("GPG_PRIVATE_PASSWORD") }
-            )
-        )
-
-        run(
-            name = "Publish to Maven Central",
-            command = "./gradlew :markout-plugin:publishPlugins",
-            env = linkedMapOf(
+                "GPG_PRIVATE_PASSWORD" to expr { secrets.getValue("GPG_PRIVATE_PASSWORD") },
                 "GRADLE_PUBLISH_KEY"  to expr { secrets.getValue("GRADLE_PUBLISH_KEY") },
                 "GRADLE_PUBLISH_SECRET" to expr { secrets.getValue("GRADLE_PUBLISH_SECRET") }
             )
