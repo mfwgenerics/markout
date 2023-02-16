@@ -72,6 +72,13 @@ fun Markout.setupDocusaurus() = docusaurus {
 
             h2("How it works")
 
+            -"Markout is designed around a core file generation layer that allows file trees to be declared in code."
+            -"These file trees are reconciled into a target directory, which is your project root directory by default."
+            -"Through extra plugins and libraries, the file generation layer can be extended with functionality for"
+            -"generating markdown, capturing source code and building Docusaurus websites."
+
+            h3("File Generation")
+
             -"Markout generates files by running code from Kotlin projects with the Markout Gradle plugin applied."
             -"You supply a `main` method which invokes a `markout` block to describe how files should be generated."
             -"This code runs every time files are generated or verified."
@@ -107,6 +114,8 @@ fun Markout.setupDocusaurus() = docusaurus {
             code(fileTree)
 
             -"The `:markoutCheck` task then verifies that these files match subsequent runs of the code."
+
+            h3("Extensions")
         }
     }
 }
