@@ -5,10 +5,7 @@ repositories {
 plugins {
     id("conventions")
 
-    id("io.koalaql.markout")
     id("io.koalaql.markout-docusaurus")
-
-    id("io.koalaql.kapshot-plugin") version "0.1.1"
 }
 
 markout {

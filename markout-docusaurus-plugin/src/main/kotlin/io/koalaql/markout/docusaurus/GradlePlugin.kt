@@ -186,7 +186,11 @@ abstract class RunDocusaurus: DefaultTask() {
 
 class GradlePlugin: Plugin<Project> {
     override fun apply(target: Project) = with (target) {
-        plugins.apply("com.github.node-gradle.node")
+        with(plugins) {
+            apply("com.github.node-gradle.node")
+            apply("io.koalaql.markout")
+            apply("io.koalaql.kapshot-plugin")
+        }
 
         extensions.configure(NodeExtension::class.java) {
             it.download.set(true)

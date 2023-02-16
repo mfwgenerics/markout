@@ -11,7 +11,7 @@ pluginBundle {
 gradlePlugin {
     plugins {
         create("markoutPlugin") {
-            id = "io.koalaql.markout-docusaurus"
+            id = "io.koalaql.markout"
             displayName = "Markout Plugin"
             description = "Plugin Support for Markout: an executable documentation platform and Markdown DSL for Kotlin"
             implementationClass = "io.koalaql.markout.GradlePlugin"
