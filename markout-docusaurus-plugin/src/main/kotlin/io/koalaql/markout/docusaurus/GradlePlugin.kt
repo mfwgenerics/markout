@@ -218,6 +218,12 @@ class GradlePlugin: Plugin<Project> {
         tasks.register<RunDocusaurus>("docusaurusStart", RunDocusaurus::class.java) {
             it.dependsOn("docusaurusInstall")
             it.dependsOn("markout")
+
+            it.doLast {
+                gradle.startParameter.setExcludedTaskNames(
+                    mutableSetOf("docusaurusInstall").apply { addAll(gradle.startParameter.excludedTaskNames) }
+                )
+            }
         }
 
         tasks.register("docusaurusBuild", YarnTask::class.java) {
