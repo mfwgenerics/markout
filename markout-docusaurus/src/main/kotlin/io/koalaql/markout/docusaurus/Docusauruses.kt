@@ -157,3 +157,9 @@ fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
         }
     }.block()
 }
+
+@MarkoutDsl
+fun Markout.docusaurus(name: String, block: DocusaurusRoot.() -> Unit) =
+    directory(name) {
+        docusaurus(block)
+    }

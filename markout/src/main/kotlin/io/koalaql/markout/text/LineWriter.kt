@@ -21,6 +21,8 @@ interface LineWriter {
         newline()
     }
 
+    fun line() = newline()
+
     fun raw(text: String) {
         if (text.isEmpty()) return
 

@@ -40,14 +40,11 @@ markout(Path("..")) {
 When this code is run it generates the following file tree
 
 ```
-.markout
 my-directory
-├─ .markout
 ├─ inner
-│  ├─ .markout
 │  └─ inner.txt
-├─ plain.txt
-└─ circle.svg
+├─ circle.svg
+└─ plain.txt
 readme.md
 ```
 
