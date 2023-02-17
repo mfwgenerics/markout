@@ -7,13 +7,21 @@ import io.koalaql.markout.Markout
 import io.koalaql.markout.buildOutput
 import io.koalaql.markout.docusaurus.Docusaurus
 import io.koalaql.markout.docusaurus.DocusaurusMarkdown
+import io.koalaql.markout.docusaurus.docusaurus
 import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdown
+import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
 import io.koalaql.markout.output.OutputEntry
 import io.koalaql.markout.output.OutputFile
 import java.io.ByteArrayOutputStream
 
+private fun drawProjectFileTree(output: Output) = drawFileTree(object : OutputDirectory {
+    override fun entries(): Map<String, OutputEntry> = mapOf("my-project" to OutputEntry(
+        tracked = false,
+        output
+    ))
+})
 
 private fun DocusaurusMarkdown.markdownDslExample() {
     lateinit var markoutOutput: Pair<String, String>
@@ -115,6 +123,39 @@ private fun DocusaurusMarkdown.sourceCaptureExample() {
     ))
 }
 
+private fun DocusaurusMarkdown.docusaurusExample() {
+    lateinit var fileTree: String
+
+    fun markout(builder: Markout.() -> Unit) {
+        fileTree = drawProjectFileTree(buildOutput(builder))
+    }
+
+    val source = execBlock {
+        markout {
+            docusaurus("my-site") {
+                configure {
+                    title = "Example Site"
+                }
+
+                docs {
+                    markdown("hello.md") {
+                        h1("Hello Docusaurus!")
+                    }
+                }
+            }
+        }
+    }
+
+    tabbed(imports = false, mapOf(
+        "Main.kt" to {
+            code("kotlin", source)
+        },
+        "Generated Files" to {
+            code(fileTree)
+        }
+    ))
+}
+
 fun Docusaurus.intro() = markdown("intro") {
     slug = "/"
 
@@ -193,16 +234,10 @@ fun Docusaurus.intro() = markdown("intro") {
         }
     }}")
 
-    -"When the code above is run using `:markout`, it generates the following files"
-    -"and creates them into the project directory."
+    -"When the code above is run using `:markout`, it generates the following file tree"
+    -"and creates it in the project directory."
 
-    code(drawFileTree(object : OutputDirectory {
-        override fun entries(): Map<String, OutputEntry> = mapOf("my-project" to OutputEntry(
-            tracked = false,
-            markoutOutput
-        )
-        )
-    }, dotfiles = false))
+    code(drawProjectFileTree(markoutOutput))
 
     -"The `:markoutCheck` task then verifies that these files match subsequent runs of the code."
 
@@ -224,4 +259,6 @@ fun Docusaurus.intro() = markdown("intro") {
 
     -"The Docusaurus plugin provides a `docusaurus` builder and Gradle tasks for building and running a "
     a(cite("https://docusaurus.io/"), "Docusaurus")+" site."
+
+    docusaurusExample()
 }

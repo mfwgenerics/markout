@@ -104,6 +104,8 @@ fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
                 }
             }
 
+            copyResource("/bootstrap/gitignore", ".gitignore")
+
             this@docusaurus.file(this@docusaurus.untracked("docusaurus.config.js")) {
                 val writer = it.writer()
 
@@ -115,7 +117,6 @@ fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
                 writer.flush()
             }
 
-            copyResource("/bootstrap/gitignore", ".gitignore")
             copyResource("/bootstrap/babel.config.js")
             copyResource("/bootstrap/package.json")
             copyResource("/bootstrap/sidebars.js")
@@ -157,3 +158,9 @@ fun Markout.docusaurus(block: DocusaurusRoot.() -> Unit) {
         }
     }.block()
 }
+
+@MarkoutDsl
+fun Markout.docusaurus(name: String, block: DocusaurusRoot.() -> Unit) =
+    directory(name) {
+        docusaurus(block)
+    }

@@ -60,15 +60,15 @@ fun main() = markout {
 }
 ```
 
-When the code above is run using `:markout`, it generates the following files
-and creates them into the project directory.
+When the code above is run using `:markout`, it generates the following file tree
+and creates it in the project directory.
 
 ```
 my-project
-├─ README.txt
-└─ docs
-   ├─ INTRO.txt
-   └─ OUTRO.txt
+├─ docs
+│  ├─ INTRO.txt
+│  └─ OUTRO.txt
+└─ README.txt
 ```
 
 The `:markoutCheck` task then verifies that these files match subsequent runs of the code.
@@ -201,6 +201,51 @@ If the result changes unexpectedly then `./gradlew check` will fail
 ### Docusaurus sites
 
 The Docusaurus plugin provides a `docusaurus` builder and Gradle tasks for building and running a [Docusaurus][1] site.
+
+````mdx-code-block
+<Tabs>
+<TabItem value='main.kt' label='Main.kt'>
+
+```kotlin
+markout {
+    docusaurus("my-site") {
+        configure {
+            title = "Example Site"
+        }
+
+        docs {
+            markdown("hello.md") {
+                h1("Hello Docusaurus!")
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value='generated files' label='Generated Files'>
+
+```
+my-project
+└─ my-site
+   ├─ docs
+   │  └─ hello.md
+   ├─ static
+   │  └─ .nojekyll
+   ├─ .gitignore
+   ├─ babel.config.js
+   ├─ docusaurus.config.js
+   ├─ linux.yarnrc
+   ├─ package.json
+   ├─ sidebars.js
+   ├─ tsconfig.json
+   └─ yarn.lock
+```
+
+</TabItem>
+</Tabs>
+
+````
 
 [1]: https://docusaurus.io/
 [2]: https://github.com/mfwgenerics/kapshot
