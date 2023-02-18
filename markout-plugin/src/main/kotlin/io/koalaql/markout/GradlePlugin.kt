@@ -7,6 +7,12 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.JavaExec
 import java.util.concurrent.Callable
 import io.koalaql.markout_plugin.BuildConfig
+import org.gradle.api.tasks.OutputFile
+
+open class MarkoutExecTask: JavaExec() {
+    @OutputFile
+    val outputPath = project.buildDir.toPath().resolve("markout/paths.txt")
+}
 
 class GradlePlugin: Plugin<Project> {
     override fun apply(target: Project) = with(target) {
@@ -24,9 +30,23 @@ class GradlePlugin: Plugin<Project> {
             }
         }
 
-        fun execTask(name: String, builder: (JavaExec) -> Unit) = tasks
-            .register(name, JavaExec::class.java) {
+        fun execTask(name: String, builder: (MarkoutExecTask) -> Unit) = tasks
+            .register(name, MarkoutExecTask::class.java) {
                 val ext = target.extensions.getByType(MarkoutConfig::class.java)
+
+                val markoutBuildDir = project
+                    .buildDir
+                    .toPath()
+                    .resolve("markout")
+
+                it.doFirst {
+                    markoutBuildDir.toFile().apply {
+                        deleteRecursively()
+                        mkdir()
+                    }
+                }
+
+                it.environment("MARKOUT_BUILD_DIR", "$markoutBuildDir")
 
                 it.group = "markout"
 

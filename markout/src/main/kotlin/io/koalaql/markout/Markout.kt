@@ -13,12 +13,11 @@ import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
+import java.nio.file.StandardOpenOption
 import kotlin.io.path.*
 
 @MarkoutDsl
 interface Markout {
-    val path: Path
-
     @MarkoutDsl
     fun untracked(name: String) = UntrackedName(name)
 
@@ -49,7 +48,6 @@ interface Markout {
 }
 
 fun buildOutput(
-    path: Path,
     builder: Markout.() -> Unit
 ): OutputDirectory = OutputDirectory {
     val entries = linkedMapOf<String, OutputEntry>()
@@ -65,10 +63,8 @@ fun buildOutput(
     }
 
     object : Markout {
-        override val path: Path get() = path
-
         override fun directory(name: FileName, builder: Markout.() -> Unit) {
-            set(name, buildOutput(path.resolve(name.name), builder))
+            set(name, buildOutput(builder))
         }
 
         override fun file(name: FileName, output: OutputFile) {
@@ -78,9 +74,6 @@ fun buildOutput(
 
     entries
 }
-
-fun buildOutput(builder: Markout.() -> Unit): OutputDirectory
-    = buildOutput(Path("."), builder)
 
 val METADATA_FILE_NAME = Path(".markout")
 
@@ -228,7 +221,7 @@ fun markout(
     mode: ExecutionMode = executionModeProperty(),
     builder: Markout.() -> Unit
 ) {
-    val output = buildOutput(path, builder)
+    val output = buildOutput(builder)
 
     val normalized = path.normalize()
 
@@ -244,6 +237,12 @@ fun markout(
             if (diffs.isNotEmpty()) error(diffs.joinToString("\n"))
         }
     }
+
+    System.getenv("MARKOUT_BUILD_DIR")
+        ?.takeIf { it.isNotBlank() }
+        ?.let(::Path)
+        ?.resolve("paths.txt")
+        ?.writeLines(actions.paths().asSequence().map { "$it" })
 }
 
 fun markout(
