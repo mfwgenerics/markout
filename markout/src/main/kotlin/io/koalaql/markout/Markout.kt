@@ -13,6 +13,7 @@ import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
+import java.nio.file.StandardOpenOption
 import kotlin.io.path.*
 
 @MarkoutDsl
@@ -46,7 +47,9 @@ interface Markout {
         file(TrackedName(name), contents)
 }
 
-fun buildOutput(builder: Markout.() -> Unit): OutputDirectory = OutputDirectory {
+fun buildOutput(
+    builder: Markout.() -> Unit
+): OutputDirectory = OutputDirectory {
     val entries = linkedMapOf<String, OutputEntry>()
 
     fun set(name: FileName, output: Output) {
@@ -234,6 +237,12 @@ fun markout(
             if (diffs.isNotEmpty()) error(diffs.joinToString("\n"))
         }
     }
+
+    System.getenv("MARKOUT_BUILD_DIR")
+        ?.takeIf { it.isNotBlank() }
+        ?.let(::Path)
+        ?.resolve("paths.txt")
+        ?.writeLines(actions.paths().asSequence().map { "$it" })
 }
 
 fun markout(

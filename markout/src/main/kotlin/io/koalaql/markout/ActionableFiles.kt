@@ -10,6 +10,9 @@ class ActionableFiles(
         return paths.mapNotNull { (path, action) -> action.perform(path) }
     }
 
+    fun paths(): List<Path> =
+        paths.asSequence().map { it.key }.toList()
+
     fun expect(): List<Diff> {
         val visited = linkedMapOf<Path, Boolean>()
 

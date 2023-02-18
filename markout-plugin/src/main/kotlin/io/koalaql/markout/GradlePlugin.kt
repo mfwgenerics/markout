@@ -1,12 +1,32 @@
 package io.koalaql.markout
 
-import org.gradle.api.DefaultTask
-import org.gradle.api.Plugin
-import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.JavaExec
 import java.util.concurrent.Callable
 import io.koalaql.markout_plugin.BuildConfig
+import org.gradle.api.*
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
+
+open class MarkoutExecTask: JavaExec() {
+    @Internal
+    val markoutBuildDir = project
+        .buildDir
+        .toPath()
+        .resolve("markout")
+
+    @OutputFile
+    val outputPath = project.buildDir.toPath().resolve("markout/paths.txt")
+
+    override fun exec() {
+        markoutBuildDir.toFile().apply {
+            deleteRecursively()
+            mkdir()
+        }
+
+        super.exec()
+    }
+}
 
 class GradlePlugin: Plugin<Project> {
     override fun apply(target: Project) = with(target) {
@@ -24,8 +44,8 @@ class GradlePlugin: Plugin<Project> {
             }
         }
 
-        fun execTask(name: String, builder: (JavaExec) -> Unit) = tasks
-            .register(name, JavaExec::class.java) {
+        fun execTask(name: String, builder: (MarkoutExecTask) -> Unit) = tasks
+            .register(name, MarkoutExecTask::class.java) {
                 val ext = target.extensions.getByType(MarkoutConfig::class.java)
 
                 it.group = "markout"
@@ -39,6 +59,7 @@ class GradlePlugin: Plugin<Project> {
                         .runtimeClasspath
                     })
 
+                it.environment("MARKOUT_BUILD_DIR", "${it.markoutBuildDir}")
                 it.environment("MARKOUT_PATH", (ext.rootDir ?: rootDir).absolutePath)
 
                 if (ext.mainClass != null) it.mainClass.set(ext.mainClass)

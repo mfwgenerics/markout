@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation("com.github.node-gradle:gradle-node-plugin:3.5.1")
     implementation("io.koalaql:kapshot-plugin-gradle:0.1.1")
-    implementation("io.koalaql:markout-plugin")
+    implementation("io.koalaql:markout-plugin:${project.version}")
 }
 
 pluginBundle {
