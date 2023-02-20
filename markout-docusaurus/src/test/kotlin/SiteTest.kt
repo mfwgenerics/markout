@@ -83,6 +83,8 @@ class SiteTest {
                         """.trimIndent())
                     }
 
+                    markdown("empty") { }
+
                     markdown("admonitions-and-mdx.mdx") {
                         h1("Markdown Features")
 
