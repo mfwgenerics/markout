@@ -11,9 +11,6 @@ fun <T> Markdown.code(lang: String, code: CapturedBlock<T>): T {
     return code()
 }
 
-@MarkoutDsl
-fun <T> Markdown.code(code: CapturedBlock<T>): T = code("kotlin", code)
-
 fun Markout.markdownDocs() = markdown("MARKDOWN") {
     h1("Markdown")
 

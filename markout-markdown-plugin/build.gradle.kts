@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation("io.koalaql:kapshot-plugin-gradle:0.1.1")
+    implementation(libs.kapshot.plugin.gradle)
     implementation("io.koalaql:markout-plugin:${project.version}")
 }
 

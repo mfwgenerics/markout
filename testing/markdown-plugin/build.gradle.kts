@@ -3,7 +3,8 @@ repositories {
 }
 
 plugins {
-    id("build-config")
+    java
+    kotlin("jvm") version "1.8.10"
 
     id("io.koalaql.markout-docusaurus")
 }
@@ -13,7 +14,5 @@ markout {
 }
 
 dependencies {
-    implementation("io.koalaql:markout-github-workflows-kt")
-
-    implementation(kotlin("reflect"))
+    testImplementation(kotlin("test"))
 }

@@ -9,10 +9,9 @@ import com.github.gradle.node.yarn.exec.YarnExecRunner
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import com.github.gradle.node.yarn.task.YarnTask
-import io.koalaql.markout_plugin.BuildConfig
+import io.koalaql.markout_docusaurus_plugin.BuildConfig
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.Directory
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
@@ -25,13 +24,10 @@ import org.gradle.deployment.internal.DeploymentRegistry
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.gradle.process.ExecResult
 import org.gradle.process.ExecSpec
-import java.io.File
-import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.concurrent.thread
-import org.gradle.api.provider.Provider
 import kotlin.io.readLines
 
 class StopHandle {

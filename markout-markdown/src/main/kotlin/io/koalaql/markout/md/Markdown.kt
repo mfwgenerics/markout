@@ -1,5 +1,7 @@
 package io.koalaql.markout.md
 
+import io.koalaql.kapshot.Capturable
+import io.koalaql.kapshot.CapturedBlock
 import io.koalaql.markout.MarkoutDsl
 
 @MarkoutDsl
@@ -53,6 +55,10 @@ interface Markdown: MarkdownBlock {
     fun code(lang: String, code: String)
     @MarkoutDsl
     fun code(code: String) = code("", code)
+
+    @MarkoutDsl
+    fun <T> code(block: CapturedBlock<T>): CapturedBlock<T> =
+        block.also { code("kotlin", it.source.text) }
 
     @MarkoutDsl
     fun ol(builder: MarkdownNumberedList.() -> Unit)

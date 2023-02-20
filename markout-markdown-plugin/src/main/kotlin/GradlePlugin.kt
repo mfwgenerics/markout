@@ -10,7 +10,6 @@ class GradlePlugin: Plugin<Project> {
         dependencies.add("api", "io.koalaql:markout-docusaurus:${BuildConfig.VERSION}")
 
         with(plugins) {
-            apply("com.github.node-gradle.node")
             apply("io.koalaql.markout")
             apply("io.koalaql.kapshot-plugin")
         }
