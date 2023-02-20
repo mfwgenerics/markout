@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     api(kotlin("reflect"))
+    api(libs.kapshot.runtime)
 
     api("io.koalaql:markout")
 

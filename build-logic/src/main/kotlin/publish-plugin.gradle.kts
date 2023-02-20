@@ -1,16 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("conventions")
+    id("build-config")
 
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish")
-
-    id("com.github.gmazzo.buildconfig")
-}
-
-buildConfig {
-    buildConfigField("String", "VERSION", "\"${project.version}\"")
 }
 
 java {

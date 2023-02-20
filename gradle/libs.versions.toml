@@ -1,0 +1,9 @@
+[versions]
+kapshot = "0.1.1"
+
+[libraries]
+kapshot-runtime = { module = "io.koalaql:kapshot-runtime", version.ref = "kapshot" }
+kapshot-plugin-gradle = { module = "io.koalaql:kapshot-plugin-gradle", version.ref = "kapshot" }
+
+[plugins]
+kapshot = { id = "io.koalaql.kapshot-plugin", version.ref = "kapshot" }

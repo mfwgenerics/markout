@@ -5,6 +5,7 @@ tasks.register("check") {
 tasks.register("publish") {
     dependsOn(listOf(
         gradle.includedBuild("markout-plugin"),
+        gradle.includedBuild("markout-markdown-plugin"),
         gradle.includedBuild("markout-docusaurus-plugin")
     ).map { it.task(":publishPlugins") })
 

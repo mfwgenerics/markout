@@ -284,15 +284,15 @@ code("kotlin", """
     }
 """.trimIndent())
 
-val result = code {
-    /* this code block runs */
+val block = code {
+    /* this code block is captured */
     fun square(x: Int) = x*x
 
     square(7)
 }
 
 +"Code executed with result: "
-c("$result")
+c("${block.invoke()}")
 ```
 
 ### Generated
@@ -313,7 +313,7 @@ fun main() {
 ```
 
 ```kotlin
-/* this code block runs */
+/* this code block is captured */
 fun square(x: Int) = x*x
 
 square(7)
@@ -339,7 +339,7 @@ Code executed with result: `49`
 > ```
 > 
 > ```kotlin
-> /* this code block runs */
+> /* this code block is captured */
 > fun square(x: Int) = x*x
 > 
 > square(7)

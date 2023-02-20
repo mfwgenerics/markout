@@ -11,9 +11,6 @@ fun <T> Markdown.code(lang: String, code: CapturedBlock<T>): T {
     return code()
 }
 
-@MarkoutDsl
-fun <T> Markdown.code(code: CapturedBlock<T>): T = code("kotlin", code)
-
 fun Markout.markdownDocs() = markdown("MARKDOWN") {
     h1("Markdown")
 
@@ -137,15 +134,15 @@ fun Markout.markdownDocs() = markdown("MARKDOWN") {
                     }
                 """.trimIndent())
 
-                val result = code {
-                    /* this code block runs */
+                val block = code {
+                    /* this code block is captured */
                     fun square(x: Int) = x*x
 
                     square(7)
                 }
 
                 +"Code executed with result: "
-                c("$result")
+                c("${block.invoke()}")
             }
         }
 

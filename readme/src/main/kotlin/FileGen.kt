@@ -47,7 +47,7 @@ fun Markout.fileGen() = markdown("FILES") {
 
             -"When this code is run it generates the following file tree"
 
-            code(drawFileTree(output))
+            code(drawFileTree(output.invoke()))
 
             h3("File Tracking")
 

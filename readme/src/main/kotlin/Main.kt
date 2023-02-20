@@ -6,8 +6,6 @@ import workflows.deployGhPagesYml
 import workflows.releaseYml
 import kotlin.io.path.Path
 
-private val CURRENT_VERSION = "0.0.6"
-
 fun main() = markout {
     directory(".github") {
         directory("workflows") {
@@ -60,7 +58,7 @@ fun main() = markout {
                     """
                     /* build.gradle.kts */
                     dependencies {
-                        implementation("io.koalaql:markout:$CURRENT_VERSION")
+                        implementation("io.koalaql:markout:$MARKOUT_VERSION")
                     }
                     """.trimIndent()
                 )
@@ -103,7 +101,7 @@ fun main() = markout {
 
                 -"The above will produce the String"
 
-                code("markdown", result)
+                code("markdown", result.invoke())
             }
 
             section("Usage") {
