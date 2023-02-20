@@ -86,7 +86,7 @@ import TabItem from '@theme/TabItem';
 <TabItem value='main.kt' label='Main.kt'>
 
 ```kotlin
-val markoutVersion = "0.0.7"
+val markoutVersion = "0.0.9"
 
 markout {
     markdown("README.md") {
@@ -112,7 +112,7 @@ markout {
 
 Here's some *generated* Markdown with a list
 
-Using Markout version `0.0.7`
+Using Markout version `0.0.9`
 
 1. One
 2. Two
@@ -125,7 +125,7 @@ Using Markout version `0.0.7`
 > 
 > Here's some *generated* Markdown with a list
 > 
-> Using Markout version `0.0.7`
+> Using Markout version `0.0.9`
 > 
 > 1. One
 > 2. Two
@@ -145,21 +145,15 @@ This allows you to execute your sample code blocks and use the results.
 <TabItem value='main.kt' label='Main.kt'>
 
 ```kotlin
-fun <T> Markdown.execCodeBlock(block: CapturedBlock<T>): T {
-    code("kotlin", block.source.text)
-
-    return block()
-}
-
 markout {
     markdown("EXAMPLE.md") {
-        val result = execCodeBlock {
+        val block = code {
             fun square(x: Int) = x*x
 
             square(7)
         }
 
-        p("The code above results in: $result")
+        p("The code above results in: ${block.invoke()}")
         p("If the result changes unexpectedly then `./gradlew check` will fail")
     }
 }

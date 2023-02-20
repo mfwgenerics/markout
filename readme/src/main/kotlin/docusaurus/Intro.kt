@@ -88,21 +88,15 @@ private fun DocusaurusMarkdown.sourceCaptureExample() {
     }
 
     val source = execBlock {
-        fun <T> Markdown.execCodeBlock(block: CapturedBlock<T>): T {
-            code("kotlin", block.source.text)
-
-            return block()
-        }
-
         markout {
             markdown("EXAMPLE.md") {
-                val result = execCodeBlock {
+                val block = code {
                     fun square(x: Int) = x*x
 
                     square(7)
                 }
 
-                p("The code above results in: $result")
+                p("The code above results in: ${block.invoke()}")
                 p("If the result changes unexpectedly then `./gradlew check` will fail")
             }
         }

@@ -29,7 +29,7 @@ Add the `markout` dependency
 ```kotlin
 /* build.gradle.kts */
 dependencies {
-    implementation("io.koalaql:markout:0.0.6")
+    implementation("io.koalaql:markout:0.0.9")
 }
 ```
 

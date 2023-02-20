@@ -1,1 +1,1 @@
-const val MARKOUT_VERSION: String = io.koalaql.readme.BuildConfig.VERSION
+const val MARKOUT_VERSION: String = "0.0.9"

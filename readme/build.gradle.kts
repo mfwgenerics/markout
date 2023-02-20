@@ -3,7 +3,7 @@ repositories {
 }
 
 plugins {
-    id("build-config")
+    id("conventions")
 
     id("io.koalaql.markout-docusaurus")
 }
