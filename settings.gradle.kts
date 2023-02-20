@@ -7,6 +7,7 @@ includeBuild("markout-docusaurus")
 includeBuild("markout-docusaurus-plugin")
 includeBuild("markout-github-workflows-kt")
 
-includeBuild("testing")
+includeBuild("samples/getting-started")
+includeBuild("samples/markdown-plugin")
 
 include("readme")

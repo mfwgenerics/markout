@@ -2,6 +2,19 @@ package docusaurus
 
 import io.koalaql.markout.Markout
 import io.koalaql.markout.docusaurus.docusaurus
+import MARKOUT_VERSION
+import docusaurus.start.projectStructure
+import io.koalaql.markout.md.MarkdownTable
+
+fun MarkdownTable.pluginRow(id: String, function: String) {
+    tr {
+        td { c(id) }
+        td(function)
+        td {
+            a("https://plugins.gradle.org/plugin/$id", "Gradle")
+        }
+    }
+}
 
 fun Markout.setupDocusaurus() = docusaurus {
     configure {
@@ -21,9 +34,7 @@ fun Markout.setupDocusaurus() = docusaurus {
         directory("getting-started") {
             label = "Getting started"
 
-            markdown("project") {
-                h1("Project structure")
-            }
+            projectStructure()
 
             markdown("markdown") {
                 h1("Generating markdown")
