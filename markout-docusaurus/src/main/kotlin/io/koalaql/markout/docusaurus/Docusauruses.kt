@@ -19,16 +19,23 @@ private fun docusaurusMdFile(
     val writer = output.writer()
     val lw = AppendableLineWriter(writer)
 
+    var wrote = false
+
     markdownTo(lw.onWrite {
         lw.raw(impl.header())
         lw.newline()
+        wrote = true
     }) {
         impl = MarkdownFileImpl(this, position)
 
         impl.builder()
     }
 
-    lw.newline()
+    if (!wrote) {
+        lw.raw(impl.header())
+    } else {
+        lw.newline()
+    }
 
     writer.flush()
 }
