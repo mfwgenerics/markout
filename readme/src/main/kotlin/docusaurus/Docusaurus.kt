@@ -17,5 +17,17 @@ fun Markout.setupDocusaurus() = docusaurus {
 
     docs {
         intro()
+
+        directory("getting-started") {
+            label = "Getting started"
+
+            markdown("project") {
+                h1("Project structure")
+            }
+
+            markdown("markdown") {
+                h1("Generating markdown")
+            }
+        }
     }
 }

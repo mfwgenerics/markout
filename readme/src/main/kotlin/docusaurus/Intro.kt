@@ -1,14 +1,11 @@
 package docusaurus
 
-import MARKOUT_VERSION
 import drawFileTree
-import io.koalaql.kapshot.CapturedBlock
 import io.koalaql.markout.Markout
 import io.koalaql.markout.buildOutput
 import io.koalaql.markout.docusaurus.Docusaurus
 import io.koalaql.markout.docusaurus.DocusaurusMarkdown
 import io.koalaql.markout.docusaurus.docusaurus
-import io.koalaql.markout.md.Markdown
 import io.koalaql.markout.md.markdown
 import io.koalaql.markout.output.Output
 import io.koalaql.markout.output.OutputDirectory
@@ -22,55 +19,6 @@ private fun drawProjectFileTree(output: Output) = drawFileTree(object : OutputDi
         output
     ))
 })
-
-private fun DocusaurusMarkdown.markdownDslExample() {
-    lateinit var markoutOutput: Pair<String, String>
-
-    fun markout(builder: Markout.() -> Unit) {
-        markoutOutput = buildOutput(builder).entries().mapValues { entry ->
-            with (entry.value.output as OutputFile) {
-                ByteArrayOutputStream()
-                    .also { writeTo(it) }
-                    .toByteArray()
-                    .toString(Charsets.UTF_8)
-                    .trim()
-            }
-        }.entries.map { (x,y) -> x to y }.first()
-    }
-
-    val markoutVersion = MARKOUT_VERSION
-
-    val source = execBlock {
-        markout {
-            markdown("README.md") {
-                h2("Readme")
-
-                p("Here's some *generated* Markdown with a list")
-
-                p("Using Markout version `$markoutVersion`")
-
-                ol {
-                    li("One")
-                    li("Two")
-                }
-            }
-        }
-    }
-
-    tabbed(imports = true, mapOf(
-        "Main.kt" to {
-            code("kotlin", "val markoutVersion = \"$MARKOUT_VERSION\"\n\n${source}")
-        },
-        markoutOutput.first to {
-            code("markdown", markoutOutput.second)
-        },
-        "Rendered" to {
-            quote {
-                raw(markoutOutput.second)
-            }
-        }
-    ))
-}
 
 private fun DocusaurusMarkdown.sourceCaptureExample() {
     lateinit var markoutOutput: Pair<String, String>
@@ -90,19 +38,26 @@ private fun DocusaurusMarkdown.sourceCaptureExample() {
     val source = execBlock {
         markout {
             markdown("EXAMPLE.md") {
+                h2("Sample Code")
+
                 val block = code {
                     fun square(x: Int) = x*x
 
                     square(7)
                 }
 
-                p("The code above results in: ${block.invoke()}")
-                p("If the result changes unexpectedly then `./gradlew check` will fail")
+                p {
+                    -"The code above results in `${block.invoke()}`."
+                }
+
+                p {
+                    -"Source file and line numbers of code blocks are also captured."
+                }
             }
         }
     }
 
-    tabbed(imports = false, mapOf(
+    tabbed(imports = true, mapOf(
         "Main.kt" to {
             code("kotlin", source)
         },
@@ -235,24 +190,17 @@ fun Docusaurus.intro() = markdown("intro") {
 
     -"The `:markoutCheck` task then verifies that these files match subsequent runs of the code."
 
-    h3("Markdown DSL")
+    h3("Markdown")
 
-    -"Markout is extended with a DSL for generating markdown files procedurally."
-    -"The DSL can also be used to generate standalone Markdown strings."
-
-    markdownDslExample()
-
-    h3("Source code capture")
-
-    -"Source code capture works using the "+a(cite("https://github.com/mfwgenerics/kapshot"), "Kapshot")+" plugin."
-    -"This allows you to execute your sample code blocks and use the results."
+    -"The Markdown plugin provides a DSL for generating Markdown files and strings."
+    -"Markdown code blocks can directly capture source code which allows you to execute and test sample code."
 
     sourceCaptureExample()
 
-    h3("Docusaurus sites")
+    h3("Docusaurus")
 
     -"The Docusaurus plugin provides a `docusaurus` builder and Gradle tasks for building and running a "
-    a(cite("https://docusaurus.io/"), "Docusaurus")+" site."
+    a(cite("https://docusaurus.io/"), "Docusaurus")+" site. This plugin is how these docs are generated."
 
     docusaurusExample()
 }

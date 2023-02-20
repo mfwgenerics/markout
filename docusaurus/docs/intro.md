@@ -73,12 +73,12 @@ my-project
 
 The `:markoutCheck` task then verifies that these files match subsequent runs of the code.
 
-### Markdown DSL
+### Markdown
 
-Markout is extended with a DSL for generating markdown files procedurally.
-The DSL can also be used to generate standalone Markdown strings.
+The Markdown plugin provides a DSL for generating Markdown files and strings.
+Markdown code blocks can directly capture source code which allows you to execute and test sample code.
 
-````mdx-code-block
+`````mdx-code-block
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -86,75 +86,23 @@ import TabItem from '@theme/TabItem';
 <TabItem value='main.kt' label='Main.kt'>
 
 ```kotlin
-val markoutVersion = "0.0.9"
-
-markout {
-    markdown("README.md") {
-        h2("Readme")
-
-        p("Here's some *generated* Markdown with a list")
-
-        p("Using Markout version `$markoutVersion`")
-
-        ol {
-            li("One")
-            li("Two")
-        }
-    }
-}
-```
-
-</TabItem>
-<TabItem value='readme.md' label='README.md'>
-
-```markdown
-## Readme
-
-Here's some *generated* Markdown with a list
-
-Using Markout version `0.0.9`
-
-1. One
-2. Two
-```
-
-</TabItem>
-<TabItem value='rendered' label='Rendered'>
-
-> ## Readme
-> 
-> Here's some *generated* Markdown with a list
-> 
-> Using Markout version `0.0.9`
-> 
-> 1. One
-> 2. Two
-
-</TabItem>
-</Tabs>
-
-````
-
-### Source code capture
-
-Source code capture works using the [Kapshot][2] plugin.
-This allows you to execute your sample code blocks and use the results.
-
-`````mdx-code-block
-<Tabs>
-<TabItem value='main.kt' label='Main.kt'>
-
-```kotlin
 markout {
     markdown("EXAMPLE.md") {
+        h2("Sample Code")
+
         val block = code {
             fun square(x: Int) = x*x
 
             square(7)
         }
 
-        p("The code above results in: ${block.invoke()}")
-        p("If the result changes unexpectedly then `./gradlew check` will fail")
+        p {
+            -"The code above results in `${block.invoke()}`."
+        }
+
+        p {
+            -"Source file and line numbers of code blocks are also captured."
+        }
     }
 }
 ```
@@ -163,38 +111,42 @@ markout {
 <TabItem value='example.md' label='EXAMPLE.md'>
 
 ````markdown
+## Sample Code
+
 ```kotlin
 fun square(x: Int) = x*x
 
 square(7)
 ```
 
-The code above results in: 49
+The code above results in `49`.
 
-If the result changes unexpectedly then `./gradlew check` will fail
+Source file and line numbers of code blocks are also captured.
 ````
 
 </TabItem>
 <TabItem value='rendered' label='Rendered'>
 
+> ## Sample Code
+> 
 > ```kotlin
 > fun square(x: Int) = x*x
 > 
 > square(7)
 > ```
 > 
-> The code above results in: 49
+> The code above results in `49`.
 > 
-> If the result changes unexpectedly then `./gradlew check` will fail
+> Source file and line numbers of code blocks are also captured.
 
 </TabItem>
 </Tabs>
 
 `````
 
-### Docusaurus sites
+### Docusaurus
 
-The Docusaurus plugin provides a `docusaurus` builder and Gradle tasks for building and running a [Docusaurus][1] site.
+The Docusaurus plugin provides a `docusaurus` builder and Gradle tasks for building and running a [Docusaurus][1] site. This plugin is how these docs are generated.
 
 ````mdx-code-block
 <Tabs>
