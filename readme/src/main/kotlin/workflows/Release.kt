@@ -2,6 +2,7 @@ package workflows
 
 import io.koalaql.markout.Markout
 import io.koalaql.markout.workflow
+import it.krzeminski.githubactions.actions.Action
 import it.krzeminski.githubactions.actions.ActionWithOutputs
 import it.krzeminski.githubactions.actions.actions.CheckoutV3
 import it.krzeminski.githubactions.actions.actions.SetupJavaV3
@@ -34,6 +35,30 @@ class CreateNexusStagingRepo(
     )
 
     override fun buildOutputObject(stepId: String) = Outputs(stepId)
+
+    class Outputs(private val stepId: String) {
+        val repositoryId: String = "steps.$stepId.outputs.repository_id"
+
+        operator fun get(outputName: String) = "steps.$stepId.outputs.$outputName"
+    }
+}
+
+class ReleaseNexusStagingRepo(
+    val username: String,
+    val password: String,
+    val stagingRepoId: String,
+    val baseUrl: String
+): Action(
+    "nexus-actions",
+    "release-nexus-staging-repo",
+    "main"
+) {
+    override fun toYamlArguments() = linkedMapOf(
+        "username" to username,
+        "password" to password,
+        "staging_repository_id" to stagingRepoId,
+        "base_url" to baseUrl
+    )
 
     class Outputs(private val stepId: String) {
         val repositoryId: String = "steps.$stepId.outputs.repository_id"
@@ -94,5 +119,12 @@ fun Markout.releaseYml() = workflow("release",
                 "GRADLE_PUBLISH_SECRET" to expr { secrets.getValue("GRADLE_PUBLISH_SECRET") }
             )
         )
+
+        uses(ReleaseNexusStagingRepo(
+            username = expr { secrets.getValue("SONATYPE_USERNAME") },
+            password =  expr { secrets.getValue("SONATYPE_PASSWORD") },
+            stagingRepoId = expr { staging.outputs.repository_id },
+            baseUrl = "https://s01.oss.sonatype.org/service/local/"
+        ))
     }
 }
