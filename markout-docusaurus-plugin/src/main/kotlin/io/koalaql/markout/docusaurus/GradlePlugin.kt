@@ -209,6 +209,8 @@ class GradlePlugin: Plugin<Project> {
             ) }
 
         tasks.register("docusaurusInstall", YarnTask::class.java) {
+            it.group = "markout"
+
             it.dependsOn("markout")
             it.workingDir.set(workingDirProvider)
 
@@ -221,6 +223,8 @@ class GradlePlugin: Plugin<Project> {
         }
 
         tasks.register("docusaurusCheckInstall", YarnTask::class.java) {
+            it.group = "markout"
+
             it.dependsOn("markoutCheck")
             it.workingDir.set(workingDirProvider)
 
@@ -233,6 +237,8 @@ class GradlePlugin: Plugin<Project> {
         }
 
         tasks.register<RunDocusaurus>("docusaurusStart", RunDocusaurus::class.java) {
+            it.group = "markout"
+
             it.dependsOn("docusaurusInstall")
             it.dependsOn("markout")
             it.workingDir.set(workingDirProvider)
@@ -245,6 +251,8 @@ class GradlePlugin: Plugin<Project> {
         }
 
         tasks.register("docusaurusBuild", YarnTask::class.java) {
+            it.group = "markout"
+
             it.dependsOn("markoutCheck")
             it.dependsOn("docusaurusCheckInstall")
             it.workingDir.set(workingDirProvider)
