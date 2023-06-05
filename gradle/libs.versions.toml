@@ -1,5 +1,5 @@
 [versions]
-kapshot = "0.1.1"
+kapshot = "0.1.2"
 
 [libraries]
 kapshot-runtime = { module = "io.koalaql:kapshot-runtime", version.ref = "kapshot" }
