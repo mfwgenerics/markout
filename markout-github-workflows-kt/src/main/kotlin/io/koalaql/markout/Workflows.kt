@@ -1,10 +1,10 @@
 package io.koalaql.markout
 
-import it.krzeminski.githubactions.domain.Concurrency
-import it.krzeminski.githubactions.domain.triggers.Trigger
-import it.krzeminski.githubactions.dsl.WorkflowBuilder
-import it.krzeminski.githubactions.dsl.workflow as workflowImpl
-import it.krzeminski.githubactions.yaml.toYaml
+import io.github.typesafegithub.workflows.domain.Concurrency
+import io.github.typesafegithub.workflows.domain.triggers.Trigger
+import io.github.typesafegithub.workflows.dsl.WorkflowBuilder
+import io.github.typesafegithub.workflows.dsl.workflow as workflowImpl
+import io.github.typesafegithub.workflows.yaml.toYaml
 import kotlin.io.path.Path
 
 fun Markout.workflow(

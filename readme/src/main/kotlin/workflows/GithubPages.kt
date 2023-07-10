@@ -2,11 +2,11 @@ package workflows
 
 import io.koalaql.markout.Markout
 import io.koalaql.markout.workflow
-import it.krzeminski.githubactions.actions.actions.CheckoutV3
-import it.krzeminski.githubactions.actions.actions.SetupNodeV3
-import it.krzeminski.githubactions.domain.Concurrency
-import it.krzeminski.githubactions.domain.RunnerType
-import it.krzeminski.githubactions.domain.triggers.Push
+import io.github.typesafegithub.workflows.actions.actions.CheckoutV3
+import io.github.typesafegithub.workflows.actions.actions.SetupNodeV3
+import io.github.typesafegithub.workflows.domain.Concurrency
+import io.github.typesafegithub.workflows.domain.RunnerType
+import io.github.typesafegithub.workflows.domain.triggers.Push
 
 fun Markout.deployGhPagesYml() = file("pages.yml",
     """
