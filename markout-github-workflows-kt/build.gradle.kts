@@ -11,7 +11,7 @@ dependencies {
 
     api("io.koalaql:markout")
 
-    api("it.krzeminski:github-actions-kotlin-dsl:0.36.0")
+    api("io.github.typesafegithub:github-workflows-kt:0.47.0")
 
     testImplementation(kotlin("test"))
 }

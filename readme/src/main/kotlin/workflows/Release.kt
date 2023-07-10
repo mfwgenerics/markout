@@ -2,18 +2,18 @@ package workflows
 
 import io.koalaql.markout.Markout
 import io.koalaql.markout.workflow
-import it.krzeminski.githubactions.actions.Action
-import it.krzeminski.githubactions.actions.ActionWithOutputs
-import it.krzeminski.githubactions.actions.actions.CheckoutV3
-import it.krzeminski.githubactions.actions.actions.SetupJavaV3
-import it.krzeminski.githubactions.actions.gradle.WrapperValidationActionV1
-import it.krzeminski.githubactions.domain.JobOutputs
-import it.krzeminski.githubactions.domain.RunnerType
-import it.krzeminski.githubactions.domain.triggers.PullRequest
-import it.krzeminski.githubactions.domain.triggers.Push
-import it.krzeminski.githubactions.domain.triggers.Release
-import it.krzeminski.githubactions.dsl.expressions.Contexts
-import it.krzeminski.githubactions.dsl.expressions.expr
+import io.github.typesafegithub.workflows.actions.actions.CheckoutV3
+import io.github.typesafegithub.workflows.actions.actions.SetupJavaV3
+import io.github.typesafegithub.workflows.actions.gradle.WrapperValidationActionV1
+import io.github.typesafegithub.workflows.domain.JobOutputs
+import io.github.typesafegithub.workflows.domain.RunnerType
+import io.github.typesafegithub.workflows.domain.actions.Action
+import io.github.typesafegithub.workflows.domain.actions.RegularAction
+import io.github.typesafegithub.workflows.domain.triggers.PullRequest
+import io.github.typesafegithub.workflows.domain.triggers.Push
+import io.github.typesafegithub.workflows.domain.triggers.Release
+import io.github.typesafegithub.workflows.dsl.expressions.Contexts
+import io.github.typesafegithub.workflows.dsl.expressions.expr
 
 class CreateNexusStagingRepo(
     val username: String,
@@ -21,7 +21,7 @@ class CreateNexusStagingRepo(
     val stagingProfileId: String,
     val description: String,
     val baseUrl: String
-) : ActionWithOutputs<CreateNexusStagingRepo.Outputs>(
+) : RegularAction<CreateNexusStagingRepo.Outputs>(
     "nexus-actions",
     "create-nexus-staging-repo",
     "main"
@@ -36,10 +36,8 @@ class CreateNexusStagingRepo(
 
     override fun buildOutputObject(stepId: String) = Outputs(stepId)
 
-    class Outputs(private val stepId: String) {
+    class Outputs(private val stepId: String) : Action.Outputs(stepId) {
         val repositoryId: String = "steps.$stepId.outputs.repository_id"
-
-        operator fun get(outputName: String) = "steps.$stepId.outputs.$outputName"
     }
 }
 
@@ -48,7 +46,7 @@ class ReleaseNexusStagingRepo(
     val password: String,
     val stagingRepoId: String,
     val baseUrl: String
-): Action(
+): RegularAction<Action.Outputs>(
     "nexus-actions",
     "release-nexus-staging-repo",
     "main"
@@ -60,10 +58,10 @@ class ReleaseNexusStagingRepo(
         "base_url" to baseUrl
     )
 
-    class Outputs(private val stepId: String) {
-        val repositoryId: String = "steps.$stepId.outputs.repository_id"
+    override fun buildOutputObject(stepId: String) = Outputs(stepId)
 
-        operator fun get(outputName: String) = "steps.$stepId.outputs.$outputName"
+    class Outputs(private val stepId: String) : Action.Outputs(stepId) {
+        val repositoryId: String = "steps.$stepId.outputs.repository_id"
     }
 }
 
@@ -76,14 +74,14 @@ fun Markout.releaseYml() = workflow("release",
         ),
     )),
 ) {
-    val staging = job("staging_repository",
+    val staging = job(id = "staging_repository",
         name = "Create staging repository",
         runsOn = RunnerType.UbuntuLatest,
         outputs = object : JobOutputs() {
             var repository_id by output()
         }
     ) {
-        val step = uses(CreateNexusStagingRepo(
+        val step = uses(action = CreateNexusStagingRepo(
             username = expr { secrets.getValue("SONATYPE_USERNAME") },
             password =  expr { secrets.getValue("SONATYPE_PASSWORD") },
             stagingProfileId = expr { secrets.getValue("SONATYPE_PROFILE_ID") },
@@ -94,13 +92,13 @@ fun Markout.releaseYml() = workflow("release",
         jobOutputs.repository_id = step.outputs.repositoryId
     }
 
-    job("publish",
+    job(id = "publish",
         runsOn = RunnerType.UbuntuLatest,
         needs = listOf(staging)
     ) {
-        uses(CheckoutV3())
+        uses(action = CheckoutV3())
         uses(
-            SetupJavaV3(
+            action = SetupJavaV3(
                 javaVersion = "19",
                 distribution = SetupJavaV3.Distribution.Temurin
             )
@@ -120,7 +118,7 @@ fun Markout.releaseYml() = workflow("release",
             )
         )
 
-        uses(ReleaseNexusStagingRepo(
+        uses(action = ReleaseNexusStagingRepo(
             username = expr { secrets.getValue("SONATYPE_USERNAME") },
             password =  expr { secrets.getValue("SONATYPE_PASSWORD") },
             stagingRepoId = expr { staging.outputs.repository_id },
